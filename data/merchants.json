@@ -1,0 +1,62 @@
+[
+  {
+    "id": "super_pharm",
+    "name": "סופר-פארם",
+    "domains": ["super-pharm.co.il"],
+    "venue_ids": ["azrieli_tlv", "dizengoff_center", "ayalon_mall", "ramat_aviv_mall", "malha_mall"]
+  },
+  {
+    "id": "shufersal",
+    "name": "שופרסל",
+    "domains": ["shufersal.co.il"],
+    "venue_ids": ["ayalon_mall", "big_fashion_glilot"]
+  },
+  {
+    "id": "ksp",
+    "name": "KSP",
+    "domains": ["ksp.co.il"],
+    "venue_ids": ["azrieli_tlv", "grand_kanyon_haifa"]
+  },
+  {
+    "id": "terminalx",
+    "name": "Terminal X",
+    "domains": ["terminalx.com"],
+    "venue_ids": ["azrieli_tlv", "ayalon_mall", "seven_stars_mall"]
+  },
+  {
+    "id": "castro",
+    "name": "קסטרו",
+    "domains": ["castro.com"],
+    "venue_ids": ["azrieli_tlv", "dizengoff_center", "ayalon_mall", "malha_mall", "sharonim_mall"]
+  },
+  {
+    "id": "fox",
+    "name": "FOX",
+    "domains": ["fox.co.il"],
+    "venue_ids": ["dizengoff_center", "ayalon_mall", "grand_canyon_beersheva"]
+  },
+  {
+    "id": "aroma",
+    "name": "ארומה",
+    "domains": ["aroma.co.il"],
+    "venue_ids": ["azrieli_tlv", "dizengoff_center", "ramat_aviv_mall", "seven_stars_mall"]
+  },
+  {
+    "id": "mcdonalds",
+    "name": "מקדונלד'ס",
+    "domains": ["mcdonalds.co.il"],
+    "venue_ids": ["azrieli_tlv", "ayalon_mall", "malha_mall", "grand_canyon_beersheva"]
+  },
+  {
+    "id": "adika",
+    "name": "ADIKA",
+    "domains": ["adika.com"],
+    "venue_ids": ["dizengoff_center"]
+  },
+  {
+    "id": "ivory",
+    "name": "Ivory",
+    "domains": ["ivory.co.il"],
+    "venue_ids": []
+  }
+]

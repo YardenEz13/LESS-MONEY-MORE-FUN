@@ -1,0 +1,65 @@
+[
+  {
+    "id": "isracard",
+    "name": "ישראכרט",
+    "category": "credit_card",
+    "catalog_url": "https://www.isracard.co.il/he-il/benefits/",
+    "hint": "כרטיס אשראי ישראכרט"
+  },
+  {
+    "id": "max",
+    "name": "Max",
+    "category": "credit_card",
+    "catalog_url": "https://www.max.co.il/benefits",
+    "hint": "כרטיס אשראי Max (לשעבר לאומי קארד)"
+  },
+  {
+    "id": "cal",
+    "name": "כאל",
+    "category": "credit_card",
+    "catalog_url": "https://www.cal-online.co.il/benefits",
+    "hint": "כרטיס אשראי כאל / ויזה כאל"
+  },
+  {
+    "id": "hever",
+    "name": "חבר",
+    "category": "employer_club",
+    "catalog_url": "https://www.hvr.co.il/",
+    "hint": "מועדון חבר (משרתי קבע וגמלאי צה\"ל)"
+  },
+  {
+    "id": "shotrim",
+    "name": "קרן השוטרים",
+    "category": "employer_club",
+    "catalog_url": null,
+    "hint": "קרנות השוטרים"
+  },
+  {
+    "id": "behatsdaa",
+    "name": "בהצדעה",
+    "category": "employer_club",
+    "catalog_url": null,
+    "hint": "מועדון בהצדעה"
+  },
+  {
+    "id": "hitechzone",
+    "name": "הייטקזון",
+    "category": "employer_club",
+    "catalog_url": null,
+    "hint": "הייטקזון (עובדי הייטק)"
+  },
+  {
+    "id": "shufersal_life",
+    "name": "שופרסל LIFE",
+    "category": "retail_club",
+    "catalog_url": "https://www.shufersal.co.il/online/he/promotions",
+    "hint": "מועדון שופרסל LIFE"
+  },
+  {
+    "id": "superpharm_lifestyle",
+    "name": "LIFESTYLE סופר-פארם",
+    "category": "retail_club",
+    "catalog_url": "https://www.super-pharm.co.il/",
+    "hint": "מועדון LIFESTYLE של סופר-פארם"
+  }
+]

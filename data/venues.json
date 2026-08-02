@@ -1,0 +1,82 @@
+[
+  {
+    "id": "azrieli_tlv",
+    "name": "קניון עזריאלי תל אביב",
+    "city": "תל אביב",
+    "lat": 32.0741,
+    "lng": 34.7922,
+    "radius_m": 250
+  },
+  {
+    "id": "dizengoff_center",
+    "name": "דיזנגוף סנטר",
+    "city": "תל אביב",
+    "lat": 32.0757,
+    "lng": 34.7748,
+    "radius_m": 200
+  },
+  {
+    "id": "ayalon_mall",
+    "name": "קניון איילון",
+    "city": "רמת גן",
+    "lat": 32.0846,
+    "lng": 34.8003,
+    "radius_m": 250
+  },
+  {
+    "id": "ramat_aviv_mall",
+    "name": "קניון רמת אביב",
+    "city": "תל אביב",
+    "lat": 32.1128,
+    "lng": 34.7967,
+    "radius_m": 200
+  },
+  {
+    "id": "malha_mall",
+    "name": "קניון מלחה",
+    "city": "ירושלים",
+    "lat": 31.7513,
+    "lng": 35.1877,
+    "radius_m": 250
+  },
+  {
+    "id": "grand_kanyon_haifa",
+    "name": "גרנד קניון חיפה",
+    "city": "חיפה",
+    "lat": 32.7866,
+    "lng": 35.0209,
+    "radius_m": 250
+  },
+  {
+    "id": "big_fashion_glilot",
+    "name": "BIG פאשן גלילות",
+    "city": "רמת השרון",
+    "lat": 32.1358,
+    "lng": 34.8033,
+    "radius_m": 300
+  },
+  {
+    "id": "sharonim_mall",
+    "name": "קניון שרונים",
+    "city": "הוד השרון",
+    "lat": 32.1481,
+    "lng": 34.8859,
+    "radius_m": 220
+  },
+  {
+    "id": "seven_stars_mall",
+    "name": "קניון שבעת הכוכבים",
+    "city": "הרצליה",
+    "lat": 32.1616,
+    "lng": 34.8291,
+    "radius_m": 250
+  },
+  {
+    "id": "grand_canyon_beersheva",
+    "name": "גרנד קניון באר שבע",
+    "city": "באר שבע",
+    "lat": 31.2503,
+    "lng": 34.7712,
+    "radius_m": 250
+  }
+]

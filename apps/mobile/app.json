@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Smart Benefits Recall",
+    "slug": "smart-benefits-recall",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "sbr",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "bundleIdentifier": "com.sbr.mvp",
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "כדי להזכיר לך על הטבות כשאתה מגיע לקניון",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "כדי להזכיר לך על הטבות גם כשהאפליקציה סגורה",
+        "UIBackgroundModes": ["location"]
+      }
+    },
+    "android": {
+      "package": "com.sbr.mvp",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "POST_NOTIFICATIONS"
+      ],
+      "intentFilters": [
+        {
+          "action": "android.intent.action.SEND",
+          "category": ["android.intent.category.DEFAULT"],
+          "data": [{ "mimeType": "text/plain" }]
+        }
+      ]
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "כדי להזכיר לך על הטבות כשאתה מגיע לקניון",
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ],
+      "expo-notifications"
+    ]
+  }
+}

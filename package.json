@@ -1,0 +1,24 @@
+{
+  "name": "smart-benefits-recall",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zero-auth contextual recall for Israeli club benefits, discounts and gift cards (MVP)",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "extract": "npm run -w @sbr/extraction start --",
+    "validate:data": "node scripts/validate-data.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4",
+    "@types/node": "^22.9.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

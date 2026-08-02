@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.local
+.expo/
+.DS_Store
+
+# Pipeline output (generated, not source of truth for the repo)
+data/generated/

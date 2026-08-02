@@ -1,0 +1,20 @@
+[
+  {
+    "program_id": "hever",
+    "program_name": "חבר",
+    "url": "https://www.hvr.co.il/",
+    "fixture": "packages/extraction/fixtures/hever-sample.html"
+  },
+  {
+    "program_id": "max",
+    "program_name": "Max",
+    "url": "https://www.max.co.il/benefits",
+    "fixture": "packages/extraction/fixtures/max-sample.html"
+  },
+  {
+    "program_id": "isracard",
+    "program_name": "ישראכרט",
+    "url": "https://www.isracard.co.il/he-il/benefits/",
+    "fixture": "packages/extraction/fixtures/isracard-sample.html"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@sbr/core": ["../../packages/core/src/index.ts"],
+      "@sbr/data/*": ["../../data/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}
