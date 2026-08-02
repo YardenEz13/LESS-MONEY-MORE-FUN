@@ -24,6 +24,24 @@ into it, so there is exactly one definition of "eligible" to get right.
 
 ## The decisions that shaped it
 
+### Conditions are the interface, so the engine reports every one of them
+
+`evaluateBenefit` returns a `gates` array: one entry per stated condition, each
+carrying the verdict the engine reached — `met`, `pending`, or `blocked` — plus
+a chip-sized label and a full sentence. `blockers` and `requirements` say what
+went wrong; gates say what was *checked*, including the checks that passed.
+
+The UI needs the passes. "7 conditions, 2 on you, 2 already satisfied" is a
+useful thing to read at a till; a list of caveats with no denominator is not.
+
+A pending gate also carries `actionable`: true when the user can still change
+the outcome before paying (top up the basket, issue a voucher), false for
+caveats they can only note (no stacking, excluded categories, a discount cap).
+`actionsRequired` is the actionable subset, and it — not `status` — is what the
+list screen counts. Counting caveats made every benefit look conditional and
+the "ready now" figure sat permanently at zero, which is how the distinction
+was found: by looking at the screen.
+
 ### An unknown condition is never resolved in the benefit's favour
 
 `evaluateBenefit` returns one of three states, not a boolean:
@@ -84,6 +102,21 @@ timezone must not change which benefits apply.
 The profile is a list of club ids in `AsyncStorage`. There is no account, no
 server, and no network write path in the app at all. If a sync feature ever
 lands, that's the property it has to argue with.
+
+## The look
+
+The design system lives in `apps/mobile/src/theme.ts` under the name "Ledger".
+It takes its cues from the artifact that already answers this app's question
+honestly — a printed receipt: ink on warm paper, hairline rules, figures given
+room, conditions never demoted to grey small print. The accent is a deep
+teal-green rather than promotional red, because the app never sells a deal; it
+tells you what you already hold. Rubik carries headlines and every figure,
+Heebo does the reading work; both are bundled, so first launch needs no network.
+
+The one device the app is built around is the **condition strip**: each stated
+condition as a chip in one of four tones — satisfied (mint ✓), do this (amber
+!), note (quiet grey •), violated (clay ✕). It is the gate model rendered
+directly, and it is why a card can show its own terms without a paragraph.
 
 ## Known gaps
 

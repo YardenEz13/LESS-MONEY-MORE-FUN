@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { Benefit, Merchant } from '@sbr/core';
-import { htmlToText } from '../src/scrape.js';
+import { htmlToText } from '../src/scrape';
 import {
   benefitId,
   mergeBenefits,
   partitionByConfidence,
   resolveMerchantId,
   toBenefit,
-} from '../src/store.js';
-import { ExtractionResult } from '../src/schema.js';
+} from '../src/store';
+import { ExtractionResult } from '../src/schema';
 
 const merchants = [
   Merchant.parse({ id: 'super_pharm', name: 'סופר-פארם', domains: [], venue_ids: [] }),

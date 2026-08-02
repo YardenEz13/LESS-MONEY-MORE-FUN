@@ -1,7 +1,31 @@
-import type { Evaluation } from './matching.js';
-import type { Benefit } from './types.js';
+import type { Evaluation } from './matching';
+import type { Benefit } from './types';
 
-/** "15% הנחה" / "₪50 מתנה" / "1+1" — the headline on a benefit card. */
+/**
+ * The figure and its unit, split.
+ *
+ * On a card the size difference between "20%" and "הנחה" is doing the work;
+ * setting them as one string makes the number compete with the merchant name
+ * for the same space and forces an ugly wrap on the longer types.
+ */
+export function formatValue(benefit: Benefit): { figure: string; unit: string } {
+  switch (benefit.type) {
+    case 'percent':
+      return { figure: `${benefit.value}%`, unit: 'הנחה' };
+    case 'cashback':
+      return { figure: `${benefit.value}%`, unit: 'זיכוי' };
+    case 'fixed':
+      return { figure: `₪${benefit.value}`, unit: 'הנחה' };
+    case 'gift_card':
+      return { figure: `₪${benefit.value}`, unit: 'מתנה' };
+    case 'bogo':
+      return { figure: '1+1', unit: 'על הזול' };
+    default:
+      return { figure: '—', unit: 'הטבה' };
+  }
+}
+
+/** "15% הנחה" / "₪50 מתנה" / "1+1" — one-line form, for notifications. */
 export function formatHeadline(benefit: Benefit): string {
   switch (benefit.type) {
     case 'percent':

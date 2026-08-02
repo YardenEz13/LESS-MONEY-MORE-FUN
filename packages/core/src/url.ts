@@ -1,4 +1,4 @@
-import type { Merchant } from './types.js';
+import type { Merchant } from './types';
 
 /**
  * Extract a comparable hostname from arbitrary shared text. The Share sheet on

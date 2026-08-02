@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import * as Linking from 'expo-linking';
 import { rankBenefits, resolveMerchantFromShare, type Evaluation } from '@sbr/core';
 import { benefitsForMerchant, merchants } from './catalog';
@@ -74,7 +75,13 @@ export function subscribeToShares(onShare: (shared: string) => void): () => void
     const parsed = Linking.parse(url);
     const shared = parsed.queryParams?.url ?? parsed.queryParams?.text;
     if (typeof shared === 'string') return shared;
-    return url.startsWith('sbr://') ? null : url;
+    // An `sbr://` link that isn't the share route is ordinary navigation.
+    if (url.startsWith('sbr://')) return null;
+    // Android delivers a SEND intent as a bare http(s) URL. On web the same
+    // API hands back the app's own address on every load, which is not a
+    // share — without this the app would open the share screen at launch.
+    if (Platform.OS === 'web') return null;
+    return url;
   };
 
   void Linking.getInitialURL().then((url) => {

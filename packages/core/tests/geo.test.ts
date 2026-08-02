@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { Venue } from '../src/types.js';
+import { Venue } from '../src/types';
 import {
   DEFAULT_NOTIFICATION_POLICY,
   distanceMeters,
   shouldNotifyForVenue,
   venuesContaining,
-} from '../src/geo.js';
+} from '../src/geo';
 
 const azrieli = Venue.parse({
   id: 'azrieli_tlv',

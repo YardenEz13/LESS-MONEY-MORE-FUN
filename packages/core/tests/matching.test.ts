@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Benefit } from '../src/types.js';
-import { estimateSaving, evaluateBenefit, rankBenefits, type EvalContext } from '../src/matching.js';
+import { Benefit } from '../src/types';
+import { estimateSaving, evaluateBenefit, rankBenefits, type EvalContext } from '../src/matching';
 
 /** 2026-08-02 is a Sunday; 13:00 Asia/Jerusalem == 10:00Z (IDT, UTC+3). */
 const SUNDAY_NOON = new Date('2026-08-02T10:00:00Z');
@@ -140,6 +140,77 @@ describe('evaluateBenefit', () => {
         (r) => r.code,
       ),
     ).toContain('ends_soon');
+  });
+});
+
+describe('gates', () => {
+  it('reports satisfied conditions, not just failures', () => {
+    const evaluation = evaluateBenefit(
+      makeBenefit({
+        conditions: {
+          raw_text_summary: 'א-ה, מעל 100',
+          valid_days: [1, 2, 3, 4, 5],
+          min_spend: 100,
+          stacks_with_club: true,
+        },
+      }),
+      { ...baseCtx, cartAmount: 200 },
+    );
+    const byCode = Object.fromEntries(evaluation.gates.map((g) => [g.code, g]));
+    expect(byCode.day?.state).toBe('met');
+    expect(byCode.min_spend?.state).toBe('met');
+    expect(byCode.stacking?.state).toBe('met');
+    expect(byCode.freshness?.state).toBe('met');
+    expect(evaluation.status).toBe('eligible');
+  });
+
+  it('collapses a consecutive day range the way a Hebrew T&C writes it', () => {
+    const weekdays = evaluateBenefit(
+      makeBenefit({ conditions: { raw_text_summary: 'x', valid_days: [1, 2, 3, 4, 5] } }),
+      baseCtx,
+    );
+    expect(weekdays.gates.find((g) => g.code === 'day')?.label).toBe('א׳-ה׳');
+
+    const split = evaluateBenefit(
+      makeBenefit({ conditions: { raw_text_summary: 'x', valid_days: [1, 3] } }),
+      baseCtx,
+    );
+    expect(split.gates.find((g) => g.code === 'day')?.label).toBe('א׳, ג׳');
+  });
+
+  it('orders blocked before pending before met', () => {
+    const evaluation = evaluateBenefit(
+      makeBenefit({
+        conditions: {
+          raw_text_summary: 'שבת בלבד, מעל 100',
+          valid_days: [7],
+          min_spend: 100,
+          stacks_with_club: true,
+        },
+      }),
+      baseCtx,
+    );
+    expect(evaluation.gates.map((g) => g.state)).toEqual(['blocked', 'pending', 'met', 'met']);
+  });
+
+  it('gives every gate a chip label and a full sentence', () => {
+    const evaluation = evaluateBenefit(
+      makeBenefit({
+        conditions: {
+          raw_text_summary: 'x',
+          max_discount: 50,
+          requires_voucher: true,
+          exclusions: ['תרופות מרשם'],
+          channel: 'online',
+        },
+      }),
+      baseCtx,
+    );
+    for (const gate of evaluation.gates) {
+      expect(gate.label.length).toBeGreaterThan(0);
+      expect(gate.label.length).toBeLessThanOrEqual(14);
+      expect(gate.detail.length).toBeGreaterThan(gate.label.length);
+    }
   });
 });
 

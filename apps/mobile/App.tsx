@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
+import { useFonts, Rubik_500Medium, Rubik_700Bold } from '@expo-google-fonts/rubik';
+import { Heebo_400Regular, Heebo_500Medium, Heebo_700Bold } from '@expo-google-fonts/heebo';
 import type { Evaluation, UserProfile } from '@sbr/core';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
@@ -35,7 +37,18 @@ type Screen =
 export default function App() {
   const [screen, setScreen] = useState<Screen>({ name: 'loading' });
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [geofenceStatus, setGeofenceStatus] = useState('התראות מיקום לא הופעלו');
+  const [geofenceStatus, setGeofenceStatus] = useState('תזכורת בקניון כבויה');
+  const [geofenceActive, setGeofenceActive] = useState(false);
+
+  // Rubik carries the figures and headlines, Heebo does the reading work. Both
+  // ship with the bundle, so there is no network dependency on first launch.
+  const [fontsLoaded] = useFonts({
+    Rubik_500Medium,
+    Rubik_700Bold,
+    Heebo_400Regular,
+    Heebo_500Medium,
+    Heebo_700Bold,
+  });
 
   const persist = useCallback(async (next: UserProfile) => {
     setProfile(next);
@@ -48,7 +61,8 @@ export default function App() {
       setProfile(loaded);
       setScreen(loaded.onboarded_at ? { name: 'home' } : { name: 'onboarding' });
       if (await isGeofencingActive()) {
-        setGeofenceStatus('התראות מיקום פעילות');
+        setGeofenceActive(true);
+        setGeofenceStatus('תזכורת בקניון פעילה');
       }
     })();
   }, []);
@@ -76,23 +90,25 @@ export default function App() {
   const enableGeofencing = useCallback(async () => {
     const granted = await requestNotificationPermission();
     if (!granted) {
-      setGeofenceStatus('אין הרשאת התראות — אי אפשר להזכיר בכניסה לקניון');
+      setGeofenceActive(false);
+      setGeofenceStatus('אין הרשאת התראות — אין דרך להזכיר בכניסה לקניון');
       return;
     }
     const result = await startGeofencing();
+    setGeofenceActive(result.ok);
     setGeofenceStatus(
       result.ok
-        ? `התראות מיקום פעילות · ${result.venueCount} מתחמים`
+        ? `תזכורת בקניון פעילה · ${result.venueCount} מתחמים`
         : result.reason === 'foreground_denied'
-          ? 'אין הרשאת מיקום — ההטבות עדיין ברשימה, בלי תזכורת בקניון'
-          : 'הרשאת רקע חסרה — התזכורת תעבוד רק כשהאפליקציה פתוחה',
+          ? 'אין הרשאת מיקום — ההטבות ברשימה, בלי תזכורת בקניון'
+          : 'חסרה הרשאת רקע — התזכורת תעבוד רק כשהאפליקציה פתוחה',
     );
   }, []);
 
-  if (!profile || screen.name === 'loading') {
+  if (!fontsLoaded || !profile || screen.name === 'loading') {
     return (
       <SafeAreaView style={styles.centered}>
-        <ActivityIndicator color={colors.accent} />
+        <ActivityIndicator color={colors.mint} />
       </SafeAreaView>
     );
   }
@@ -107,8 +123,11 @@ export default function App() {
             onChange={persist}
             onDone={async () => {
               await persist({ ...profile, onboarded_at: new Date().toISOString() });
-              await enableGeofencing();
               setScreen({ name: 'home' });
+              // Permission dialogs are asked for over the benefit list, not
+              // instead of it. Blocking the transition on them leaves the user
+              // staring at the form they just finished.
+              void enableGeofencing();
             }}
           />
         )}
@@ -117,6 +136,7 @@ export default function App() {
           <HomeScreen
             profile={profile}
             geofenceStatus={geofenceStatus}
+            geofenceActive={geofenceActive}
             onSelect={(evaluation) => {
               void logEvent({ kind: 'benefit_viewed', benefitId: evaluation.benefit.id });
               setScreen({ name: 'detail', evaluation });
@@ -174,7 +194,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1, backgroundColor: colors.paper },
   body: { flex: 1 },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.paper },
 });

@@ -1,16 +1,16 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { Merchant } from '@sbr/core';
-import { extractBenefits } from './extract.js';
-import { htmlToText, scrapePage, type ScrapedPage } from './scrape.js';
+import { extractBenefits } from './extract';
+import { htmlToText, scrapePage, type ScrapedPage } from './scrape';
 import {
   JsonStore,
   mergeBenefits,
   partitionByConfidence,
   toBenefit,
   type ReviewItem,
-} from './store.js';
-import type { ExtractedBenefit } from './schema.js';
+} from './store';
+import type { ExtractedBenefit } from './schema';
 
 export interface Source {
   program_id: string;

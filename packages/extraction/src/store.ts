@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { Benefit, DEFAULT_MIN_CONFIDENCE, Merchant } from '@sbr/core';
-import type { ExtractedBenefit } from './schema.js';
+import type { ExtractedBenefit } from './schema';
 
 export interface ReviewItem {
   benefit: Benefit;

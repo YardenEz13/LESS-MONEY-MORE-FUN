@@ -1,5 +1,5 @@
-import type { Benefit } from './types.js';
-import { DEFAULT_TIME_ZONE, daysSince, isWithinHours, toLocalMoment } from './time.js';
+import type { Benefit } from './types';
+import { DEFAULT_TIME_ZONE, daysSince, isWithinHours, toLocalMoment } from './time';
 
 export type EvalChannel = 'in_store' | 'online';
 
@@ -77,11 +77,66 @@ export type EvalStatus =
   /** A stated condition is violated right now. */
   | 'blocked';
 
+export type GateCode =
+  | 'day'
+  | 'hours'
+  | 'min_spend'
+  | 'channel'
+  | 'stacking'
+  | 'voucher'
+  | 'exclusions'
+  | 'usage'
+  | 'cap'
+  | 'freshness'
+  | 'validity';
+
+export type GateState =
+  /** Stated, checkable, and satisfied right now. */
+  | 'met'
+  /** Stated, but only the user can settle it (basket size, coupon, exclusions). */
+  | 'pending'
+  /** Stated and violated right now. */
+  | 'blocked';
+
+/**
+ * One condition, with the verdict the engine reached on it.
+ *
+ * `blockers` and `requirements` are what went wrong; a gate is every check
+ * that ran, including the ones that passed. The UI needs the passes too — "5
+ * conditions, 4 already satisfied, 1 up to you" is a far more useful thing to
+ * show at a till than a list of caveats with no denominator.
+ */
+export interface Gate {
+  code: GateCode;
+  /** Two or three words — sized for a chip on a card. */
+  label: string;
+  /** Full sentence — sized for the detail list. */
+  detail: string;
+  state: GateState;
+  /**
+   * True when the user can still change the outcome before paying — top up the
+   * basket, issue a voucher, switch to the other channel.
+   *
+   * The rest are caveats: no stacking, excluded categories, a discount cap.
+   * They are real and they are shown, but there is nothing to *do* about them,
+   * so counting them as outstanding work would make every benefit look
+   * conditional and drain the word of meaning.
+   */
+  actionable: boolean;
+}
+
 export interface Evaluation {
   benefit: Benefit;
   status: EvalStatus;
   blockers: Blocker[];
   requirements: Requirement[];
+  /** Every stated condition and how it fared. Ordered blocked → pending → met. */
+  gates: Gate[];
+  /**
+   * The subset of gates the user can still act on. Empty means: walk up and
+   * pay. This, not `status`, is what the list screen counts — see `Gate`.
+   */
+  actionsRequired: Gate[];
   /** Estimated ILS saved. `isEstimate` is true when the cart amount was unknown. */
   estimatedSavingIls: number;
   isEstimate: boolean;
@@ -90,8 +145,27 @@ export interface Evaluation {
 
 const DAY_NAMES_HE = ['', 'א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'שבת'];
 
+const dayName = (day: number) => DAY_NAMES_HE[day] ?? String(day);
+
+/**
+ * Collapse consecutive days into a range: [1,2,3,4,5] reads "א׳-ה׳", the way a
+ * Hebrew T&C writes it, rather than "א׳, ב׳, ג׳, ד׳, ה׳".
+ */
 function formatDays(days: readonly number[]): string {
-  return days.map((d) => DAY_NAMES_HE[d] ?? String(d)).join(', ');
+  const sorted = [...days].sort((a, b) => a - b);
+  const groups: string[] = [];
+  let start = 0;
+  for (let i = 1; i <= sorted.length; i += 1) {
+    const isBreak = i === sorted.length || sorted[i]! !== sorted[i - 1]! + 1;
+    if (!isBreak) continue;
+    const from = sorted[start]!;
+    const to = sorted[i - 1]!;
+    groups.push(
+      to - from >= 2 ? `${dayName(from)}-${dayName(to)}` : sorted.slice(start, i).map(dayName).join(', '),
+    );
+    start = i;
+  }
+  return groups.join(', ');
 }
 
 function shekels(amount: number): string {
@@ -141,6 +215,14 @@ export function estimateSaving(
 export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation {
   const blockers: Blocker[] = [];
   const requirements: Requirement[] = [];
+  const gates: Gate[] = [];
+  const gate = (
+    code: GateCode,
+    state: GateState,
+    label: string,
+    detail: string,
+    actionable = false,
+  ) => gates.push({ code, state, label, detail, actionable });
   const timeZone = ctx.timeZone ?? DEFAULT_TIME_ZONE;
   const freshness = ctx.freshness ?? DEFAULT_FRESHNESS;
   const minConfidence = ctx.minConfidence ?? DEFAULT_MIN_CONFIDENCE;
@@ -164,40 +246,59 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
       code: 'stale_data',
       message: `ההטבה לא אומתה מעל ${freshness.staleDays} ימים`,
     });
+    gate('freshness', 'blocked', 'לא אומת', `ההטבה לא אומתה מעל ${freshness.staleDays} ימים`);
   } else if (ageDays > freshness.agingDays) {
     requirements.push({
       code: 'aging_data',
       message: `אומת לאחרונה לפני ${Math.floor(ageDays)} ימים — כדאי לוודא בקופה`,
     });
+    gate(
+      'freshness',
+      'pending',
+      'אימות ישן',
+      `אומת לאחרונה לפני ${Math.floor(ageDays)} ימים — כדאי לוודא בקופה`,
+    );
+  } else {
+    gate('freshness', 'met', 'מאומת', 'אומת בימים האחרונים מול המקור');
   }
 
   if (benefit.valid_from && new Date(benefit.valid_from) > ctx.now) {
     blockers.push({ code: 'not_yet_valid', message: 'ההטבה עדיין לא נכנסה לתוקף' });
+    gate('validity', 'blocked', 'טרם החל', 'ההטבה עדיין לא נכנסה לתוקף');
   }
   if (benefit.valid_until) {
     const until = new Date(benefit.valid_until);
     const daysLeft = (until.getTime() - ctx.now.getTime()) / 86_400_000;
+    const untilLabel = until.toLocaleDateString('he-IL', { timeZone });
     if (until < ctx.now) {
       blockers.push({ code: 'expired', message: 'תוקף ההטבה פג' });
+      gate('validity', 'blocked', 'פג תוקף', `התוקף פג ב-${untilLabel}`);
     } else if (daysLeft <= 7) {
-      requirements.push({
-        code: 'ends_soon',
-        message: `בתוקף עד ${until.toLocaleDateString('he-IL', { timeZone })}`,
-      });
+      requirements.push({ code: 'ends_soon', message: `בתוקף עד ${untilLabel}` });
+      gate('validity', 'pending', `עד ${untilLabel}`, `נגמר בקרוב — בתוקף עד ${untilLabel}`);
+    } else {
+      gate('validity', 'met', 'בתוקף', `בתוקף עד ${untilLabel}`);
     }
   }
 
   const local = toLocalMoment(ctx.now, timeZone);
-  if (conditions.valid_days && !conditions.valid_days.includes(local.day)) {
-    blockers.push({
-      code: 'wrong_day',
-      message: `תקף בימים ${formatDays(conditions.valid_days)} בלבד`,
-    });
+  if (conditions.valid_days) {
+    const daysLabel = formatDays(conditions.valid_days);
+    if (conditions.valid_days.includes(local.day)) {
+      gate('day', 'met', daysLabel, `תקף בימים ${daysLabel} — היום נכלל`);
+    } else {
+      blockers.push({ code: 'wrong_day', message: `תקף בימים ${daysLabel} בלבד` });
+      gate('day', 'blocked', daysLabel, `תקף בימים ${daysLabel} בלבד — לא היום`);
+    }
   }
   if (conditions.valid_hours) {
     const { from, to } = conditions.valid_hours;
-    if (!isWithinHours(local.minutes, from, to)) {
+    const hoursLabel = `${from}-${to}`;
+    if (isWithinHours(local.minutes, from, to)) {
+      gate('hours', 'met', hoursLabel, `תקף בין ${from} ל-${to} — עכשיו בתוך החלון`);
+    } else {
       blockers.push({ code: 'wrong_hours', message: `תקף בין ${from} ל-${to} בלבד` });
+      gate('hours', 'blocked', hoursLabel, `תקף בין ${from} ל-${to} בלבד — לא עכשיו`);
     }
   }
 
@@ -205,24 +306,34 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
     const channelLabel = conditions.channel === 'online' ? 'באונליין' : 'בסניפים';
     if (ctx.channel && ctx.channel !== conditions.channel) {
       blockers.push({ code: 'wrong_channel', message: `תקף ${channelLabel} בלבד` });
+      gate('channel', 'blocked', channelLabel, `תקף ${channelLabel} בלבד`);
     } else if (!ctx.channel) {
       requirements.push({ code: 'channel_restricted', message: `תקף ${channelLabel} בלבד` });
+      // Not actionable: which channel a benefit works in is information, not
+      // an errand. It becomes a hard blocker once the channel is known.
+      gate('channel', 'pending', channelLabel, `תקף ${channelLabel} בלבד`);
+    } else {
+      gate('channel', 'met', channelLabel, `תקף ${channelLabel} — זה הערוץ הנוכחי`);
     }
   }
 
   if (conditions.min_spend != null && conditions.min_spend > 0) {
+    const spendLabel = `${shekels(conditions.min_spend)}+`;
     if (ctx.cartAmount == null) {
       requirements.push({
         code: 'min_spend_unknown',
         message: `בקנייה מעל ${shekels(conditions.min_spend)}`,
       });
+      gate('min_spend', 'pending', spendLabel, `בקנייה מעל ${shekels(conditions.min_spend)}`, true);
     } else if (ctx.cartAmount < conditions.min_spend) {
+      const missing = shekels(conditions.min_spend - ctx.cartAmount);
       blockers.push({
         code: 'below_min_spend',
-        message: `דרוש מינימום ${shekels(conditions.min_spend)} (חסרים ${shekels(
-          conditions.min_spend - ctx.cartAmount,
-        )})`,
+        message: `דרוש מינימום ${shekels(conditions.min_spend)} (חסרים ${missing})`,
       });
+      gate('min_spend', 'blocked', spendLabel, `חסרים ${missing} כדי להגיע למינימום`, true);
+    } else {
+      gate('min_spend', 'met', spendLabel, `הסל עובר את המינימום של ${shekels(conditions.min_spend)}`);
     }
   }
 
@@ -231,32 +342,47 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
       code: 'max_discount_cap',
       message: `תקרת הנחה ${shekels(conditions.max_discount)}`,
     });
+    gate(
+      'cap',
+      'pending',
+      `עד ${shekels(conditions.max_discount)}`,
+      `ההנחה מוגבלת ל-${shekels(conditions.max_discount)}`,
+    );
   }
   if (conditions.requires_voucher) {
     requirements.push({ code: 'requires_voucher', message: 'יש להנפיק שובר באתר המועדון מראש' });
+    gate('voucher', 'pending', 'שובר מראש', 'יש להנפיק שובר באתר המועדון לפני הרכישה', true);
   }
   if (conditions.exclusions?.length) {
-    requirements.push({
-      code: 'has_exclusions',
-      message: `לא כולל: ${conditions.exclusions.join(', ')}`,
-    });
+    const detail = `לא כולל: ${conditions.exclusions.join(', ')}`;
+    requirements.push({ code: 'has_exclusions', message: detail });
+    gate('exclusions', 'pending', 'החרגות', detail);
   }
   if (conditions.stacks_with_club === false) {
     requirements.push({ code: 'no_stacking', message: 'אין כפל מבצעים עם מועדון החנות' });
+    gate('stacking', 'pending', 'ללא כפל', 'אין כפל מבצעים עם מועדון החנות');
   } else if (conditions.stacks_with_club == null) {
     requirements.push({ code: 'stacking_unknown', message: 'כפל מבצעים לא מצוין בתקנון' });
+    gate('stacking', 'pending', 'כפל?', 'התקנון לא אומר אם יש כפל מבצעים — כדאי לשאול בקופה');
+  } else {
+    gate('stacking', 'met', 'כפל מותר', 'ניתן לשלב עם מבצעי מועדון החנות');
   }
   if (conditions.usage_limit) {
     requirements.push({ code: 'usage_limited', message: conditions.usage_limit });
+    gate('usage', 'pending', 'הגבלת שימוש', conditions.usage_limit);
   }
 
   const { value, isEstimate } = estimateSaving(benefit, ctx.cartAmount);
+  // Blocked first, then what the user still has to do, then the reassurance.
+  const gateOrder: Record<GateState, number> = { blocked: 0, pending: 1, met: 2 };
 
   return {
     benefit,
     status: blockers.length > 0 ? 'blocked' : requirements.length > 0 ? 'conditional' : 'eligible',
     blockers,
     requirements,
+    gates: gates.sort((a, b) => gateOrder[a.state] - gateOrder[b.state]),
+    actionsRequired: gates.filter((g) => g.state === 'pending' && g.actionable),
     estimatedSavingIls: Math.round(value * 100) / 100,
     isEstimate,
     ageDays: Number.isFinite(ageDays) ? Math.floor(ageDays) : -1,
@@ -283,9 +409,12 @@ export function rankBenefits(
     .map((benefit) => evaluateBenefit(benefit, ctx))
     .filter((evaluation) => (hideBlocked ? evaluation.status !== 'blocked' : true))
     .sort((a, b) => {
-      const statusRank = (s: EvalStatus) => (s === 'eligible' ? 0 : s === 'conditional' ? 1 : 2);
-      const byStatus = statusRank(a.status) - statusRank(b.status);
-      if (byStatus !== 0) return byStatus;
+      // "Nothing left to do" outranks "one thing to do" at equal value: a
+      // card you can act on now should never sit under a card you can't.
+      const rank = (e: Evaluation) =>
+        e.status === 'blocked' ? 2 : e.actionsRequired.length > 0 ? 1 : 0;
+      const byRank = rank(a) - rank(b);
+      if (byRank !== 0) return byRank;
       const byValue = b.estimatedSavingIls - a.estimatedSavingIls;
       if (byValue !== 0) return byValue;
       // Tie-break on freshness so the better-verified row wins deterministically.

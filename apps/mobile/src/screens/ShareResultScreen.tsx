@@ -1,9 +1,10 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { Evaluation } from '@sbr/core';
 import { BenefitCard } from '../components/BenefitCard';
+import { PrimaryButton, ScreenHeader } from '../components/ui';
 import type { ShareResult } from '../services/shareIntent';
-import { colors, font, radius, spacing } from '../theme';
+import { colors, radius, space, type } from '../theme';
 
 interface Props {
   result: ShareResult;
@@ -12,20 +13,26 @@ interface Props {
 }
 
 /**
- * What the user sees a second after hitting Share on a shopping site: the
- * single most valuable thing they hold for this merchant, with the catch
- * spelled out.
+ * What you see a second after hitting Share in a mobile checkout. The channel
+ * is pinned to online upstream, so anything shown here is genuinely usable on
+ * this site — no "valid in stores only" teases.
  */
 export function ShareResultScreen({ result, onSelect, onClose }: Props) {
   return (
     <View style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {result.kind === 'match' ? (
           <>
-            <Text style={font.title}>{result.match.merchantName}</Text>
-            <Text style={font.small}>
-              {result.match.hostname} · {result.match.evaluations.length} הטבות רלוונטיות לקנייה
-              אונליין
+            <ScreenHeader eyebrow={result.match.hostname} title={result.match.merchantName} />
+            <Text style={styles.lede}>
+              {result.match.evaluations.length === 1 ? (
+                'הטבה אחת תקפה לקנייה באתר הזה.'
+              ) : (
+                <>
+                  <Text style={styles.figureInline}>{result.match.evaluations.length}</Text>
+                  {'  '}הטבות תקפות לקנייה באתר הזה, הטובה ביותר למעלה.
+                </>
+              )}
             </Text>
             <View style={styles.list}>
               {result.match.evaluations.map((evaluation) => (
@@ -38,62 +45,58 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
             </View>
           </>
         ) : result.kind === 'no_benefits' ? (
-          <View style={styles.notice}>
-            <Text style={font.heading}>אין הטבה ב{result.merchantName}</Text>
-            <Text style={font.small}>
-              מזהים את {result.hostname}, אבל אף אחד מהמועדונים שסימנת לא נותן שם הטבה תקפה לקנייה
-              אונליין כרגע.
-            </Text>
-          </View>
+          <>
+            <ScreenHeader eyebrow={result.hostname} title={result.merchantName} />
+            <View style={styles.notice}>
+              <Text style={type.heading}>אין כאן הטבה תקפה</Text>
+              <Text style={type.small}>
+                מזהים את האתר, אבל אף מועדון שסימנת לא נותן בו הטבה שתקפה לקנייה אונליין כרגע.
+              </Text>
+            </View>
+          </>
         ) : (
-          <View style={styles.notice}>
-            <Text style={font.heading}>האתר לא מוכר לנו</Text>
-            <Text style={font.small}>
-              {result.hostname
-                ? `${result.hostname} לא נמצא בקטלוג בתי העסק.`
-                : 'לא זוהתה כתובת בתוכן ששותף.'}
-            </Text>
-          </View>
+          <>
+            <ScreenHeader eyebrow="שיתוף" title="האתר לא בקטלוג" />
+            <View style={styles.notice}>
+              <Text style={type.heading}>{result.hostname ?? 'לא זוהתה כתובת'}</Text>
+              <Text style={type.small}>
+                {result.hostname
+                  ? 'הדומיין הזה עדיין לא ממופה לבית עסק. הוספה שלו לקטלוג היא התיקון הזול ביותר שאפשר לעשות כאן.'
+                  : 'לא נמצאה כתובת אינטרנט בתוכן ששותף.'}
+              </Text>
+            </View>
+          </>
         )}
       </ScrollView>
 
       <View style={styles.footer}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onClose}
-          style={({ pressed }) => [styles.cta, pressed && styles.pressed]}
-        >
-          <Text style={styles.ctaText}>סגור</Text>
-        </Pressable>
+        <PrimaryButton label="סגור" tone="ink" onPress={onClose} />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, gap: spacing.sm },
-  list: { marginTop: spacing.lg },
+  screen: { flex: 1, backgroundColor: colors.paper },
+  content: { paddingBottom: space.xxl },
+  lede: { ...type.body, paddingHorizontal: space.xl, paddingBottom: space.lg },
+  figureInline: { fontFamily: 'Rubik_700Bold', fontSize: 22, color: colors.mint },
+  list: { paddingHorizontal: space.xl },
   notice: {
-    backgroundColor: colors.surface,
+    marginHorizontal: space.xl,
+    backgroundColor: colors.card,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.xl,
-    gap: spacing.sm,
+    borderColor: colors.line,
+    padding: space.xl,
+    gap: space.sm,
   },
   footer: {
-    padding: spacing.lg,
+    flexDirection: 'row',
+    padding: space.lg,
+    paddingHorizontal: space.xl,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.surface,
+    borderTopColor: colors.line,
+    backgroundColor: colors.card,
   },
-  cta: {
-    backgroundColor: colors.accent,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    alignItems: 'center',
-  },
-  ctaText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  pressed: { opacity: 0.7 },
 });

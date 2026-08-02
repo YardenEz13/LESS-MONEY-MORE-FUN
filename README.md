@@ -23,7 +23,7 @@ Built from [`docs/PRD.md`](docs/PRD.md). The design decisions live in
 
 ```bash
 npm install                # workspaces: core + extraction
-npm test                   # 42 tests across core and extraction
+npm test                   # 46 tests across core and extraction
 npm run typecheck
 npm run validate:data
 ```
@@ -55,10 +55,11 @@ The app is not part of the npm workspace — Metro reaches `@sbr/core` and
 
 ## What it actually does
 
-**Condition-awareness over headline numbers.** A benefit is `eligible`,
-`conditional`, or `blocked`, and an unstated condition is never resolved in the
-benefit's favour. `min_spend: 150` with an unknown basket shows as "בקנייה מעל
-₪150", not as a promise. A T&C silent on stacking says so.
+**Condition-awareness over headline numbers.** The engine reports every stated
+condition with its verdict — satisfied, up to you, or violated — so a card can
+show its own terms instead of burying them. An unstated condition is never
+resolved in the benefit's favour: `min_spend: 150` with an unknown basket shows
+as "בקנייה מעל ₪150", not as a promise, and a T&C silent on stacking says so.
 
 **Two gates before anything reaches a phone.** Low-confidence extractions go to
 a human review queue instead of the store, and the client refuses to display
@@ -71,6 +72,13 @@ the pipeline.
 **Malls, not shops.** Ten geofenced complexes, plus a 3-minute dwell threshold,
 a 12-hour per-venue cooldown, and quiet hours — because a geofence enter event
 on its own is mostly GPS drift.
+
+## The look
+
+"Ledger" — ink on warm paper, deep teal for money kept, Rubik and Heebo set
+right-to-left. The signature device is the condition strip: each term as a chip
+in one of four tones (satisfied, do this, note, violated). Details in
+`docs/ARCHITECTURE.md`.
 
 ## Status
 

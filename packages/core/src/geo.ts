@@ -1,4 +1,4 @@
-import type { Venue } from './types.js';
+import type { Venue } from './types';
 
 export interface Coordinates {
   lat: number;

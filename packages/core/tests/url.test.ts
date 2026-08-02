@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { Merchant } from '../src/types.js';
-import { extractHostname, resolveMerchantFromShare } from '../src/url.js';
+import { Merchant } from '../src/types';
+import { extractHostname, resolveMerchantFromShare } from '../src/url';
 
 const merchants = [
   Merchant.parse({ id: 'ksp', name: 'KSP', domains: ['ksp.co.il'], venue_ids: [] }),

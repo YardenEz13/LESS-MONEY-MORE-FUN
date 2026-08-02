@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { BENEFIT_EXTRACTION_JSON_SCHEMA, ExtractionResult } from './schema.js';
-import { EXTRACTION_SYSTEM_PROMPT, buildExtractionUserMessage } from './prompt.js';
+import { BENEFIT_EXTRACTION_JSON_SCHEMA, ExtractionResult } from './schema';
+import { EXTRACTION_SYSTEM_PROMPT, buildExtractionUserMessage } from './prompt';
 
 export const EXTRACTION_MODEL = 'claude-opus-5';
 

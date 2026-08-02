@@ -1,14 +1,10 @@
 import React from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import {
-  formatHeadline,
-  formatLastVerified,
-  formatSaving,
-  type Evaluation,
-} from '@sbr/core';
-import { ConditionList } from '../components/ConditionList';
+import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { formatLastVerified, formatSaving, formatValue, type Evaluation } from '@sbr/core';
+import { GateList, gateSummary } from '../components/Gates';
+import { GhostButton, PrimaryButton, ScreenHeader, Section } from '../components/ui';
 import { programNames } from '../services/catalog';
-import { colors, font, radius, spacing } from '../theme';
+import { colors, radius, space, type } from '../theme';
 
 interface Props {
   evaluation: Evaluation;
@@ -25,117 +21,140 @@ export function BenefitDetailScreen({
   onRedeemed,
   onToggleMute,
 }: Props) {
-  const { benefit } = evaluation;
+  const { benefit, gates, actionsRequired } = evaluation;
+  const { figure, unit } = formatValue(benefit);
 
   return (
     <View style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <Pressable onPress={onBack} accessibilityRole="button">
-          <Text style={styles.back}>← חזרה</Text>
-        </Pressable>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScreenHeader
+          title={benefit.merchant_name}
+          eyebrow={programNames[benefit.program_id] ?? benefit.program_id}
+          onBack={onBack}
+        />
 
-        <View style={styles.hero}>
-          <Text style={font.heading}>{benefit.merchant_name}</Text>
-          <Text style={styles.headline}>{formatHeadline(benefit)}</Text>
-          <Text style={font.small}>
-            {programNames[benefit.program_id] ?? benefit.program_id} · {formatSaving(evaluation)}
+        {/* The till card: inverted, deliberately the loudest thing on the
+            screen, because this is what you hold up at the counter. It states
+            the benefit and the one thing still standing in the way. */}
+        <View style={styles.till}>
+          <View style={styles.tillValue}>
+            <Text style={styles.tillFigure}>{figure}</Text>
+            <Text style={styles.tillUnit}>{unit}</Text>
+          </View>
+          <Text style={styles.tillSaving}>{formatSaving(evaluation)}</Text>
+          <View style={styles.tillRule} />
+          <Text style={styles.tillNote}>
+            {actionsRequired.length === 0
+              ? 'אין מה להכין מראש — אפשר ללכת לקופה.'
+              : actionsRequired.length === 1
+                ? actionsRequired[0]!.detail
+                : `להכין מראש: ${actionsRequired.map((g) => g.label).join(' · ')}`}
           </Text>
         </View>
 
-        <Text style={styles.sectionTitle}>התנאים</Text>
-        <ConditionList evaluation={evaluation} />
+        <Section eyebrow={gateSummary(gates)}>
+          <GateList gates={gates} />
+        </Section>
 
-        <Text style={styles.sectionTitle}>מה כתוב בתקנון</Text>
-        <View style={styles.quote}>
-          <Text style={font.body}>{benefit.conditions.raw_text_summary}</Text>
-        </View>
+        <Section eyebrow="לשון התקנון">
+          <View style={styles.quote}>
+            <Text style={type.body}>{benefit.conditions.raw_text_summary}</Text>
+          </View>
+        </Section>
 
-        <View style={styles.trustRow}>
-          <Text style={font.small}>{formatLastVerified(benefit)}</Text>
-          <Pressable
-            accessibilityRole="link"
-            onPress={() => void Linking.openURL(benefit.source_url)}
-          >
-            <Text style={styles.link}>פתח את המקור</Text>
-          </Pressable>
-        </View>
-        <Text style={font.mono}>
-          confidence {benefit.confidence_score.toFixed(2)}
-          {benefit.reviewed_by_human ? ' · אושר ידנית' : ''}
-        </Text>
+        <Section eyebrow="מקור ואמינות">
+          <View style={styles.trust}>
+            <TrustRow label="אימות אחרון" value={formatLastVerified(benefit)} />
+            <TrustRow
+              label="ציון חילוץ"
+              value={`${benefit.confidence_score.toFixed(2)}${
+                benefit.reviewed_by_human ? ' · אושר ידנית' : ''
+              }`}
+            />
+            <View style={styles.trustAction}>
+              <GhostButton
+                label="פתח את עמוד המקור"
+                onPress={() => void Linking.openURL(benefit.source_url)}
+              />
+            </View>
+          </View>
+          <Text style={styles.disclaimer}>
+            אנחנו לא מנחשים תנאים. מה שלא כתוב בתקנון מסומן כ״לא צוין״ ולא כ״אין הגבלה״.
+          </Text>
+        </Section>
       </ScrollView>
 
       <View style={styles.footer}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onRedeemed}
-          style={({ pressed }) => [styles.cta, pressed && styles.pressed]}
-        >
-          <Text style={styles.ctaText}>מימשתי את ההטבה</Text>
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
+        <PrimaryButton label="מימשתי את ההטבה" onPress={onRedeemed} />
+        <GhostButton
+          label={isMuted ? 'בטל השתקה' : 'השתק'}
           onPress={onToggleMute}
-          style={({ pressed }) => [styles.secondary, pressed && styles.pressed]}
-        >
-          <Text style={styles.secondaryText}>{isMuted ? 'בטל השתקה' : 'השתק'}</Text>
-        </Pressable>
+          style={styles.mute}
+        />
       </View>
     </View>
   );
 }
 
+function TrustRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.trustRow}>
+      <Text style={type.small}>{label}</Text>
+      <Text style={type.bodyStrong}>{value}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xl, gap: spacing.md, paddingBottom: spacing.xxl },
-  back: { ...font.small, color: colors.accent },
-  hero: {
-    backgroundColor: colors.surface,
+  screen: { flex: 1, backgroundColor: colors.paper },
+  content: { paddingBottom: space.xxl, gap: space.xl },
+  till: {
+    marginHorizontal: space.xl,
+    backgroundColor: colors.ink,
+    borderRadius: radius.lg,
+    padding: space.xl,
+    gap: space.xs,
+  },
+  tillValue: { flexDirection: 'row', alignItems: 'baseline', gap: space.sm },
+  tillFigure: { fontFamily: 'Rubik_700Bold', fontSize: 46, lineHeight: 52, color: '#7FE3C6' },
+  tillUnit: { fontFamily: 'Heebo_500Medium', fontSize: 17, color: '#7FE3C6' },
+  tillSaving: { fontFamily: 'Heebo_400Regular', fontSize: 14, color: '#A9B6C2' },
+  tillRule: { height: 1, backgroundColor: '#2C3947', marginVertical: space.md },
+  tillNote: { fontFamily: 'Heebo_500Medium', fontSize: 15, lineHeight: 22, color: colors.inkInverse },
+  quote: {
+    marginHorizontal: space.xl,
+    backgroundColor: colors.card,
+    borderRightWidth: 3,
+    borderRightColor: colors.mint,
+    borderRadius: radius.sm,
+    padding: space.lg,
+  },
+  trust: {
+    marginHorizontal: space.xl,
+    backgroundColor: colors.card,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    gap: spacing.xs,
-  },
-  headline: { fontSize: 30, fontWeight: '700', color: colors.accent },
-  sectionTitle: { ...font.heading, fontSize: 16, marginTop: spacing.md },
-  quote: {
-    backgroundColor: colors.surface,
-    borderRightWidth: 3,
-    borderRightColor: colors.accent,
-    borderRadius: radius.sm,
-    padding: spacing.lg,
+    borderColor: colors.line,
+    paddingHorizontal: space.lg,
   },
   trustRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: spacing.md,
+    paddingVertical: space.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
   },
-  link: { ...font.small, color: colors.accent, textDecorationLine: 'underline' },
+  trustAction: { paddingVertical: space.md },
+  disclaimer: { ...type.caption, marginHorizontal: space.xl, lineHeight: 17 },
   footer: {
     flexDirection: 'row',
-    gap: spacing.md,
-    padding: spacing.lg,
+    gap: space.md,
+    padding: space.lg,
+    paddingHorizontal: space.xl,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.surface,
+    borderTopColor: colors.line,
+    backgroundColor: colors.card,
   },
-  cta: {
-    flex: 1,
-    backgroundColor: colors.accent,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    alignItems: 'center',
-  },
-  ctaText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  secondary: {
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: spacing.lg,
-    justifyContent: 'center',
-  },
-  secondaryText: font.body,
-  pressed: { opacity: 0.7 },
+  mute: { alignSelf: 'stretch', justifyContent: 'center' },
 });
