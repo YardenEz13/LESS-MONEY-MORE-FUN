@@ -8,10 +8,13 @@ export function ScreenHeader({
   title,
   eyebrow,
   onBack,
+  /** Set for merchant/brand names, which are data rather than our own voice. */
+  titleIsName,
 }: {
   title: string;
   eyebrow?: string;
   onBack?: () => void;
+  titleIsName?: boolean;
 }) {
   return (
     <View style={styles.header}>
@@ -22,7 +25,7 @@ export function ScreenHeader({
         </Pressable>
       )}
       {eyebrow && <Text style={type.eyebrow}>{eyebrow}</Text>}
-      <Text style={type.title}>{title}</Text>
+      <Text style={titleIsName ? styles.headerName : type.title}>{title}</Text>
     </View>
   );
 }
@@ -132,6 +135,7 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: space.xl, paddingTop: space.lg, paddingBottom: space.md, gap: 3 },
   back: { flexDirection: 'row', alignItems: 'center', gap: space.xs, marginBottom: space.sm },
   backGlyph: { fontSize: 22, lineHeight: 24, color: colors.inkFaint },
+  headerName: { ...type.identity, fontSize: 26, lineHeight: 34 },
   primary: {
     borderRadius: radius.md,
     paddingVertical: space.lg,
@@ -139,7 +143,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primaryDisabled: { backgroundColor: colors.lineStrong },
-  primaryLabel: { fontFamily: 'Heebo_700Bold', fontSize: 16, color: colors.inkInverse },
+  primaryLabel: type.button,
   ghost: {
     borderRadius: radius.sm,
     borderWidth: 1,

@@ -23,7 +23,7 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {result.kind === 'match' ? (
           <>
-            <ScreenHeader eyebrow={result.match.hostname} title={result.match.merchantName} />
+            <ScreenHeader eyebrow={result.match.hostname} title={result.match.merchantName} titleIsName />
             <Text style={styles.lede}>
               {result.match.evaluations.length === 1 ? (
                 'הטבה אחת תקפה לקנייה באתר הזה.'
@@ -46,7 +46,7 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
           </>
         ) : result.kind === 'no_benefits' ? (
           <>
-            <ScreenHeader eyebrow={result.hostname} title={result.merchantName} />
+            <ScreenHeader eyebrow={result.hostname} title={result.merchantName} titleIsName />
             <View style={styles.notice}>
               <Text style={type.heading}>אין כאן הטבה תקפה</Text>
               <Text style={type.small}>
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.paper },
   content: { paddingBottom: space.xxl },
   lede: { ...type.body, paddingHorizontal: space.xl, paddingBottom: space.lg },
-  figureInline: { fontFamily: 'Rubik_700Bold', fontSize: 22, color: colors.mint },
+  figureInline: type.figureInline,
   list: { paddingHorizontal: space.xl },
   notice: {
     marginHorizontal: space.xl,

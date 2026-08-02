@@ -110,8 +110,22 @@ It takes its cues from the artifact that already answers this app's question
 honestly — a printed receipt: ink on warm paper, hairline rules, figures given
 room, conditions never demoted to grey small print. The accent is a deep
 teal-green rather than promotional red, because the app never sells a deal; it
-tells you what you already hold. Rubik carries headlines and every figure,
-Heebo does the reading work; both are bundled, so first launch needs no network.
+tells you what you already hold.
+
+The type is two Hebrew revivals rather than the Google-default product sans
+(Rubik and Heebo — the Hebrew equivalent of reaching for Inter). **Frank Ruhl
+Libre** is the digital revival of Frank-Rühl, the face Hebrew newspapers and
+Hebrew fine print were set in for most of a century; an app arguing that the
+terms *are* the product should speak in the typeface the terms were printed
+in. It carries our own voice and every figure. **Miriam Libre** — the revival
+of Miriam, the squarish face of official Israeli forms and early screens —
+carries names, markers, buttons and counts, and its contemporary Latin keeps
+"Terminal X" from looking like a 1990s masthead.
+
+The split is not decorative: Miriam draws ₪ as a wide ש-ח ligature, so "₪50"
+came out reading as "50שח" at 44px. Anything that can carry an amount — the
+figures, the condition chips, the captions — is set in the serif. Both faces
+ship in the bundle, so first launch needs no network.
 
 The one device the app is built around is the **condition strip**: each stated
 condition as a chip in one of four tones — satisfied (mint ✓), do this (amber

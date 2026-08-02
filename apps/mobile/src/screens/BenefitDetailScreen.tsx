@@ -4,7 +4,7 @@ import { formatLastVerified, formatSaving, formatValue, type Evaluation } from '
 import { GateList, gateSummary } from '../components/Gates';
 import { GhostButton, PrimaryButton, ScreenHeader, Section } from '../components/ui';
 import { programNames } from '../services/catalog';
-import { colors, radius, space, type } from '../theme';
+import { colors, fonts, radius, space, type } from '../theme';
 
 interface Props {
   evaluation: Evaluation;
@@ -29,6 +29,7 @@ export function BenefitDetailScreen({
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <ScreenHeader
           title={benefit.merchant_name}
+          titleIsName
           eyebrow={programNames[benefit.program_id] ?? benefit.program_id}
           onBack={onBack}
         />
@@ -116,11 +117,11 @@ const styles = StyleSheet.create({
     gap: space.xs,
   },
   tillValue: { flexDirection: 'row', alignItems: 'baseline', gap: space.sm },
-  tillFigure: { fontFamily: 'Rubik_700Bold', fontSize: 46, lineHeight: 52, color: '#7FE3C6' },
-  tillUnit: { fontFamily: 'Heebo_500Medium', fontSize: 17, color: '#7FE3C6' },
-  tillSaving: { fontFamily: 'Heebo_400Regular', fontSize: 14, color: '#A9B6C2' },
+  tillFigure: { ...type.figureLarge, color: '#7FE3C6' },
+  tillUnit: { fontFamily: fonts.voiceMedium, fontSize: 17, color: '#7FE3C6' },
+  tillSaving: { fontFamily: fonts.voice, fontSize: 14, color: '#A9B6C2' },
   tillRule: { height: 1, backgroundColor: '#2C3947', marginVertical: space.md },
-  tillNote: { fontFamily: 'Heebo_500Medium', fontSize: 15, lineHeight: 22, color: colors.inkInverse },
+  tillNote: { fontFamily: fonts.voiceMedium, fontSize: 16, lineHeight: 25, color: colors.inkInverse },
   quote: {
     marginHorizontal: space.xl,
     backgroundColor: colors.card,

@@ -40,7 +40,7 @@ export function BenefitCard({ evaluation, onPress }: Props) {
         <View style={styles.top}>
           <View style={styles.identity}>
             <Text style={type.eyebrow}>{programNames[benefit.program_id] ?? benefit.program_id}</Text>
-            <Text style={type.heading} numberOfLines={1}>
+            <Text style={type.identity} numberOfLines={1}>
               {benefit.merchant_name}
             </Text>
           </View>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   identity: { flex: 1, gap: 3 },
   value: { alignItems: 'flex-end' },
-  figure: { fontFamily: 'Rubik_700Bold', fontSize: 30, lineHeight: 34, color: colors.mint },
+  figure: type.figure,
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

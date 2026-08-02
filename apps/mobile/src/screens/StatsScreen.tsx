@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { GhostButton, ScreenHeader, Section } from '../components/ui';
 import { clearEvents, computeKpis, loadEvents, type Kpis } from '../state/events';
-import { colors, radius, space, type } from '../theme';
+import { colors, fonts, radius, space, type } from '../theme';
 
 const TARGET = 0.3;
 
@@ -106,9 +106,9 @@ const styles = StyleSheet.create({
     padding: space.xl,
     gap: space.sm,
   },
-  ratio: { fontFamily: 'Rubik_700Bold', fontSize: 52, lineHeight: 58, color: colors.inkFaint },
+  ratio: { ...type.figureLarge, fontSize: 52, lineHeight: 58, color: colors.inkFaint },
   ratioMet: { color: colors.mint },
-  ratioEmpty: { fontFamily: 'Rubik_500Medium', fontSize: 27, lineHeight: 58, color: colors.inkFaint },
+  ratioEmpty: { fontFamily: fonts.voiceMedium, fontSize: 26, lineHeight: 58, color: colors.inkFaint },
   track: {
     height: 8,
     borderRadius: radius.pill,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.line,
   },
   rowLast: { borderBottomWidth: 0 },
-  rowValue: { fontFamily: 'Rubik_500Medium', fontSize: 17, color: colors.ink },
+  rowValue: type.tableValue,
   note: { ...type.caption, marginHorizontal: space.xl, lineHeight: 17 },
   reset: { paddingHorizontal: space.xl },
 });

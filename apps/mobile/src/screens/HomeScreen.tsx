@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     borderColor: colors.line,
     backgroundColor: colors.card,
   },
-  figureInline: { fontFamily: 'Rubik_700Bold', fontSize: 22, color: colors.mint },
+  figureInline: type.figureInline,
   list: { paddingHorizontal: space.xl, paddingBottom: space.xxxl },
   geofence: {
     flexDirection: 'row',

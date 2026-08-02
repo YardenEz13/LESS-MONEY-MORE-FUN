@@ -2,8 +2,18 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
-import { useFonts, Rubik_500Medium, Rubik_700Bold } from '@expo-google-fonts/rubik';
-import { Heebo_400Regular, Heebo_500Medium, Heebo_700Bold } from '@expo-google-fonts/heebo';
+import {
+  useFonts,
+  FrankRuhlLibre_400Regular,
+  FrankRuhlLibre_500Medium,
+  FrankRuhlLibre_700Bold,
+  FrankRuhlLibre_900Black,
+} from '@expo-google-fonts/frank-ruhl-libre';
+import {
+  MiriamLibre_400Regular,
+  MiriamLibre_500Medium,
+  MiriamLibre_700Bold,
+} from '@expo-google-fonts/miriam-libre';
 import type { Evaluation, UserProfile } from '@sbr/core';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
@@ -40,14 +50,17 @@ export default function App() {
   const [geofenceStatus, setGeofenceStatus] = useState('תזכורת בקניון כבויה');
   const [geofenceActive, setGeofenceActive] = useState(false);
 
-  // Rubik carries the figures and headlines, Heebo does the reading work. Both
-  // ship with the bundle, so there is no network dependency on first launch.
+  // Frank Ruhl Libre does the talking, Miriam Libre does the counting — two
+  // Hebrew revivals rather than the Google-default product sans. Both ship in
+  // the bundle, so first launch needs no network.
   const [fontsLoaded] = useFonts({
-    Rubik_500Medium,
-    Rubik_700Bold,
-    Heebo_400Regular,
-    Heebo_500Medium,
-    Heebo_700Bold,
+    FrankRuhlLibre_400Regular,
+    FrankRuhlLibre_500Medium,
+    FrankRuhlLibre_700Bold,
+    FrankRuhlLibre_900Black,
+    MiriamLibre_400Regular,
+    MiriamLibre_500Medium,
+    MiriamLibre_700Bold,
   });
 
   const persist = useCallback(async (next: UserProfile) => {

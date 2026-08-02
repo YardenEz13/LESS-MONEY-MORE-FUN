@@ -75,9 +75,12 @@ on its own is mostly GPS drift.
 
 ## The look
 
-"Ledger" — ink on warm paper, deep teal for money kept, Rubik and Heebo set
-right-to-left. The signature device is the condition strip: each term as a chip
-in one of four tones (satisfied, do this, note, violated). Details in
+"Ledger" — ink on warm paper, deep teal for money kept. The type is two Hebrew
+revivals with actual provenance rather than the default product sans: Frank
+Ruhl Libre, the face Hebrew fine print was set in, for our voice and every
+figure; Miriam Libre, the squarish face of official forms, for names and
+markers. The signature device is the condition strip: each term as a chip in
+one of four tones — satisfied, do this, note, violated. Details in
 `docs/ARCHITECTURE.md`.
 
 ## Status

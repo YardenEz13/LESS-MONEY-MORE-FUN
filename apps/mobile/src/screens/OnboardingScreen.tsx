@@ -94,7 +94,8 @@ function ProgramRow({
         {selected && <Text style={styles.check}>✓</Text>}
       </View>
       <View style={styles.rowText}>
-        <Text style={type.bodyStrong}>{program.name}</Text>
+        {/* Club names are brands, half of them Latin — same face as merchants. */}
+        <Text style={type.identitySmall}>{program.name}</Text>
         {program.hint && <Text style={type.caption}>{program.hint}</Text>}
       </View>
     </Pressable>

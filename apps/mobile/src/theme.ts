@@ -62,35 +62,78 @@ export const colors = {
 } as const;
 
 export const fonts = {
-  display: 'Rubik_700Bold',
-  displayMedium: 'Rubik_500Medium',
-  body: 'Heebo_400Regular',
-  bodyMedium: 'Heebo_500Medium',
-  bodyBold: 'Heebo_700Bold',
+  /**
+   * Frank Ruhl Libre — the digital revival of Frank-Rühl, the face Hebrew
+   * newspapers and, more to the point, Hebrew fine print were set in for most
+   * of a century. An app whose whole argument is "the terms are the product"
+   * should speak in the typeface the terms were actually printed in.
+   */
+  voice: 'FrankRuhlLibre_400Regular',
+  voiceMedium: 'FrankRuhlLibre_500Medium',
+  voiceBold: 'FrankRuhlLibre_700Bold',
+  voiceBlack: 'FrankRuhlLibre_900Black',
+  /**
+   * Miriam Libre — the revival of Miriam, the squarish Hebrew face of official
+   * forms and early Israeli screens. It carries every number and every
+   * condition chip: a ledger total, not a promotional sticker.
+   */
+  data: 'MiriamLibre_400Regular',
+  dataMedium: 'MiriamLibre_500Medium',
+  dataBold: 'MiriamLibre_700Bold',
 } as const;
 
 /**
- * Type scale. Rubik carries the headlines and every figure — its Hebrew is
- * geometric and holds up at large sizes. Heebo does the reading work, where
- * neutrality beats character.
+ * Type scale.
+ *
+ * Two Hebrew revivals, split by job rather than by size: the serif does the
+ * talking, the squarish sans does the counting. Frank Ruhl has a generous
+ * x-height and needs a little more leading than a UI sans at the same size.
  */
 export const type = {
-  hero: { fontFamily: fonts.display, fontSize: 44, lineHeight: 48, color: colors.ink },
-  title: { fontFamily: fonts.display, fontSize: 27, lineHeight: 34, color: colors.ink },
-  heading: { fontFamily: fonts.display, fontSize: 18, lineHeight: 24, color: colors.ink },
-  figure: { fontFamily: fonts.display, fontSize: 32, lineHeight: 36, color: colors.mint },
-  /** Small caps-ish section marker. Letter-spaced, never bold. */
+  title: { fontFamily: fonts.voiceBold, fontSize: 28, lineHeight: 38, color: colors.ink },
+  heading: { fontFamily: fonts.voiceBold, fontSize: 19, lineHeight: 27, color: colors.ink },
+  /**
+   * Merchant and brand names. Miriam rather than the serif, because half of
+   * them are Latin — "Terminal X" set in Frank Ruhl's Latin companion reads
+   * like a 1990s masthead. A name is data; the serif is for our own voice.
+   */
+  identity: { fontFamily: fonts.dataBold, fontSize: 19, lineHeight: 26, color: colors.ink },
+  identitySmall: { fontFamily: fonts.dataMedium, fontSize: 16, lineHeight: 23, color: colors.ink },
+  body: { fontFamily: fonts.voice, fontSize: 16, lineHeight: 25, color: colors.ink },
+  bodyStrong: { fontFamily: fonts.voiceMedium, fontSize: 16, lineHeight: 25, color: colors.ink },
+  small: { fontFamily: fonts.voice, fontSize: 14, lineHeight: 21, color: colors.inkSoft },
+  quote: { fontFamily: fonts.voice, fontSize: 16.5, lineHeight: 27, color: colors.ink },
+
+  /**
+   * Figures in Frank Ruhl Black. Heavy serif numerals read as a printed total
+   * rather than a promotional sticker — and, decisively, Miriam draws ₪ as a
+   * wide ש-ח ligature, so "₪50" came out looking like "50שח" at 44px. The
+   * currency mark has to be unmistakable in the one element people read first.
+   */
+  figure: { fontFamily: fonts.voiceBlack, fontSize: 32, lineHeight: 38, color: colors.mint },
+  figureLarge: { fontFamily: fonts.voiceBlack, fontSize: 46, lineHeight: 56, color: colors.mint },
+  figureInline: { fontFamily: fonts.voiceBlack, fontSize: 22, color: colors.mint },
+  /**
+   * Section marker. Barely tracked: Hebrew has no uppercase, so the small-caps
+   * eyebrow convention has nothing to work with, and loose tracking just pulls
+   * the letters of a word apart.
+   */
   eyebrow: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 11,
-    letterSpacing: 1.4,
+    fontFamily: fonts.dataMedium,
+    fontSize: 12,
+    letterSpacing: 0.2,
     color: colors.inkFaint,
   },
-  body: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: colors.ink },
-  bodyStrong: { fontFamily: fonts.bodyMedium, fontSize: 15, lineHeight: 22, color: colors.ink },
-  small: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: colors.inkSoft },
-  chip: { fontFamily: fonts.bodyMedium, fontSize: 12.5, lineHeight: 16 },
-  caption: { fontFamily: fonts.body, fontSize: 11.5, lineHeight: 16, color: colors.inkFaint },
+  /**
+   * Chips and captions routinely carry amounts ("₪300+", "עד ₪50"), so they
+   * follow the voice face for the same reason the figures do. Miriam is left
+   * with the jobs where no currency appears and its squarish Latin is the
+   * point: names, markers, buttons, counts.
+   */
+  chip: { fontFamily: fonts.voiceMedium, fontSize: 13, lineHeight: 17 },
+  caption: { fontFamily: fonts.voice, fontSize: 12.5, lineHeight: 18, color: colors.inkFaint },
+  button: { fontFamily: fonts.dataBold, fontSize: 16, color: colors.inkInverse },
+  tableValue: { fontFamily: fonts.dataBold, fontSize: 17, color: colors.ink },
 } satisfies Record<string, TextStyle>;
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 22, xxl: 32, xxxl: 44 } as const;
