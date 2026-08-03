@@ -1,0 +1,41 @@
+name: smart-benefits-recall
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  core:
+    name: engine + pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm run validate:data
+      - run: npm test
+      - run: npm run typecheck
+      # No API key in CI: prove the scrape + wiring still runs end to end
+      # against the committed fixtures without calling the model.
+      - run: npm run extract -- --offline --scrape-only
+
+  mobile:
+    name: app typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # apps/mobile is deliberately outside the npm workspace (it reaches
+      # @sbr/core via source-path aliases, not a symlinked node_modules
+      # entry), so its own install never resolves @sbr/core's dependencies —
+      # notably zod, which packages/core/src/types.ts imports directly and
+      # apps/mobile type-checks against. Install the workspace root first.
+      - run: npm install
+      - run: npm install
+        working-directory: apps/mobile
+      - run: npm run typecheck
+        working-directory: apps/mobile
