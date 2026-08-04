@@ -8,7 +8,7 @@ import {
   toLocalMoment,
   type DwellState,
 } from '@sbr/core';
-import { benefitsAtVenue, venuesById, venues } from './catalog';
+import { benefitsAtVenue, ownedProgramIds, venuesById, venues } from './catalog';
 import { notifyVenue } from './notifications';
 import { loadProfile } from '../state/profile';
 
@@ -54,7 +54,7 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
   // promote an online-only benefit to "eligible".
   const evaluations = rankBenefits(benefitsAtVenue(venueId), {
     now: nowDate,
-    ownedProgramIds: profile.program_ids,
+    ownedProgramIds: ownedProgramIds(profile.program_ids),
     mutedBenefitIds: profile.muted_benefit_ids,
   });
 

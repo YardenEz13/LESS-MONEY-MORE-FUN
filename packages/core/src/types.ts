@@ -75,9 +75,38 @@ export const Program = z
     catalog_url: z.string().url().nullish(),
     /** Shown during onboarding so the user recognises what they hold. */
     hint: z.string().nullish(),
+    /**
+     * The issuer this is a specific card of — `cal_cash_pro`'s parent is `cal`.
+     *
+     * A card carries its own terms (1% cashback on everything) *and* everything
+     * the issuer offers, so holding the card means holding both. Ticking one box
+     * in onboarding therefore has to grant two program ids — see
+     * `expandOwnedPrograms`.
+     */
+    parent_id: z.string().min(1).nullish(),
   })
   .strict();
 export type Program = z.infer<typeof Program>;
+
+/**
+ * What a merchant sells, coarse enough to stay stable.
+ *
+ * This exists so an errand ("I need to fill up") can be turned into a filter
+ * without guessing from the merchant's name. Deliberately a closed list: the
+ * advisor maps free text onto these, and an open vocabulary would let it invent
+ * a category that matches nothing.
+ */
+export const MerchantCategory = z.enum([
+  'fuel',
+  'grocery',
+  'pharmacy',
+  'fashion',
+  'electronics',
+  'dining',
+  'home',
+  'leisure',
+]);
+export type MerchantCategory = z.infer<typeof MerchantCategory>;
 
 export const Merchant = z
   .object({
@@ -87,6 +116,8 @@ export const Merchant = z
     domains: z.array(z.string()).default([]),
     /** Venue ids where this merchant has a branch (MVP: mall-level only). */
     venue_ids: z.array(z.string()).default([]),
+    /** A merchant can be more than one — a supermarket that sells fuel. */
+    categories: z.array(MerchantCategory).default([]),
   })
   .strict();
 export type Merchant = z.infer<typeof Merchant>;

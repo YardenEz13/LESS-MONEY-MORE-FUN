@@ -1,62 +1,107 @@
 [
   {
+    "id": "any_merchant",
+    "name": "כל בית עסק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
     "id": "super_pharm",
     "name": "סופר-פארם",
     "domains": ["super-pharm.co.il"],
-    "venue_ids": ["azrieli_tlv", "dizengoff_center", "ayalon_mall", "ramat_aviv_mall", "malha_mall"]
+    "venue_ids": ["azrieli_tlv", "dizengoff_center", "ayalon_mall", "ramat_aviv_mall", "malha_mall"],
+    "categories": ["pharmacy", "grocery"]
   },
   {
     "id": "shufersal",
     "name": "שופרסל",
     "domains": ["shufersal.co.il"],
-    "venue_ids": ["ayalon_mall", "big_fashion_glilot"]
+    "venue_ids": ["ayalon_mall", "big_fashion_glilot"],
+    "categories": ["grocery"]
   },
   {
     "id": "ksp",
     "name": "KSP",
     "domains": ["ksp.co.il"],
-    "venue_ids": ["azrieli_tlv", "grand_kanyon_haifa"]
+    "venue_ids": ["azrieli_tlv", "grand_kanyon_haifa"],
+    "categories": ["electronics"]
   },
   {
     "id": "terminalx",
     "name": "Terminal X",
     "domains": ["terminalx.com"],
-    "venue_ids": ["azrieli_tlv", "ayalon_mall", "seven_stars_mall"]
+    "venue_ids": ["azrieli_tlv", "ayalon_mall", "seven_stars_mall"],
+    "categories": ["fashion"]
   },
   {
     "id": "castro",
     "name": "קסטרו",
     "domains": ["castro.com"],
-    "venue_ids": ["azrieli_tlv", "dizengoff_center", "ayalon_mall", "malha_mall", "sharonim_mall"]
+    "venue_ids": ["azrieli_tlv", "dizengoff_center", "ayalon_mall", "malha_mall", "sharonim_mall"],
+    "categories": ["fashion"]
   },
   {
     "id": "fox",
     "name": "FOX",
     "domains": ["fox.co.il"],
-    "venue_ids": ["dizengoff_center", "ayalon_mall", "grand_canyon_beersheva"]
+    "venue_ids": ["dizengoff_center", "ayalon_mall", "grand_canyon_beersheva"],
+    "categories": ["fashion"]
   },
   {
     "id": "aroma",
     "name": "ארומה",
     "domains": ["aroma.co.il"],
-    "venue_ids": ["azrieli_tlv", "dizengoff_center", "ramat_aviv_mall", "seven_stars_mall"]
+    "venue_ids": ["azrieli_tlv", "dizengoff_center", "ramat_aviv_mall", "seven_stars_mall"],
+    "categories": ["dining"]
   },
   {
     "id": "mcdonalds",
     "name": "מקדונלד'ס",
     "domains": ["mcdonalds.co.il"],
-    "venue_ids": ["azrieli_tlv", "ayalon_mall", "malha_mall", "grand_canyon_beersheva"]
+    "venue_ids": ["azrieli_tlv", "ayalon_mall", "malha_mall", "grand_canyon_beersheva"],
+    "categories": ["dining"]
   },
   {
     "id": "adika",
     "name": "ADIKA",
     "domains": ["adika.com"],
-    "venue_ids": ["dizengoff_center"]
+    "venue_ids": ["dizengoff_center"],
+    "categories": ["fashion"]
   },
   {
     "id": "ivory",
     "name": "Ivory",
     "domains": ["ivory.co.il"],
-    "venue_ids": []
+    "venue_ids": [],
+    "categories": ["electronics"]
+  },
+  {
+    "id": "paz",
+    "name": "פז",
+    "domains": ["paz.co.il"],
+    "venue_ids": [],
+    "categories": ["fuel"]
+  },
+  {
+    "id": "delek",
+    "name": "דלק",
+    "domains": ["delek.co.il"],
+    "venue_ids": [],
+    "categories": ["fuel"]
+  },
+  {
+    "id": "sonol",
+    "name": "סונול",
+    "domains": ["sonol.co.il"],
+    "venue_ids": [],
+    "categories": ["fuel"]
+  },
+  {
+    "id": "dor_alon",
+    "name": "דור אלון",
+    "domains": ["dor-alon.co.il"],
+    "venue_ids": [],
+    "categories": ["fuel"]
   }
 ]

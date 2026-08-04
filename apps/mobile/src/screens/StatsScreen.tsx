@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { GhostButton, ScreenHeader, Section } from '../components/ui';
 import { clearEvents, computeKpis, loadEvents, type Kpis } from '../state/events';
-import { colors, fonts, radius, space, type } from '../theme';
+import { border, colors, radius, space, type } from '../theme';
 
 const TARGET = 0.3;
 
@@ -30,29 +30,35 @@ export function StatsScreen({ onBack }: { onBack: () => void }) {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <ScreenHeader eyebrow="30 ימי בדיקה" title="האם זה עובד" onBack={onBack} />
 
+      {/* The KPI is a figure that matters, so it goes on the plate. */}
       <View style={styles.hero}>
-        <Text style={type.eyebrow}>יחס השפעה על החלטה</Text>
-        {/* A 52px em-dash reads as a broken element, not as "no data". Say it. */}
+        <Text style={styles.heroLabel}>יחס השפעה על החלטה</Text>
+        {/* A 58px em-dash reads as a broken element, not as "no data". Say it. */}
         {ratio == null ? (
           <Text style={styles.ratioEmpty}>טרם נמדד</Text>
         ) : (
           <Text style={[styles.ratio, met && styles.ratioMet]}>{Math.round(ratio * 100)}%</Text>
         )}
+        {/* Both layers are flex rows, so the bar grows from the reading edge in
+            either direction — `start`/`left` offsets do not survive RTL on web. */}
         <View style={styles.track}>
           <View style={[styles.fill, met && styles.fillMet, { width: `${fill * 100}%` }]} />
-          <View style={[styles.target, { start: `${TARGET * 100}%` }]} />
+          <View style={styles.targetRow} pointerEvents="none">
+            <View style={{ width: `${TARGET * 100}%` }} />
+            <View style={styles.target} />
+          </View>
         </View>
         <View style={styles.trackLabels}>
-          <Text style={type.caption}>
+          <Text style={styles.heroCaption}>
             {ratio == null
               ? 'עוד לא נשלחו התראות'
               : met
                 ? 'מעל היעד'
                 : `${Math.round((TARGET - fill) * 100)} נקודות מתחת ליעד`}
           </Text>
-          <Text style={type.caption}>יעד 30%</Text>
+          <Text style={styles.heroCaption}>יעד 30%</Text>
         </View>
-        <Text style={type.small}>
+        <Text style={styles.heroBody}>
           חלק ההתראות שהובילו לפתיחת פירוט או ללחיצה על ״מימשתי״. מתחת ליעד פירושו שההתראות מגיעות
           ברגע הלא נכון — לא שההטבות גרועות.
         </Text>
@@ -95,51 +101,52 @@ function Row({ label, value, last }: { label: string; value: number; last?: bool
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingBottom: space.xxxl, gap: space.xl },
+  screen: { flex: 1, backgroundColor: colors.surfacePage },
+  content: { paddingBottom: space.s6, gap: space.s4 },
   hero: {
-    marginHorizontal: space.xl,
-    backgroundColor: colors.card,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: space.xl,
-    gap: space.sm,
+    marginHorizontal: space.s4,
+    backgroundColor: colors.surfacePlate,
+    borderRadius: radius.sharp,
+    padding: space.s4,
+    gap: space.s2,
   },
-  ratio: { ...type.figureLarge, fontSize: 52, lineHeight: 58, color: colors.inkFaint },
-  ratioMet: { color: colors.mint },
-  ratioEmpty: { fontFamily: fonts.voiceMedium, fontSize: 26, lineHeight: 58, color: colors.inkFaint },
+  heroLabel: { ...type.meta, color: colors.textMutedInverse },
+  heroCaption: { ...type.caption, color: colors.textMutedInverse },
+  heroBody: { ...type.small, color: colors.textMutedInverse },
+  ratio: { ...type.figureLarge, color: colors.textMutedInverse },
+  ratioMet: { color: colors.textInverse },
+  ratioEmpty: { ...type.displaySmall, color: colors.textMutedInverse },
   track: {
     height: 8,
-    borderRadius: radius.pill,
-    backgroundColor: colors.paper,
-    borderWidth: 1,
-    borderColor: colors.line,
-    marginTop: space.sm,
-    overflow: 'hidden',
+    borderRadius: radius.sharp,
+    backgroundColor: colors.surfacePlateSoft,
+    marginTop: space.s2,
+    flexDirection: 'row',
   },
-  fill: { position: 'absolute', top: 0, bottom: 0, start: 0, backgroundColor: colors.amberLine },
-  fillMet: { backgroundColor: colors.mint },
-  target: { position: 'absolute', top: -2, bottom: -2, width: 2, backgroundColor: colors.ink },
-  trackLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: space.xs },
+  fill: { backgroundColor: colors.accentUrgent },
+  fillMet: { backgroundColor: colors.surfacePrimary },
+  /* The target sits on the bar itself — a percentage without its bar is just a number. */
+  targetRow: { ...StyleSheet.absoluteFillObject, top: -3, bottom: -3, flexDirection: 'row' },
+  target: { width: border.rule, backgroundColor: colors.textInverse },
+  trackLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: space.s1 },
   table: {
-    marginHorizontal: space.xl,
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    paddingHorizontal: space.lg,
+    marginHorizontal: space.s4,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
+    paddingHorizontal: space.s3,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: space.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.line,
+    gap: space.s3,
+    paddingVertical: space.s3 - 4,
+    borderBottomWidth: border.hairline,
+    borderBottomColor: colors.borderHairlineSoft,
   },
   rowLast: { borderBottomWidth: 0 },
   rowValue: type.tableValue,
-  note: { ...type.caption, marginHorizontal: space.xl, lineHeight: 17 },
-  reset: { paddingHorizontal: space.xl },
+  note: { ...type.caption, marginHorizontal: space.s4, lineHeight: 18 },
+  reset: { paddingHorizontal: space.s4 },
 });

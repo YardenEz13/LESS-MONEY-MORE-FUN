@@ -4,7 +4,7 @@ import type { UserProfile } from '@sbr/core';
 import { GhostButton, ScreenHeader, Section } from '../components/ui';
 import { programsById, venues } from '../services/catalog';
 import { handleVenueEnter } from '../services/geofencing';
-import { colors, radius, space, type } from '../theme';
+import { border, colors, radius, space, type } from '../theme';
 
 interface Props {
   profile: UserProfile;
@@ -49,7 +49,7 @@ export function SettingsScreen({
             </View>
             <Switch
               value={profile.notifications_enabled}
-              trackColor={{ true: colors.mint, false: colors.lineStrong }}
+              trackColor={{ true: colors.surfacePrimary, false: colors.borderHairline }}
               onValueChange={(value) => onChange({ ...profile, notifications_enabled: value })}
             />
           </View>
@@ -85,7 +85,8 @@ export function SettingsScreen({
         </View>
         {simulated && (
           <View style={styles.hint}>
-            <Text style={[type.small, { color: colors.amber }]}>
+            <View style={styles.hintBar} />
+            <Text style={styles.hintText}>
               הופעלה כניסה ל{simulated}. אם לא הגיעה התראה — סף השהייה של 3 דקות או הצינון של 12
               שעות חסם אותה, וזו התנהגות תקינה.
             </Text>
@@ -99,6 +100,13 @@ export function SettingsScreen({
             אין חשבון, אין שרת, אין ת״ז. הפרופיל, יומן האינטראקציות והקטלוג יושבים על המכשיר.
             מחיקת האפליקציה מוחקת הכול.
           </Text>
+          <Text style={type.bodyStrong}>חריג אחד: העוזר החכם</Text>
+          <Text style={type.small}>
+            כששואלים שאלה במסך ״שאל״, השאלה יחד עם רשימת המועדונים שסימנת וההטבות התואמות
+            נשלחות ל-Gemini של Google כדי לנסח תשובה. רשימת המועדונים מעידה על דברים אישיים —
+            ״חבר״ מעיד על שירות קבע, ״הייטקזון״ על מקום העבודה. שום דבר לא נשלח עד שתשאלו,
+            ואפשר להשתמש באפליקציה כרגיל בלי המסך הזה.
+          </Text>
         </View>
       </Section>
     </ScrollView>
@@ -106,42 +114,46 @@ export function SettingsScreen({
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingBottom: space.xxxl, gap: space.xl },
+  screen: { flex: 1, backgroundColor: colors.surfacePage },
+  content: { paddingBottom: space.s6, gap: space.s4 },
   card: {
-    marginHorizontal: space.xl,
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: space.lg,
-    gap: space.md,
+    marginHorizontal: space.s4,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
+    padding: space.s3,
+    gap: space.s3 - 4,
   },
-  switchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.md },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: space.s3 - 4,
+  },
   switchText: { flex: 1, gap: 2 },
   venues: {
-    marginHorizontal: space.xl,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: colors.card,
-    overflow: 'hidden',
+    marginHorizontal: space.s4,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
   },
   venueRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'space-between',
-    paddingVertical: space.md,
-    paddingHorizontal: space.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.line,
+    gap: space.s3,
+    paddingVertical: space.s3 - 4,
+    paddingHorizontal: space.s3,
+    borderBottomWidth: border.hairline,
+    borderBottomColor: colors.borderHairlineSoft,
   },
+  /* A note, not an alarm: the marker bar carries it, no coloured field. */
   hint: {
-    marginHorizontal: space.xl,
-    backgroundColor: colors.amberSoft,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    borderColor: colors.amberLine,
-    padding: space.lg,
+    marginHorizontal: space.s4,
+    flexDirection: 'row',
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radius.sharp,
   },
+  hintBar: { width: border.marker, backgroundColor: colors.accentUrgent },
+  hintText: { ...type.small, flex: 1, padding: space.s3 },
 });

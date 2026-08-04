@@ -3,7 +3,7 @@
     "id": "isracard",
     "name": "ישראכרט",
     "category": "credit_card",
-    "catalog_url": "https://www.isracard.co.il/he-il/benefits/",
+    "catalog_url": "https://www.isracard.co.il/",
     "hint": "כרטיס אשראי ישראכרט"
   },
   {
@@ -19,6 +19,22 @@
     "category": "credit_card",
     "catalog_url": "https://www.cal-online.co.il/benefits",
     "hint": "כרטיס אשראי כאל / ויזה כאל"
+  },
+  {
+    "id": "cal_cash_pro",
+    "name": "Cash כאל Pro",
+    "category": "credit_card",
+    "parent_id": "cal",
+    "catalog_url": "https://www.cal-online.co.il/benefits",
+    "hint": "כרטיס Cash כאל Pro — 1% קאשבק על כל עסקה"
+  },
+  {
+    "id": "max_back",
+    "name": "מקס בק",
+    "category": "credit_card",
+    "parent_id": "max",
+    "catalog_url": "https://www.max.co.il/",
+    "hint": "כרטיס מקס בק — צבירת החזר על כל עסקה"
   },
   {
     "id": "hever",
@@ -52,7 +68,7 @@
     "id": "shufersal_life",
     "name": "שופרסל LIFE",
     "category": "retail_club",
-    "catalog_url": "https://www.shufersal.co.il/online/he/promotions",
+    "catalog_url": "https://www.shufersal.co.il/online/he/",
     "hint": "מועדון שופרסל LIFE"
   },
   {

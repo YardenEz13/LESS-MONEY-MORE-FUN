@@ -32,6 +32,7 @@
         }
       ]
     },
+    "web": { "bundler": "metro" },
     "plugins": [
       [
         "expo-location",

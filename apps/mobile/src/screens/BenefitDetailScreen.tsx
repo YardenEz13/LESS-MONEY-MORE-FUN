@@ -4,7 +4,7 @@ import { formatLastVerified, formatSaving, formatValue, type Evaluation } from '
 import { GateList, gateSummary } from '../components/Gates';
 import { GhostButton, PrimaryButton, ScreenHeader, Section } from '../components/ui';
 import { programNames } from '../services/catalog';
-import { colors, fonts, radius, space, type } from '../theme';
+import { border, colors, radius, space, type } from '../theme';
 
 interface Props {
   evaluation: Evaluation;
@@ -29,14 +29,13 @@ export function BenefitDetailScreen({
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <ScreenHeader
           title={benefit.merchant_name}
-          titleIsName
           eyebrow={programNames[benefit.program_id] ?? benefit.program_id}
           onBack={onBack}
         />
 
-        {/* The till card: inverted, deliberately the loudest thing on the
-            screen, because this is what you hold up at the counter. It states
-            the benefit and the one thing still standing in the way. */}
+        {/* The plate, full width: deliberately the loudest thing on the screen,
+            because this is what you hold up at the counter. It states the
+            benefit and the one thing still standing in the way. */}
         <View style={styles.till}>
           <View style={styles.tillValue}>
             <Text style={styles.tillFigure}>{figure}</Text>
@@ -59,7 +58,8 @@ export function BenefitDetailScreen({
 
         <Section eyebrow="לשון התקנון">
           <View style={styles.quote}>
-            <Text style={type.body}>{benefit.conditions.raw_text_summary}</Text>
+            <View style={styles.quoteBar} />
+            <Text style={styles.quoteText}>{benefit.conditions.raw_text_summary}</Text>
           </View>
         </Section>
 
@@ -107,55 +107,54 @@ function TrustRow({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingBottom: space.xxl, gap: space.xl },
+  screen: { flex: 1, backgroundColor: colors.surfacePage },
+  content: { paddingBottom: space.s5, gap: space.s4 },
   till: {
-    marginHorizontal: space.xl,
-    backgroundColor: colors.ink,
-    borderRadius: radius.lg,
-    padding: space.xl,
-    gap: space.xs,
+    marginHorizontal: space.s4,
+    backgroundColor: colors.surfacePlate,
+    borderRadius: radius.sharp,
+    padding: space.s4,
+    gap: space.s1,
   },
-  tillValue: { flexDirection: 'row', alignItems: 'baseline', gap: space.sm },
-  tillFigure: { ...type.figureLarge, color: '#7FE3C6' },
-  tillUnit: { fontFamily: fonts.voiceMedium, fontSize: 17, color: '#7FE3C6' },
-  tillSaving: { fontFamily: fonts.voice, fontSize: 14, color: '#A9B6C2' },
-  tillRule: { height: 1, backgroundColor: '#2C3947', marginVertical: space.md },
-  tillNote: { fontFamily: fonts.voiceMedium, fontSize: 16, lineHeight: 25, color: colors.inkInverse },
-  quote: {
-    marginHorizontal: space.xl,
-    backgroundColor: colors.card,
-    borderRightWidth: 3,
-    borderRightColor: colors.mint,
-    borderRadius: radius.sm,
-    padding: space.lg,
+  tillValue: { flexDirection: 'row', alignItems: 'baseline', gap: space.s2 },
+  tillFigure: type.figureLarge,
+  tillUnit: { ...type.bodyStrong, fontSize: 17, color: colors.textMutedInverse },
+  tillSaving: { ...type.small, color: colors.textMutedInverse },
+  tillRule: {
+    height: border.hairline,
+    backgroundColor: colors.borderOnPlate,
+    marginVertical: space.s3 - 2,
   },
+  tillNote: { ...type.bodyStrong, color: colors.textInverse },
+  /* The marker bar is a sibling view, not `borderStartWidth` — see BenefitCard. */
+  quote: { marginHorizontal: space.s4, flexDirection: 'row', gap: space.s3 - 2 },
+  quoteBar: { width: border.marker, backgroundColor: colors.surfacePrimary },
+  quoteText: { ...type.body, flex: 1, paddingVertical: space.s1 },
   trust: {
-    marginHorizontal: space.xl,
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    paddingHorizontal: space.lg,
+    marginHorizontal: space.s4,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
+    paddingHorizontal: space.s3,
   },
   trustRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: space.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.line,
+    gap: space.s3,
+    paddingVertical: space.s3 - 4,
+    borderBottomWidth: border.hairline,
+    borderBottomColor: colors.borderHairlineSoft,
   },
-  trustAction: { paddingVertical: space.md },
-  disclaimer: { ...type.caption, marginHorizontal: space.xl, lineHeight: 17 },
+  trustAction: { paddingVertical: space.s3 - 4 },
+  disclaimer: { ...type.caption, marginHorizontal: space.s4, lineHeight: 18 },
   footer: {
     flexDirection: 'row',
-    gap: space.md,
-    padding: space.lg,
-    paddingHorizontal: space.xl,
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-    backgroundColor: colors.card,
+    gap: space.s2,
+    paddingVertical: space.s3 - 4,
+    paddingHorizontal: space.s4,
+    borderTopWidth: border.hairline,
+    borderTopColor: colors.borderHairline,
   },
   mute: { alignSelf: 'stretch', justifyContent: 'center' },
 });

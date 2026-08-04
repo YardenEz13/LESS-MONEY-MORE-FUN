@@ -13,10 +13,17 @@ export const emptyProfile: UserProfile = {
 /**
  * The entire user model: a list of club ids on the device.
  *
- * No account, no ID number, no card number, nothing that leaves the phone.
- * That's the Zero-Auth promise in the PRD, and it's enforced by there being
- * no network write path at all — if you add one, this comment is the thing
- * you have to argue with first.
+ * No account, no ID number, no card number. That's the Zero-Auth promise in
+ * the PRD.
+ *
+ * It used to be enforced by there being no network write path at all. There is
+ * now exactly one, and it is worth stating plainly rather than letting a reader
+ * discover it: `services/advisor.ts` sends the question, this program list and
+ * the matching benefits to Gemini when the user asks the advisor something.
+ * Nothing is sent otherwise, and the settings screen says so in Hebrew.
+ *
+ * That is the only sanctioned exception. If you are about to add a second one,
+ * this comment is still the thing you have to argue with first.
  */
 export async function loadProfile(): Promise<UserProfile> {
   try {

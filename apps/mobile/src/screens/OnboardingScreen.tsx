@@ -4,7 +4,7 @@ import type { Program, UserProfile } from '@sbr/core';
 import { PrimaryButton, Section } from '../components/ui';
 import { programs } from '../services/catalog';
 import { toggleProgram } from '../state/profile';
-import { colors, radius, space, type } from '../theme';
+import { border, colors, radius, space, type } from '../theme';
 
 const SECTION_TITLES: Record<Program['category'], string> = {
   credit_card: 'כרטיסי אשראי',
@@ -38,8 +38,8 @@ export function OnboardingScreen({ profile, onChange, onDone }: Props) {
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.intro}>
-          <Text style={type.eyebrow}>הגדרה חד-פעמית</Text>
-          <Text style={type.title}>מה יש לך בארנק?</Text>
+          <Text style={type.meta}>הגדרה חד-פעמית</Text>
+          <Text style={type.display}>מה יש לך בארנק?</Text>
           <Text style={type.body}>
             סמן את המועדונים והכרטיסים שברשותך. לא נשאל ת״ז, סיסמה או מספר כרטיס — הסימון נשמר
             במכשיר שלך ולא נשלח לשום מקום.
@@ -94,8 +94,7 @@ function ProgramRow({
         {selected && <Text style={styles.check}>✓</Text>}
       </View>
       <View style={styles.rowText}>
-        {/* Club names are brands, half of them Latin — same face as merchants. */}
-        <Text style={type.identitySmall}>{program.name}</Text>
+        <Text style={type.bodyStrong}>{program.name}</Text>
         {program.hint && <Text style={type.caption}>{program.hint}</Text>}
       </View>
     </Pressable>
@@ -103,45 +102,43 @@ function ProgramRow({
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingTop: space.xxl, paddingBottom: space.xxl, gap: space.xl },
-  intro: { paddingHorizontal: space.xl, gap: space.sm },
+  screen: { flex: 1, backgroundColor: colors.surfacePage },
+  content: { paddingTop: space.s5, paddingBottom: space.s5, gap: space.s4 },
+  intro: { paddingHorizontal: space.s4, gap: space.s2 },
   group: {
-    marginHorizontal: space.xl,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: colors.card,
-    overflow: 'hidden',
+    marginHorizontal: space.s4,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.md,
-    paddingVertical: space.md + 2,
-    paddingHorizontal: space.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.line,
+    gap: space.s3 - 2,
+    paddingVertical: space.s3 - 2,
+    paddingHorizontal: space.s3,
+    borderBottomWidth: border.hairline,
+    borderBottomColor: colors.borderHairlineSoft,
   },
-  rowSelected: { backgroundColor: colors.mintSoft },
-  rowText: { flex: 1, gap: 1 },
+  rowSelected: { backgroundColor: colors.surfaceRaised },
+  /* flex-start so Latin club names ("Max") align with Hebrew ones — see ui.tsx. */
+  rowText: { flex: 1, gap: 1, alignItems: 'flex-start' },
   box: {
-    width: 21,
-    height: 21,
-    borderRadius: radius.sm - 2,
-    borderWidth: 1.5,
-    borderColor: colors.lineStrong,
+    width: 22,
+    height: 22,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  boxOn: { backgroundColor: colors.mint, borderColor: colors.mint },
-  check: { color: colors.inkInverse, fontSize: 13, lineHeight: 16 },
+  boxOn: { backgroundColor: colors.surfacePrimary, borderColor: colors.surfacePrimary },
+  check: { color: colors.textInverse, fontSize: 13, lineHeight: 16 },
   footer: {
     flexDirection: 'row',
-    padding: space.lg,
-    paddingHorizontal: space.xl,
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-    backgroundColor: colors.card,
+    paddingVertical: space.s3 - 4,
+    paddingHorizontal: space.s4,
+    borderTopWidth: border.hairline,
+    borderTopColor: colors.borderHairline,
   },
 });

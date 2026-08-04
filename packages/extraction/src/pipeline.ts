@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { Merchant } from '@sbr/core';
 import { extractBenefits } from './extract';
-import { htmlToText, scrapePage, type ScrapedPage } from './scrape';
+import { assessPage, extractJsonLd, htmlToText, scrapePage, type ScrapedPage } from './scrape';
 import {
   JsonStore,
   mergeBenefits,
@@ -10,7 +10,7 @@ import {
   toBenefit,
   type ReviewItem,
 } from './store';
-import type { ExtractedBenefit } from './schema';
+import { ExtractionResult, type ExtractedBenefit } from './schema';
 
 export interface Source {
   program_id: string;
@@ -50,10 +50,84 @@ async function loadSource(
 ): Promise<ScrapedPage> {
   if (offline) {
     if (!source.fixture) throw new Error(`${source.url}: --offline needs a fixture`);
+    // Fixtures are our own files and always UTF-8, so they skip charset
+    // detection — but they run the same structuring and scoring as the network
+    // path, or a dry run would grade a different page than production does.
     const html = await readFile(resolve(rootDir, source.fixture), 'utf8');
-    return { url: source.url, text: htmlToText(html), fetchedAt: new Date().toISOString() };
+    const structured = extractJsonLd(html);
+    const body = htmlToText(html);
+    const text = structured ? `${structured}\n\n${body}` : body;
+    return {
+      url: source.url,
+      text,
+      fetchedAt: new Date().toISOString(),
+      quality: assessPage(html, text, 'utf-8'),
+    };
   }
   return scrapePage(source.url);
+}
+
+export interface ImportOptions {
+  dataDir: string;
+  outDir: string;
+  /** JSON file shaped like ExtractionResult — what a browser agent hands back. */
+  file: string;
+  programId: string;
+  sourceUrl: string;
+  threshold?: number;
+}
+
+/**
+ * Take benefits collected by hand — a browser agent working a login-walled or
+ * client-rendered site the fetch pipeline cannot reach — and put them through
+ * the identical confidence gate.
+ *
+ * Deliberately not a bypass. A benefit that arrives this way is still scored,
+ * still queued for review below the threshold, and still merged by the same
+ * stable id, so a later automated run updates the row rather than duplicating
+ * it. The only thing this skips is the scrape and the model call.
+ */
+export async function importExtraction(options: ImportOptions): Promise<PipelineReport> {
+  const parsed = ExtractionResult.parse(
+    JSON.parse(await readFile(options.file, 'utf8')),
+  );
+  const merchants = Merchant.array().parse(
+    JSON.parse(await readFile(`${options.dataDir}/merchants.json`, 'utf8')),
+  );
+  const store = new JsonStore(options.outDir);
+  const existing = await store.read();
+  const now = new Date();
+
+  const candidates = parsed.benefits.map((item) => ({
+    benefit: toBenefit(item, {
+      programId: options.programId,
+      sourceUrl: options.sourceUrl,
+      merchants,
+      now,
+    }),
+    reason: item.confidence_reason,
+  }));
+
+  const { publish, review } = partitionByConfidence(candidates, options.threshold);
+  const queuedAt = now.toISOString();
+  const touchedIds = new Set(candidates.map((c) => c.benefit.id));
+
+  await store.write({
+    benefits: mergeBenefits(existing.benefits, publish),
+    reviewQueue: [
+      ...existing.reviewQueue.filter((item) => !touchedIds.has(item.benefit.id)),
+      ...review.map((item) => ({ ...item, queued_at: queuedAt })),
+    ],
+  });
+
+  return {
+    scraped: 0,
+    extracted: candidates.length,
+    published: publish.length,
+    queuedForReview: review.length,
+    failures: [],
+    usage: { inputTokens: 0, outputTokens: 0 },
+  };
 }
 
 export async function runPipeline(options: PipelineOptions): Promise<PipelineReport> {
@@ -88,7 +162,10 @@ export async function runPipeline(options: PipelineOptions): Promise<PipelineRep
     try {
       page = await loadSource(source, options.offline ?? false, options.rootDir);
       report.scraped += 1;
-      console.log(`  scraped ${source.url} (${page.text.length} chars)`);
+      console.log(
+        `  scraped ${source.url} (${page.text.length} chars, ` +
+          `${page.quality.offerTerms} offer terms, ${page.quality.charset})`,
+      );
     } catch (error) {
       report.failures.push({ url: source.url, error: String(error) });
       console.error(`  ! scrape failed: ${String(error)}`);

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { Gate } from '@sbr/core';
-import { colors, gateGlyph, gateTone, radius, space, type, type GateTone } from '../theme';
+import { border, colors, gateGlyph, gateTone, radius, space, type, type GateTone } from '../theme';
 
 /** Amber is for errands; a caveat you can't act on gets the quiet tone. */
 function toneFor(gate: Gate): GateTone {
@@ -25,7 +25,7 @@ export function ConditionStrip({ gates, max = 4 }: { gates: readonly Gate[]; max
     return (
       <View style={styles.strip}>
         <View style={[styles.chip, styles.chipPlain]}>
-          <Text style={[type.chip, { color: colors.inkSoft }]}>ללא תנאים בתקנון</Text>
+          <Text style={[type.chip, { color: gateTone.note.fg }]}>ללא תנאים בתקנון</Text>
         </View>
       </View>
     );
@@ -52,7 +52,7 @@ export function ConditionStrip({ gates, max = 4 }: { gates: readonly Gate[]; max
               : styles.chipPlain,
           ]}
         >
-          <Text style={[type.chip, { color: allHiddenMet ? gateTone.met.fg : colors.inkSoft }]}>
+          <Text style={[type.chip, { color: allHiddenMet ? gateTone.met.fg : gateTone.note.fg }]}>
             {allHiddenMet ? `✓ ${hidden.length} מתקיימים` : `+${hidden.length}`}
           </Text>
         </View>
@@ -88,8 +88,8 @@ export function GateChip({ gate }: { gate: Gate }) {
 export function GateList({ gates }: { gates: readonly Gate[] }) {
   if (gates.length === 0) {
     return (
-      <View style={[styles.row, { backgroundColor: colors.mintSoft }]}>
-        <Text style={[type.body, { color: colors.mint }]}>
+      <View style={[styles.row, { backgroundColor: colors.surfacePrimary }]}>
+        <Text style={[type.body, { color: colors.textInverse }]}>
           התקנון לא מציב תנאים נוספים על ההטבה הזו.
         </Text>
       </View>
@@ -138,37 +138,44 @@ export function gateSummary(gates: readonly Gate[]): string {
 }
 
 const styles = StyleSheet.create({
-  strip: { flexDirection: 'row', flexWrap: 'wrap', gap: space.xs + 2 },
+  strip: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s1 + 2 },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingHorizontal: space.sm + 1,
+    paddingHorizontal: space.s2 + 2,
     paddingVertical: 5,
-    borderRadius: radius.sm,
-    borderWidth: 1,
-    maxWidth: 160,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    maxWidth: 170,
   },
-  chipPlain: { backgroundColor: colors.paper, borderColor: colors.line },
+  chipPlain: { backgroundColor: gateTone.note.bg, borderColor: gateTone.note.border },
   glyph: { fontSize: 11 },
   struck: { textDecorationLine: 'line-through' },
-  list: { gap: 1, borderRadius: radius.md, overflow: 'hidden' },
+  list: {
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: space.md,
-    backgroundColor: colors.card,
-    paddingVertical: space.md,
-    paddingHorizontal: space.lg,
+    gap: space.s3 - 4,
+    backgroundColor: colors.surfacePage,
+    paddingVertical: space.s3 - 4,
+    paddingHorizontal: space.s3,
+    borderBottomWidth: border.hairline,
+    borderBottomColor: colors.borderHairlineSoft,
   },
   marker: {
     width: 22,
     height: 22,
-    borderRadius: radius.sm,
-    borderWidth: 1,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 1,
+    marginTop: 2,
   },
-  rowText: { flex: 1, gap: 2 },
+  /* flex-start so a number-only label ("₪300+") aligns with a Hebrew one — see ui.tsx. */
+  rowText: { flex: 1, gap: 2, alignItems: 'flex-start' },
 });

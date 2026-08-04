@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import * as Linking from 'expo-linking';
 import { rankBenefits, resolveMerchantFromShare, type Evaluation } from '@sbr/core';
-import { benefitsForMerchant, merchants } from './catalog';
+import { benefitsForMerchant, merchants, ownedProgramIds } from './catalog';
 import { loadProfile } from '../state/profile';
 import { logEvent } from '../state/events';
 
@@ -36,7 +36,7 @@ export async function resolveShare(shared: string): Promise<ShareResult> {
 
   const evaluations = rankBenefits(benefitsForMerchant(resolved.merchant.id), {
     now: new Date(),
-    ownedProgramIds: profile.program_ids,
+    ownedProgramIds: ownedProgramIds(profile.program_ids),
     mutedBenefitIds: profile.muted_benefit_ids,
     channel: 'online',
   });

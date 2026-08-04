@@ -1,104 +1,129 @@
 import React from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { formatSaving, formatValue, type Evaluation } from '@sbr/core';
 import { ConditionStrip } from './Gates';
 import { programNames } from '../services/catalog';
-import { colors, lift, radius, space, type } from '../theme';
-import { usePressScale } from '../hooks/usePressScale';
+import { border, colors, radius, space, type } from '../theme';
 
 interface Props {
   evaluation: Evaluation;
   onPress: () => void;
 }
 
+/**
+ * The card is the system's thesis in one object: the figure gets a dark plate
+ * of its own, the terms get the strip, and nothing else competes.
+ *
+ * The plate takes the row's end edge from flex order alone, so it swaps sides
+ * between RTL and LTR with no code change. Its hairline is a real 1px view
+ * rather than a `borderStartWidth`: react-native-web compiles logical borders
+ * to physical sides against a locale context that its stub I18nManager always
+ * reports as LTR, so `start` lands on the wrong edge in the web build. A
+ * sibling view is unambiguous on every platform.
+ */
 export function BenefitCard({ evaluation, onPress }: Props) {
   const { benefit, gates, actionsRequired } = evaluation;
-  const { scale, onPressIn, onPressOut } = usePressScale();
   const { figure, unit } = formatValue(benefit);
   const ready = actionsRequired.length === 0;
 
   return (
-    <Animated.View style={{ transform: [{ scale }] }}>
-      <Pressable
-        onPress={onPress}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-        accessibilityRole="button"
-        accessibilityLabel={`${figure} ${unit} ב${benefit.merchant_name}, ${
-          ready
-            ? 'אין מה לעשות מראש'
-            : actionsRequired.length === 1
-              ? 'דבר אחד לעשות מראש'
-              : `${actionsRequired.length} דברים לעשות מראש`
-        }`}
-        style={styles.card}
-      >
-        {/* Readiness is a rule down the leading edge, not a badge — it reads at
-            a glance without competing with the figure. */}
-        <View style={[styles.edge, ready ? styles.edgeReady : styles.edgePending]} />
-
-        <View style={styles.top}>
-          <View style={styles.identity}>
-            <Text style={type.eyebrow}>{programNames[benefit.program_id] ?? benefit.program_id}</Text>
-            <Text style={type.identity} numberOfLines={1}>
-              {benefit.merchant_name}
-            </Text>
-          </View>
-          <View style={styles.value}>
-            <Text style={styles.figure} numberOfLines={1}>
-              {figure}
-            </Text>
-            <Text style={type.caption}>{unit}</Text>
-          </View>
-        </View>
-
-        <ConditionStrip gates={gates} max={3} />
-
-        <View style={styles.footer}>
-          <Text style={type.caption}>{formatSaving(evaluation)}</Text>
-          <Text style={[type.caption, ready ? styles.footerReady : styles.footerPending]}>
-            {ready ? 'אפשר ללכת לקופה' : actionsRequired.map((g) => g.label).join(' · ')}
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${figure} ${unit} ב${benefit.merchant_name}, ${
+        ready
+          ? 'אין מה לעשות מראש'
+          : actionsRequired.length === 1
+            ? 'דבר אחד לעשות מראש'
+            : `${actionsRequired.length} דברים לעשות מראש`
+      }`}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+    >
+      <View style={styles.top}>
+        <View style={styles.identity}>
+          <Text style={type.meta} numberOfLines={1}>
+            {programNames[benefit.program_id] ?? benefit.program_id}
+          </Text>
+          <Text style={type.lead} numberOfLines={2}>
+            {benefit.merchant_name}
           </Text>
         </View>
-      </Pressable>
-    </Animated.View>
+        <View style={styles.rule} />
+        <View style={styles.plate}>
+          <Text style={type.figure} numberOfLines={1} adjustsFontSizeToFit>
+            {figure}
+          </Text>
+          <Text style={styles.plateUnit}>{unit}</Text>
+        </View>
+      </View>
+
+      <View style={styles.strip}>
+        <ConditionStrip gates={gates} max={3} />
+      </View>
+
+      <View style={styles.footer}>
+        {/* One indicator, not two: the square states readiness, the copy explains it. */}
+        <View style={[styles.marker, ready ? styles.markerReady : styles.markerPending]} />
+        <Text style={styles.readiness} numberOfLines={1}>
+          {ready ? 'אפשר ללכת לקופה' : actionsRequired.map((g) => g.label).join(' · ')}
+        </Text>
+        <Text style={type.caption} numberOfLines={1}>
+          {formatSaving(evaluation)}
+        </Text>
+      </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: space.lg,
-    paddingRight: space.lg + 6,
-    marginBottom: space.md,
-    gap: space.md,
-    overflow: 'hidden',
-    ...lift,
+    backgroundColor: colors.surfacePage,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
+    marginBottom: space.s3,
   },
-  edge: { position: 'absolute', top: 0, bottom: 0, right: 0, width: 4 },
-  edgeReady: { backgroundColor: colors.mint },
-  edgePending: { backgroundColor: colors.amberLine },
+  cardPressed: { backgroundColor: colors.surfaceRaised },
   top: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    gap: space.md,
+    alignItems: 'stretch',
+    borderBottomWidth: border.hairline,
+    borderBottomColor: colors.borderHairline,
   },
-  identity: { flex: 1, gap: 3 },
-  value: { alignItems: 'flex-end' },
-  figure: type.figure,
+  identity: {
+    flex: 1,
+    minWidth: 0,
+    paddingVertical: space.s3 - 2,
+    paddingHorizontal: space.s3,
+    gap: space.s1,
+    justifyContent: 'center',
+    /* Sizes each line to content so a Latin name aligns with a Hebrew one — see ui.tsx. */
+    alignItems: 'flex-start',
+  },
+  rule: { width: border.hairline, backgroundColor: colors.borderHairline },
+  plate: {
+    width: 104,
+    flexShrink: 0,
+    backgroundColor: colors.surfacePlate,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: space.s2 + 4,
+    paddingHorizontal: space.s2,
+  },
+  plateUnit: { ...type.micro, color: colors.textMutedInverse, marginTop: space.s1 + 2 },
+  strip: { paddingVertical: space.s2 + 4, paddingHorizontal: space.s3 },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: space.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-    paddingTop: space.sm + 2,
+    gap: space.s2,
+    paddingVertical: space.s2 + 3,
+    paddingHorizontal: space.s3,
+    borderTopWidth: border.hairline,
+    borderTopColor: colors.borderHairlineSoft,
   },
-  footerReady: { color: colors.mint },
-  footerPending: { color: colors.amber, flexShrink: 1, textAlign: 'left' },
+  marker: { width: 8, height: 8, flexShrink: 0 },
+  markerReady: { backgroundColor: colors.surfacePrimary },
+  markerPending: { backgroundColor: colors.accentUrgent },
+  /* Flex, not `marginStart:'auto'` — same web/native direction trap as the rule. */
+  readiness: { ...type.caption, flex: 1 },
 });

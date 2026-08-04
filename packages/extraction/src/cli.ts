@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { runPipeline } from './pipeline';
+import { importExtraction, runPipeline } from './pipeline';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '../../..');
@@ -14,6 +14,12 @@ const USAGE = `Usage: npm run extract -- [options]
   --offline          read fixtures instead of fetching
   --scrape-only      scrape and print sizes; no model call
   --help
+
+Importing benefits collected by a browser agent (see docs/COWORK_SCRAPE_PROMPT.md):
+
+  --import <path>    JSON file shaped like ExtractionResult
+  --program <id>     program the benefits belong to   (required with --import)
+  --source-url <url> page they were read from         (required with --import)
 `;
 
 function parseArgs(argv: string[]) {
@@ -40,6 +46,30 @@ async function main(): Promise<void> {
     return;
   }
 
+  const outDir = resolve(repoRoot, typeof args.out === 'string' ? args.out : 'data/generated');
+
+  if (typeof args.import === 'string') {
+    if (typeof args.program !== 'string' || typeof args['source-url'] !== 'string') {
+      throw new Error('--import also needs --program <id> and --source-url <url>');
+    }
+    const imported = await importExtraction({
+      dataDir: resolve(repoRoot, 'data'),
+      outDir,
+      file: resolve(repoRoot, args.import),
+      programId: args.program,
+      sourceUrl: args['source-url'],
+      threshold: typeof args.threshold === 'string' ? Number(args.threshold) : undefined,
+    });
+    console.log('\n--- import summary ---');
+    console.log(`extracted: ${imported.extracted}`);
+    console.log(`published: ${imported.published}`);
+    console.log(`review:    ${imported.queuedForReview}`);
+    if (imported.queuedForReview > 0) {
+      console.log('\nReview queue is not empty — those benefits will NOT reach the app until approved.');
+    }
+    return;
+  }
+
   const scrapeOnly = args['scrape-only'] === true;
   if (!scrapeOnly && !args.offline && !process.env.ANTHROPIC_API_KEY) {
     // Not fatal: the SDK also accepts ANTHROPIC_AUTH_TOKEN or an `ant auth
@@ -50,7 +80,7 @@ async function main(): Promise<void> {
   const report = await runPipeline({
     rootDir: repoRoot,
     dataDir: resolve(repoRoot, 'data'),
-    outDir: resolve(repoRoot, typeof args.out === 'string' ? args.out : 'data/generated'),
+    outDir,
     sourcesFile: resolve(
       repoRoot,
       typeof args.sources === 'string' ? args.sources : 'packages/extraction/sources.json',

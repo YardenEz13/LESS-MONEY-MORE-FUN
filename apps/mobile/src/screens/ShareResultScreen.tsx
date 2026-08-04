@@ -4,7 +4,7 @@ import type { Evaluation } from '@sbr/core';
 import { BenefitCard } from '../components/BenefitCard';
 import { PrimaryButton, ScreenHeader } from '../components/ui';
 import type { ShareResult } from '../services/shareIntent';
-import { colors, radius, space, type } from '../theme';
+import { border, colors, radius, space, type } from '../theme';
 
 interface Props {
   result: ShareResult;
@@ -23,7 +23,7 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {result.kind === 'match' ? (
           <>
-            <ScreenHeader eyebrow={result.match.hostname} title={result.match.merchantName} titleIsName />
+            <ScreenHeader eyebrow={result.match.hostname} title={result.match.merchantName} />
             <Text style={styles.lede}>
               {result.match.evaluations.length === 1 ? (
                 'הטבה אחת תקפה לקנייה באתר הזה.'
@@ -46,9 +46,9 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
           </>
         ) : result.kind === 'no_benefits' ? (
           <>
-            <ScreenHeader eyebrow={result.hostname} title={result.merchantName} titleIsName />
+            <ScreenHeader eyebrow={result.hostname} title={result.merchantName} />
             <View style={styles.notice}>
-              <Text style={type.heading}>אין כאן הטבה תקפה</Text>
+              <Text style={type.displaySmall}>אין כאן הטבה תקפה</Text>
               <Text style={type.small}>
                 מזהים את האתר, אבל אף מועדון שסימנת לא נותן בו הטבה שתקפה לקנייה אונליין כרגע.
               </Text>
@@ -58,7 +58,7 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
           <>
             <ScreenHeader eyebrow="שיתוף" title="האתר לא בקטלוג" />
             <View style={styles.notice}>
-              <Text style={type.heading}>{result.hostname ?? 'לא זוהתה כתובת'}</Text>
+              <Text style={type.displaySmall}>{result.hostname ?? 'לא זוהתה כתובת'}</Text>
               <Text style={type.small}>
                 {result.hostname
                   ? 'הדומיין הזה עדיין לא ממופה לבית עסק. הוספה שלו לקטלוג היא התיקון הזול ביותר שאפשר לעשות כאן.'
@@ -70,33 +70,31 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
       </ScrollView>
 
       <View style={styles.footer}>
-        <PrimaryButton label="סגור" tone="ink" onPress={onClose} />
+        <PrimaryButton label="סגור" tone="plate" onPress={onClose} />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.paper },
-  content: { paddingBottom: space.xxl },
-  lede: { ...type.body, paddingHorizontal: space.xl, paddingBottom: space.lg },
+  screen: { flex: 1, backgroundColor: colors.surfacePage },
+  content: { paddingBottom: space.s5 },
+  lede: { ...type.body, paddingHorizontal: space.s4, paddingBottom: space.s3 },
   figureInline: type.figureInline,
-  list: { paddingHorizontal: space.xl },
+  list: { paddingHorizontal: space.s4 },
   notice: {
-    marginHorizontal: space.xl,
-    backgroundColor: colors.card,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.line,
-    padding: space.xl,
-    gap: space.sm,
+    marginHorizontal: space.s4,
+    borderRadius: radius.sharp,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
+    padding: space.s4,
+    gap: space.s2,
   },
   footer: {
     flexDirection: 'row',
-    padding: space.lg,
-    paddingHorizontal: space.xl,
-    borderTopWidth: 1,
-    borderTopColor: colors.line,
-    backgroundColor: colors.card,
+    paddingVertical: space.s3 - 4,
+    paddingHorizontal: space.s4,
+    borderTopWidth: border.hairline,
+    borderTopColor: colors.borderHairline,
   },
 });

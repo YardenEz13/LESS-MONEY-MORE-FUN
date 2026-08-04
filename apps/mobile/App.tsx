@@ -4,17 +4,18 @@ import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import {
   useFonts,
-  FrankRuhlLibre_400Regular,
-  FrankRuhlLibre_500Medium,
-  FrankRuhlLibre_700Bold,
-  FrankRuhlLibre_900Black,
-} from '@expo-google-fonts/frank-ruhl-libre';
+  Karantina_300Light,
+  Karantina_400Regular,
+  Karantina_700Bold,
+} from '@expo-google-fonts/karantina';
 import {
-  MiriamLibre_400Regular,
-  MiriamLibre_500Medium,
-  MiriamLibre_700Bold,
-} from '@expo-google-fonts/miriam-libre';
+  NotoSansHebrew_400Regular,
+  NotoSansHebrew_500Medium,
+  NotoSansHebrew_600SemiBold,
+  NotoSansHebrew_700Bold,
+} from '@expo-google-fonts/noto-sans-hebrew';
 import type { Evaluation, UserProfile } from '@sbr/core';
+import { AdvisorScreen } from './src/screens/AdvisorScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { BenefitDetailScreen } from './src/screens/BenefitDetailScreen';
@@ -37,6 +38,7 @@ type Screen =
   | { name: 'detail'; evaluation: Evaluation }
   | { name: 'settings' }
   | { name: 'stats' }
+  | { name: 'advisor' }
   | { name: 'share'; result: ShareResult };
 
 /**
@@ -50,17 +52,17 @@ export default function App() {
   const [geofenceStatus, setGeofenceStatus] = useState('תזכורת בקניון כבויה');
   const [geofenceActive, setGeofenceActive] = useState(false);
 
-  // Frank Ruhl Libre does the talking, Miriam Libre does the counting — two
-  // Hebrew revivals rather than the Google-default product sans. Both ship in
-  // the bundle, so first launch needs no network.
+  // Karantina takes the headlines and every figure; Noto Sans Hebrew does the
+  // talking and sets the Latin brand names too. Both ship in the bundle, so
+  // first launch needs no network.
   const [fontsLoaded] = useFonts({
-    FrankRuhlLibre_400Regular,
-    FrankRuhlLibre_500Medium,
-    FrankRuhlLibre_700Bold,
-    FrankRuhlLibre_900Black,
-    MiriamLibre_400Regular,
-    MiriamLibre_500Medium,
-    MiriamLibre_700Bold,
+    Karantina_300Light,
+    Karantina_400Regular,
+    Karantina_700Bold,
+    NotoSansHebrew_400Regular,
+    NotoSansHebrew_500Medium,
+    NotoSansHebrew_600SemiBold,
+    NotoSansHebrew_700Bold,
   });
 
   const persist = useCallback(async (next: UserProfile) => {
@@ -121,7 +123,7 @@ export default function App() {
   if (!fontsLoaded || !profile || screen.name === 'loading') {
     return (
       <SafeAreaView style={styles.centered}>
-        <ActivityIndicator color={colors.mint} />
+        <ActivityIndicator color={colors.surfacePrimary} />
       </SafeAreaView>
     );
   }
@@ -156,6 +158,18 @@ export default function App() {
             }}
             onOpenSettings={() => setScreen({ name: 'settings' })}
             onOpenStats={() => setScreen({ name: 'stats' })}
+            onOpenAdvisor={() => setScreen({ name: 'advisor' })}
+          />
+        )}
+
+        {screen.name === 'advisor' && (
+          <AdvisorScreen
+            profile={profile}
+            onSelect={(evaluation) => {
+              void logEvent({ kind: 'benefit_viewed', benefitId: evaluation.benefit.id });
+              setScreen({ name: 'detail', evaluation });
+            }}
+            onBack={() => setScreen({ name: 'home' })}
           />
         )}
 
@@ -207,7 +221,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.paper },
+  root: { flex: 1, backgroundColor: colors.surfacePage },
   body: { flex: 1 },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.paper },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfacePage },
 });

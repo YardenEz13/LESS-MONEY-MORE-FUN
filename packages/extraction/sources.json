@@ -14,7 +14,22 @@
   {
     "program_id": "isracard",
     "program_name": "ישראכרט",
-    "url": "https://www.isracard.co.il/he-il/benefits/",
+    "url": "https://www.isracard.co.il/",
     "fixture": "packages/extraction/fixtures/isracard-sample.html"
+  },
+  {
+    "program_id": "cal",
+    "program_name": "כאל",
+    "url": "https://www.cal-online.co.il/benefits"
+  },
+  {
+    "program_id": "shufersal_life",
+    "program_name": "שופרסל LIFE",
+    "url": "https://www.shufersal.co.il/online/he/"
+  },
+  {
+    "program_id": "superpharm_lifestyle",
+    "program_name": "LIFESTYLE סופר-פארם",
+    "url": "https://www.super-pharm.co.il/sales"
   }
 ]

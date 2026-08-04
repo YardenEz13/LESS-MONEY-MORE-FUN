@@ -1,4 +1,4 @@
-import type { Benefit } from './types';
+import type { Benefit, Program } from './types';
 import { DEFAULT_TIME_ZONE, daysSince, isWithinHours, toLocalMoment } from './time';
 
 export type EvalChannel = 'in_store' | 'online';
@@ -22,6 +22,34 @@ export const DEFAULT_MIN_CONFIDENCE = 0.85;
 
 /** Basket size assumed only for *ranking* when the real cart is unknown. */
 export const REFERENCE_BASKET_ILS = 250;
+
+/**
+ * Ticking "Cash כאל Pro" also means holding plain כאל.
+ *
+ * The engine matches a benefit by exact `program_id`, so a card-level program
+ * has to contribute its issuer's id too or the user would have to tick both
+ * boxes and would silently lose every issuer-wide benefit if they ticked only
+ * the card. Done here rather than inside `evaluateBenefit` so the engine keeps
+ * taking a flat list of ids and needs no view of the program graph.
+ *
+ * Walks the chain, so a card under a card under an issuer still resolves, and
+ * tolerates a cycle in hand-edited data rather than hanging.
+ */
+export function expandOwnedPrograms(
+  ownedProgramIds: readonly string[],
+  programs: readonly Program[],
+): string[] {
+  const parentOf = new Map(programs.map((p) => [p.id, p.parent_id ?? null]));
+  const owned = new Set<string>();
+  for (const id of ownedProgramIds) {
+    let current: string | null | undefined = id;
+    while (current && !owned.has(current)) {
+      owned.add(current);
+      current = parentOf.get(current);
+    }
+  }
+  return [...owned];
+}
 
 export interface EvalContext {
   now: Date;

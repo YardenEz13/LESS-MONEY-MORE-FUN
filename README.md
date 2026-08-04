@@ -75,13 +75,23 @@ on its own is mostly GPS drift.
 
 ## The look
 
-"Ledger" — ink on warm paper, deep teal for money kept. The type is two Hebrew
-revivals with actual provenance rather than the default product sans: Frank
-Ruhl Libre, the face Hebrew fine print was set in, for our voice and every
-figure; Miriam Libre, the squarish face of official forms, for names and
-markers. The signature device is the condition strip: each term as a chip in
-one of four tones — satisfied, do this, note, violated. Details in
-`docs/ARCHITECTURE.md`.
+"מערכת ההנחות" — a scoreboard meeting port signage. Three laws: flat fill only
+(no gradient, glass, glow or soft shadow), 90° corners with elevation from
+lines rather than shadows, and hierarchy from weight, size and rule rather than
+letter-spacing. Deep green for money kept, a near-black plate under every
+figure that matters, and one hairline doing the work a drop shadow usually does.
+
+The type is Karantina — condensed, for headlines and figures only — over Noto
+Sans Hebrew for body, interface and the Latin brand names. Every figure carries
+`tabular-nums lining-nums` and LTR bidi isolation, so a price keeps its order
+inside a Hebrew sentence and a column of them actually lines up.
+
+The signature device is the condition strip: each term as a flat chip in one of
+four tones — satisfied, do this, note, violated. Tokens are semantic
+(`--color-surface-plate`, never a brand or source name), so a re-skin is three
+swaps: the urgent accent, the display face, the hero texture. The green, the
+structure, the 8-grid and the figures on the plate are the system. Tokens live
+in `apps/mobile/src/theme.ts`; details in `docs/ARCHITECTURE.md`.
 
 ## Status
 
