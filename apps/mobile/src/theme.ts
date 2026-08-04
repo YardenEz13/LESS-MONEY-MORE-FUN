@@ -85,18 +85,15 @@ export const colors = {
 } as const;
 
 export const fonts = {
-  /**
-   * Karantina — a condensed Hebrew display face. Headlines and figures only;
-   * it has no business setting a paragraph.
-   */
-  displayLight: 'Karantina_300Light',
-  display: 'Karantina_400Regular',
-  displayBold: 'Karantina_700Bold',
-  /** Noto Sans Hebrew — body and interface, and it sets Latin brand names too. */
-  text: 'NotoSansHebrew_400Regular',
-  textMedium: 'NotoSansHebrew_500Medium',
-  textSemibold: 'NotoSansHebrew_600SemiBold',
-  textBold: 'NotoSansHebrew_700Bold',
+  /** EFT_OffSet — headlines and figures */
+  displayLight: 'EFT_OffSet',
+  display: 'EFT_OffSet',
+  displayBold: 'EFT_OffSet',
+  /** EFT_Artzisraeli — body and interface text */
+  text: 'EFT_Artzisraeli',
+  textMedium: 'EFT_Artzisraeli',
+  textSemibold: 'EFT_Artzisraeli',
+  textBold: 'EFT_Artzisraeli',
 } as const;
 
 /**

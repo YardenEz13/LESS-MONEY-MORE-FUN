@@ -2,18 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
-import {
-  useFonts,
-  Karantina_300Light,
-  Karantina_400Regular,
-  Karantina_700Bold,
-} from '@expo-google-fonts/karantina';
-import {
-  NotoSansHebrew_400Regular,
-  NotoSansHebrew_500Medium,
-  NotoSansHebrew_600SemiBold,
-  NotoSansHebrew_700Bold,
-} from '@expo-google-fonts/noto-sans-hebrew';
+import { useFonts } from 'expo-font';
 import type { Evaluation, UserProfile } from '@sbr/core';
 import { AdvisorScreen } from './src/screens/AdvisorScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
@@ -52,17 +41,9 @@ export default function App() {
   const [geofenceStatus, setGeofenceStatus] = useState('תזכורת בקניון כבויה');
   const [geofenceActive, setGeofenceActive] = useState(false);
 
-  // Karantina takes the headlines and every figure; Noto Sans Hebrew does the
-  // talking and sets the Latin brand names too. Both ship in the bundle, so
-  // first launch needs no network.
   const [fontsLoaded] = useFonts({
-    Karantina_300Light,
-    Karantina_400Regular,
-    Karantina_700Bold,
-    NotoSansHebrew_400Regular,
-    NotoSansHebrew_500Medium,
-    NotoSansHebrew_600SemiBold,
-    NotoSansHebrew_700Bold,
+    EFT_OffSet: require('./assets/EFT_OffSet-Bold.ttf'),
+    EFT_Artzisraeli: require('./assets/EFT_Artzisraeli.ttf'),
   });
 
   const persist = useCallback(async (next: UserProfile) => {
