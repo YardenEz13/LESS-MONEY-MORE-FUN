@@ -37,27 +37,55 @@ product. An aggregator can never replace them, only widen merchant coverage.
 
 ### Tier 2 — easy.co.il (aggregator; widest merchant coverage)
 
-`npm run scrape:easy` walks easy's internal `bizlist` JSON API. Per-program
-lists currently mapped (see `LISTS` in the script): `MAX`→max,
-`Cal-Discount`→cal, `Isracard-Discounts`→isracard, `Isracard-Chever`→hever.
+`npm run scrape:easy` walks **every** discount list on the site — the slugs are
+discovered from the `/list/Discounts` hub at run time, not hardcoded, because
+easy adds and retires clubs constantly and a fixed list silently stops covering
+the site the first time they do. Last full run: 96 lists, 4787 deals, 3919
+distinct businesses, zero failures.
 
-What easy gives us that officials don't: hundreds of *small local businesses*
+`PROGRAMS` in the script maps a slug to a program id. A slug that is not in it
+is still crawled and still validated — it just cannot be handed to `extract`
+until someone adds the program, because benefit ids hash the program id. Worth
+adding programs for: `Leumi-Goodies`, `Fly-Card`, `Diners-Club`,
+`Discounts-American-Express`, `Mizrahi-Tefahot-Members`, `Rami-Levy-Club`.
+
+What easy gives us that officials don't: thousands of *small local businesses*
 ("3.5% הנחה במעמד החיוב" at a print shop), each with address + coordinates —
-exactly what the geofence feature needs. What it doesn't give: full terms. The
-one-line deal text goes through extraction like any page; expect mostly-null
-conditions and honest confidence scores.
+exactly what the geofence feature needs, and the reason `mine-merchants.mjs`
+exists. What it doesn't give: full terms. Of 262 deals sampled, 4 carried any
+condition text at all, so extraction of easy data yields mostly-null conditions
+and honest low confidence. **Mine it for merchants; get conditions from Tier 1.**
 
-Unmapped easy lists worth adding **after** their program exists in
-`programs.json`: `Leumi-Goodies`, `Fly-Card`, `Diners-Club`,
-`CampusCard-Members`, `max-Kranot`, `Special-Offers`, `SMB-Vouchers`.
-The full menu of ~180 list slugs is on https://easy.co.il/list/Discounts.
+### Proving the deals are real
+
+```bash
+node scripts/validate-easy.mjs     # after every scrape
+```
+
+Every record's `offer_url` is `easy.co.il/page/<bizid>`, and
+`/n/jsons/bizpage?bizid=N` answers whether that id is alive: the business JSON,
+or HTTP **410** when it is gone. That is a stronger check than fetching the HTML
+page, which returns a soft shell for anything.
+
+- passes → the record gains `verified_at`, and a `merchant_name` easy has since
+  changed is corrected to match
+- 410 → the record is **removed**; a deal you cannot open is worse than no deal
+- network failure → the record is left exactly as it was and counted as
+  `unreachable`. A Cloudflare bad day is not evidence a business closed, and
+  must never be allowed to empty the catalog
+
+The script exits non-zero if *nothing* verified, because a run where the check
+itself is broken must not be read as a clean bill of health.
 
 Known limits of the scraper (deliberate):
 - Results are geo-ranked around easy's default location; each list caps at
-  ~100 businesses. Pass `--lat/--lng/--rad` to sweep other cities.
+  ~100 businesses. Pass `--lat/--lng/--rad` to sweep other cities — coverage
+  outside Gush Dan is the biggest known gap.
 - Cloudflare tolerates a slow crawl (2–3s spacing, curl transport) and
   challenges bursts. The script retries with backoff; if a whole run 403s,
   wait ten minutes, don't tighten the loop.
+- A crawl cut short never overwrites a good file — see the guard test in
+  `scripts/scrape-easy.test.mjs`.
 
 ### Tier 3 — candidates, not yet wired
 
@@ -77,7 +105,7 @@ Each benefit already carries `last_verified_at`, `valid_until`, `source_url`,
 | Cadence | What runs | What it catches |
 |---|---|---|
 | every PR (CI) | `npm run validate:data` | shape breaks, dangling ids |
-| weekly | `npm run scrape:easy` + `npm run extract -- --collected ... --all` re-runs | changed/new/removed easy deals — `content_hash` means unchanged offers cost zero model calls |
+| weekly | `npm run scrape:easy` then `node scripts/validate-easy.mjs` | changed/new/removed easy deals, and any whose business has since been delisted |
 | weekly | `npm run verify:catalog -- --sources` | dead domains, source pages that stopped 200ing → candidates for removal |
 | monthly | Cowork session per Tier-1 catalog (Max rotates monthly; חבר needs your login) | condition changes the aggregator can't see |
 | after any import | `npm run -w @sbr/extraction review`, then `npm run publish:catalog` | low-confidence rows never ship un-reviewed |
@@ -88,7 +116,9 @@ patched — the source *is* the record.
 
 **Scheduling: the weekly refresh runs locally**, as Windows scheduled task
 `LessMoneyMoreFun weekly refresh` — Sundays 06:00, running
-`scripts/weekly-refresh.ps1` against this repo. It is set `StartWhenAvailable`,
+`scripts/weekly-refresh.ps1` against this repo — it crawls, then validates every
+link, and takes roughly 50 minutes (the task's limit is 3h). It is set
+`StartWhenAvailable`,
 so a run missed because the machine was off fires when it next wakes instead of
 being skipped. It appends to `data/generated/weekly-refresh.log` (git-ignored),
 ending in one of:

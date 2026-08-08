@@ -28,6 +28,14 @@ if ($code -ne 0) {
     exit $code
 }
 
+# Prove the links still resolve. Without this the catalog slowly fills with
+# deals pointing at businesses that closed, and nothing ever notices.
+node scripts/validate-easy.mjs 2>&1 | ForEach-Object { Write-Log $_ }
+if ($LASTEXITCODE -ne 0) {
+    Write-Log "RESULT: FAILED - validation could not verify anything"
+    exit $LASTEXITCODE
+}
+
 $changed = git status --porcelain -- collected/easy
 if ($changed) {
     Write-Log "RESULT: CHANGED"

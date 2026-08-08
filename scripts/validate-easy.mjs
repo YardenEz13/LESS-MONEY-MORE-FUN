@@ -23,15 +23,17 @@ import { promisify } from 'node:util';
 const execFileP = promisify(execFile);
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
-const DIR = 'collected/easy';
+const DIR = process.env.EASY_DIR ?? 'collected/easy';
+/** Overridable so the deletion path can be tested against a local server. */
+const BASE = process.env.EASY_BASE ?? 'https://easy.co.il';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** curl, for the same TLS-fingerprint reason as the scraper. */
 async function bizpage(bizid) {
-  const url = `https://easy.co.il/n/jsons/bizpage?bizid=${bizid}`;
+  const url = `${BASE}/n/jsons/bizpage?bizid=${bizid}`;
   const { stdout } = await execFileP(
     'curl',
-    ['-s', '-w', '\n%{http_code}', '-A', UA, '-H', `Referer: https://easy.co.il/page/${bizid}`, url],
+    ['-s', '-w', '\n%{http_code}', '-A', UA, '-H', `Referer: ${BASE}/page/${bizid}`, url],
     { maxBuffer: 20 * 1024 * 1024 },
   );
   const nl = stdout.lastIndexOf('\n');
