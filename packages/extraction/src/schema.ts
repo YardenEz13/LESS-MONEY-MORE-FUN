@@ -164,6 +164,15 @@ export const ExtractedBenefit = z.object({
   merchant_name: z.string().min(1),
   type: z.enum(['percent', 'fixed', 'bogo', 'cashback', 'gift_card']),
   value: z.number().nonnegative(),
+  /**
+   * The page this specific offer was read from, when the collector knew it.
+   *
+   * Not part of the model's JSON schema — the model is never asked for a URL, it
+   * would only invent one. This carries a *collector-supplied* per-offer URL
+   * through, so the detail screen's "open the source" lands on the offer instead
+   * of a catalog root. Absent means fall back to the run's source url.
+   */
+  source_url: z.string().url().optional(),
   valid_from: z.string().nullable(),
   valid_until: z.string().nullable(),
   confidence_score: z.number().min(0).max(1),

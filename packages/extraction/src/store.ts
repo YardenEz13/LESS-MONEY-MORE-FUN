@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
-import { Benefit, DEFAULT_MIN_CONFIDENCE, Merchant } from '@sbr/core';
+import { Benefit, DEFAULT_MIN_CONFIDENCE, Merchant, dateOnlyToInstant } from '@sbr/core';
 import type { ExtractedBenefit } from './schema';
 
 export interface ReviewItem {
@@ -57,6 +57,20 @@ export function benefitId(parts: {
   return `${parts.programId}_${parts.merchantId}_${digest}`;
 }
 
+/**
+ * A validity date as an instant.
+ *
+ * The extraction schema asks for ISO 8601 and a bare `YYYY-MM-DD` satisfies
+ * that, so the model returning one is correct — but `Benefit` wants a full
+ * timestamp, and the mismatch used to throw and abort the entire run rather
+ * than spoil one benefit. Dates are pinned to the edge of the local day that
+ * keeps the benefit usable for exactly as long as the T&C says.
+ */
+function toInstant(value: string | null | undefined, edge: 'start' | 'end'): string | null {
+  if (!value) return null;
+  return dateOnlyToInstant(value, edge) ?? value;
+}
+
 export function toBenefit(
   extracted: ExtractedBenefit,
   context: { programId: string; sourceUrl: string; merchants: readonly Merchant[]; now: Date },
@@ -76,9 +90,11 @@ export function toBenefit(
     type: extracted.type,
     value: extracted.value,
     conditions: extracted.conditions,
-    valid_from: extracted.valid_from,
-    valid_until: extracted.valid_until,
-    source_url: context.sourceUrl,
+    valid_from: toInstant(extracted.valid_from, 'start'),
+    valid_until: toInstant(extracted.valid_until, 'end'),
+    // A per-offer url from the collector beats the run-wide one: it is what the
+    // user opens to check the terms themselves.
+    source_url: extracted.source_url ?? context.sourceUrl,
     last_verified_at: context.now.toISOString(),
     confidence_score: extracted.confidence_score,
     reviewed_by_human: false,

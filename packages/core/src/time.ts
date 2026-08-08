@@ -52,6 +52,81 @@ export function toLocalMoment(date: Date, timeZone: string = DEFAULT_TIME_ZONE):
   };
 }
 
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+
+const boundaryFormatterCache = new Map<string, Intl.DateTimeFormat>();
+
+/** How far `timeZone` is from UTC at a given instant, in ms. DST-aware. */
+function zoneOffsetMs(instant: number, timeZone: string): number {
+  let formatter = boundaryFormatterCache.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hour12: false,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    boundaryFormatterCache.set(timeZone, formatter);
+  }
+  const parts = Object.fromEntries(
+    formatter.formatToParts(new Date(instant)).map((p) => [p.type, p.value]),
+  );
+  const asUtc = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour) % 24,
+    Number(parts.minute),
+    Number(parts.second),
+  );
+  return asUtc - instant;
+}
+
+/** The instant local midnight begins on `dateOnly` ("YYYY-MM-DD"). */
+function localDayStart(dateOnly: string, timeZone: string): number {
+  const naive = Date.parse(`${dateOnly}T00:00:00Z`);
+  // Solve twice: the first correction can land on the other side of a DST
+  // switch, and re-solving from there settles it.
+  let instant = naive - zoneOffsetMs(naive, timeZone);
+  instant = naive - zoneOffsetMs(instant, timeZone);
+  return instant;
+}
+
+/**
+ * Turn a bare calendar date into a real instant at the edge of that local day.
+ *
+ * Israeli T&C write validity as calendar dates — "בתוקף עד 31/12/26" — and a
+ * bare `YYYY-MM-DD` is legitimate ISO 8601, so an extraction model returning one
+ * is following instructions. It still has to become an instant before it can be
+ * compared to `now`.
+ *
+ * Which edge is not cosmetic. "Valid until the 31st" means through the *end* of
+ * the 31st; resolving it to midnight would retire the benefit before its last
+ * day had started, hiding something the user genuinely holds for a full day.
+ * Start-of-day is right for `valid_from` for the mirror-image reason.
+ *
+ * Returns null for input that is not a bare date, so callers can pass a full
+ * timestamp straight through.
+ */
+export function dateOnlyToInstant(
+  value: string,
+  edge: 'start' | 'end',
+  timeZone: string = DEFAULT_TIME_ZONE,
+): string | null {
+  if (!DATE_ONLY.test(value)) return null;
+  if (edge === 'start') return new Date(localDayStart(value, timeZone)).toISOString();
+  // End of day is the instant before the next local day begins — computed from
+  // the next date rather than by adding 24h, so a DST shift stays exact.
+  const nextDay = new Date(Date.parse(`${value}T00:00:00Z`) + 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+  return new Date(localDayStart(nextDay, timeZone) - 1).toISOString();
+}
+
 export function parseTimeOfDay(value: string): number {
   const [hours, minutes] = value.split(':');
   return Number(hours) * 60 + Number(minutes);
