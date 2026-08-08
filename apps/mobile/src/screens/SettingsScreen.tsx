@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import type { UserProfile } from '@sbr/core';
-import { GhostButton, ScreenHeader, Section } from '../components/ui';
+import { GhostButton, ScreenHeader, Section, Text } from '../components/ui';
 import { programsById, venues } from '../services/catalog';
 import { handleVenueEnter } from '../services/geofencing';
 import { border, colors, radius, space, type } from '../theme';

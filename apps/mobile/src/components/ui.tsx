@@ -1,6 +1,58 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
-import { border, colors, radius, space, type } from '../theme';
+import {
+  Pressable,
+  StyleSheet,
+  Text as RNText,
+  View,
+  type TextProps,
+  type ViewStyle,
+} from 'react-native';
+import { latinRuns } from '@sbr/core';
+import { border, colors, fonts, latinFace, radius, space, type } from '../theme';
+
+function splitLatin(node: React.ReactNode, face: string): React.ReactNode {
+  if (Array.isArray(node)) {
+    return node.map((child, i) => (
+      <React.Fragment key={i}>{splitLatin(child, face)}</React.Fragment>
+    ));
+  }
+  if (typeof node !== 'string') return node;
+
+  const runs = latinRuns(node);
+  // The common case in a Hebrew app: nothing to swap, so nothing to nest.
+  if (runs.length === 1 && !runs[0].latin) return node;
+
+  return runs.map((run, i) =>
+    run.latin ? (
+      <RNText key={i} style={{ fontFamily: face }}>
+        {run.text}
+      </RNText>
+    ) : (
+      run.text
+    ),
+  );
+}
+
+/**
+ * Text, with Latin runs drawn in a Latin face.
+ *
+ * React Native has no per-script font list — `fontFamily` is one family, and
+ * the platform only falls back for glyphs the font is missing. The EFT faces
+ * are not missing Latin (see theme.ts), so the split has to happen in the tree
+ * instead: each run becomes a nested Text carrying the Latin face that matches
+ * the role, inheriting size, colour and leading from its parent.
+ *
+ * Every screen imports Text from here rather than from react-native, so this is
+ * the one place the rule lives.
+ */
+export function Text({ style, children, ...rest }: TextProps) {
+  const face = latinFace[StyleSheet.flatten(style)?.fontFamily ?? ''];
+  return (
+    <RNText style={style} {...rest}>
+      {face ? splitLatin(children, face) : children}
+    </RNText>
+  );
+}
 
 /** Back affordance + title. RTL, so "back" points right. */
 export function ScreenHeader({
@@ -133,8 +185,13 @@ export function FilterRow<T extends string>({
 }
 
 /**
- * A titled block. The 2px ink rule under the label is the section device —
+ * A titled block. The heavy green band under the label is the section device —
  * the same one the design-system page uses to head 01 COLOUR, 02 TYPE.
+ *
+ * It reads as green rather than ink now, and at `band` rather than `rule`: the
+ * page turned its section heads into structural edges, and a 2px ink line under
+ * a small label was reading as another hairline in a layout already full of
+ * them. Green at 6px states that a new part of the screen starts here.
  */
 export function Section({
   eyebrow,
@@ -149,6 +206,22 @@ export function Section({
         <Text style={styles.sectionLabel}>{eyebrow}</Text>
       </View>
       {children}
+    </View>
+  );
+}
+
+/**
+ * The live marker: orange fill, near-black on top, never orange text.
+ *
+ * Tracking is the one place the system spends letter-spacing. The rule against
+ * it is about Hebrew, where hierarchy has to come from weight and size because
+ * there is no uppercase to track; this is a Latin word set in caps, which is
+ * exactly the case tracking exists for.
+ */
+export function LivePill({ label = 'LIVE' }: { label?: string }) {
+  return (
+    <View style={styles.livePill}>
+      <Text style={styles.livePillLabel}>{label}</Text>
     </View>
   );
 }
@@ -212,9 +285,24 @@ const styles = StyleSheet.create({
   section: { gap: space.s3 },
   sectionHead: {
     marginHorizontal: space.s4,
-    borderBottomWidth: border.rule,
-    borderBottomColor: colors.textPrimary,
+    borderBottomWidth: border.band,
+    borderBottomColor: colors.surfacePrimary,
     paddingBottom: space.s2,
   },
   sectionLabel: { ...type.meta, color: colors.textPrimary },
+  livePill: {
+    backgroundColor: colors.accentUrgent,
+    borderRadius: radius.sharp,
+    paddingHorizontal: space.s2 + 2,
+    paddingVertical: space.s1 + 1,
+    alignSelf: 'flex-start',
+  },
+  livePillLabel: {
+    ...type.micro,
+    color: colors.textPrimary,
+    fontFamily: fonts.latinDisplay,
+    letterSpacing: 1.6,
+    /* A Latin word, so it keeps its own order inside a Hebrew row. */
+    writingDirection: 'ltr',
+  },
 });

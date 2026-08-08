@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   findCombos,
   rankBenefits,
@@ -8,7 +8,7 @@ import {
   type UserProfile,
 } from '@sbr/core';
 import { BenefitCard } from '../components/BenefitCard';
-import { FilterRow, GhostButton } from '../components/ui';
+import { FilterRow, GhostButton, LivePill, Text } from '../components/ui';
 import { benefits, ownedProgramIds, programNames } from '../services/catalog';
 import { border, colors, radius, space, type } from '../theme';
 
@@ -62,24 +62,33 @@ export function HomeScreen({
     <View style={styles.screen}>
       {/* The hero: the one dominant green surface, per the design system. */}
       <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <View style={styles.headline}>
-            <Text style={styles.headerEyebrow}>מה שכבר יש לך</Text>
-            <Text style={styles.headerTitle}>ההטבות שלך</Text>
+        {/* The urgent edge. A sibling view rather than `borderStartWidth`: same
+            web/native direction trap the card's rule works around, and flex
+            order puts it on the reading edge in either direction. */}
+        <View style={styles.headerEdge} />
+        <View style={styles.headerBody}>
+          <View style={styles.headerTop}>
+            <View style={styles.headline}>
+              <Text style={styles.headerEyebrow}>מה שכבר יש לך</Text>
+              <Text style={styles.headerTitle}>ההטבות שלך</Text>
+              {/* The band under the display — the device that stops the title
+                  from floating on the green. */}
+              <View style={styles.headerUnderline} />
+            </View>
+            <View style={styles.actions}>
+              <IconAction label="שאל" onPress={onOpenAdvisor} />
+              <IconAction label="מדדים" onPress={onOpenStats} />
+              <IconAction label="הגדרות" onPress={onOpenSettings} />
+            </View>
           </View>
-          <View style={styles.actions}>
-            <IconAction label="שאל" onPress={onOpenAdvisor} />
-            <IconAction label="מדדים" onPress={onOpenStats} />
-            <IconAction label="הגדרות" onPress={onOpenSettings} />
-          </View>
-        </View>
 
-        {/* The count is the page's thesis: not "12 deals!", but how many of them
-            you can actually use right now. */}
-        <Text style={styles.headerLine}>
-          <Text style={styles.headerFigure}>{ready.length}</Text>
-          {'  '}מוכנות לשימוש מתוך {evaluations.length} רלוונטיות
-        </Text>
+          {/* The count is the page's thesis: not "12 deals!", but how many of them
+              you can actually use right now. */}
+          <Text style={styles.headerLine}>
+            <Text style={styles.headerFigure}>{ready.length}</Text>
+            {'  '}מוכנות לשימוש מתוך {evaluations.length} רלוונטיות
+          </Text>
+        </View>
       </View>
 
       <FilterRow<Filter>
@@ -93,8 +102,11 @@ export function HomeScreen({
       />
 
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+        {/* Geofencing armed is the one genuinely live state in the app, so it
+            gets the system's live marker. Off keeps the quiet square — a pill
+            that is always there stops meaning "now". */}
         <View style={[styles.geofence, geofenceActive && styles.geofenceOn]}>
-          <View style={[styles.dot, geofenceActive ? styles.dotOn : styles.dotOff]} />
+          {geofenceActive ? <LivePill /> : <View style={[styles.dot, styles.dotOff]} />}
           <Text style={[type.caption, geofenceActive && styles.geofenceOnText]}>
             {geofenceStatus}
           </Text>
@@ -239,17 +251,30 @@ function EmptyState({
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surfacePage },
   header: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
     backgroundColor: colors.surfacePrimary,
+    marginBottom: space.s3,
+  },
+  headerEdge: { width: 10, backgroundColor: colors.accentUrgent },
+  headerBody: {
+    flex: 1,
+    minWidth: 0,
     paddingHorizontal: space.s4,
     paddingTop: space.s3,
     paddingBottom: space.s3,
-    marginBottom: space.s3,
     gap: space.s2,
   },
   headerTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
   headline: { gap: space.s1, flexShrink: 1 },
   headerEyebrow: { ...type.meta, color: colors.textMutedOnPrimary },
-  headerTitle: { ...type.display, color: colors.textInverse },
+  headerTitle: { ...type.display, color: colors.textInverse, fontSize: 40, lineHeight: 42 },
+  headerUnderline: {
+    height: border.band,
+    width: 132,
+    backgroundColor: colors.textInverse,
+    marginTop: space.s1,
+  },
   headerLine: { ...type.body, color: colors.textMutedOnPrimary },
   headerFigure: { ...type.figureInline, color: colors.textInverse },
   actions: { flexDirection: 'row', gap: space.s2, paddingTop: space.s1 },
@@ -326,7 +351,6 @@ const styles = StyleSheet.create({
   geofenceOnText: { color: colors.textInverse },
   /* Square, not a circle — the system has one radius and it is zero. */
   dot: { width: 8, height: 8, borderRadius: radius.sharp },
-  dotOn: { backgroundColor: colors.textInverse },
   dotOff: { backgroundColor: colors.borderHairline },
   empty: {
     borderRadius: radius.sharp,

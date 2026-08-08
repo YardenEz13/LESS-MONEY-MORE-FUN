@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { Gate } from '@sbr/core';
+import { Text } from './ui';
 import { border, colors, gateGlyph, gateTone, radius, space, type, type GateTone } from '../theme';
 
 /** Amber is for errands; a caveat you can't act on gets the quiet tone. */

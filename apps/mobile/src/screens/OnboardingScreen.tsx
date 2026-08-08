@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import type { Program, UserProfile } from '@sbr/core';
-import { PrimaryButton, Section } from '../components/ui';
+import { PrimaryButton, Section, Text } from '../components/ui';
 import { programs } from '../services/catalog';
 import { toggleProgram } from '../state/profile';
 import { border, colors, radius, space, type } from '../theme';

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { GhostButton, ScreenHeader, Section } from '../components/ui';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { GhostButton, ScreenHeader, Section, Text } from '../components/ui';
 import { clearEvents, computeKpis, loadEvents, type Kpis } from '../state/events';
 import { border, colors, radius, space, type } from '../theme';
 
@@ -103,10 +103,13 @@ function Row({ label, value, last }: { label: string; value: number; last?: bool
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surfacePage },
   content: { paddingBottom: space.s6, gap: space.s4 },
+  /* The scoreboard strip: a figure on the plate, closed by the green band. */
   hero: {
     marginHorizontal: space.s4,
     backgroundColor: colors.surfacePlate,
     borderRadius: radius.sharp,
+    borderBottomWidth: border.band,
+    borderBottomColor: colors.surfacePrimary,
     padding: space.s4,
     gap: space.s2,
   },
