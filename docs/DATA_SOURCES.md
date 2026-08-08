@@ -86,6 +86,11 @@ Staleness rule: the app already treats old `last_verified_at` as a trust
 signal. A benefit whose source URL 404s twice in a row gets deleted, not
 patched — the source *is* the record.
 
-Scheduling: the weekly pair is `/schedule`-able as a cloud agent (route A needs
-no browser). Route B can be scheduled once the Cowork chat is saved as a skill;
-route C stays manual by design — never store credentials to automate it.
+Scheduling: the weekly pair **is** scheduled — cloud routine
+`trig_01AEToRq65jECsxYHChuokTR`, Sundays 06:00 Asia/Jerusalem, manageable at
+https://claude.ai/code/routines. It re-scrapes, diffs, verifies, and opens a PR;
+it stops before extraction because the cloud sandbox has no `ANTHROPIC_API_KEY`,
+so the model-judgement half stays a local step you run on the merged JSONL.
+
+Route B can be scheduled once the Cowork chat is saved as a skill; route C stays
+manual by design — never store credentials to automate it.
