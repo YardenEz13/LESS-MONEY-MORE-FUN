@@ -18,17 +18,22 @@ import { promisify } from 'node:util';
 
 const execFileP = promisify(execFile);
 
+let base;
 const server = await new Promise((resolve) => {
   const s = createServer((req, res) => {
     const id = req.url.split('/').pop();
     if (id === '222') res.writeHead(404);
     else if (id === '333') res.writeHead(500); // broken, not proof of death
+    // Real easy 302s /page/<id> to a canonical SEO url. Treating that as a
+    // failure marked every redirecting link unreachable and tripped the
+    // circuit breaker 20 links in — this case exists because that shipped.
+    else if (id === '444') res.writeHead(302, { Location: `${base}/page/canonical` });
     else res.writeHead(200);
     res.end();
   });
   s.listen(0, '127.0.0.1', () => resolve(s));
 });
-const base = `http://127.0.0.1:${server.address().port}`;
+base = `http://127.0.0.1:${server.address().port}`;
 
 const dir = await mkdtemp(join(tmpdir(), 'easyval-'));
 const easyDir = join(dir, 'easy');
@@ -43,7 +48,7 @@ const rec = (id, name) => ({
 });
 await writeFile(
   join(easyDir, 'Test.jsonl'),
-  [rec('111', 'עסק חי'), rec('222', 'עסק שנסגר'), rec('333', 'לא נגיש')]
+  [rec('111', 'עסק חי'), rec('222', 'עסק שנסגר'), rec('333', 'לא נגיש'), rec('444', 'מפנה מחדש')]
     .map((r) => JSON.stringify(r))
     .join('\n') + '\n',
   'utf8',
@@ -74,8 +79,11 @@ assert.equal(
   'an unreachable record must not be stamped as verified',
 );
 
+assert.ok(byId.has('444'), 'a redirecting link must count as live, not as a refusal');
+assert.ok(byId.get('444').verified_at, 'a redirecting link must be stamped verified_at');
+
 // Coverage is the number that answers "is every deal proven". If it ever
 // reports 100% while a record sits unproven, the metric is lying.
-assert.match(stdout, /COVERAGE:\s+50%/, 'two of three records proven should report 50% coverage');
+assert.match(stdout, /COVERAGE:\s+67%/, 'two of three surviving records proven should report 67%');
 
-console.log('ok: 200 stamped, 404 removed, unreachable untouched, coverage honest');
+console.log('ok: 200 + 302 stamped, 404 removed, unreachable untouched, coverage honest');

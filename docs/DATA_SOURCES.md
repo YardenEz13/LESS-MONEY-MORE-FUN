@@ -86,6 +86,24 @@ refusals in a row aborts it. It prints `COVERAGE: N%`, and exits non-zero if
 *nothing* verified — a run where the check itself is broken must not read as a
 clean bill of health.
 
+### easy rate-limits, and that is the binding constraint
+
+Past a few thousand requests in a day easy answers **429** and redirects to
+`/captcha`. Current coverage is **31% (1492 of 4787 records)** — the rest are
+collected and carry a link, but their link is not yet *proven*. Nothing was
+deleted; unproven is not the same as dead.
+
+This is a quota, not a bug, and there is no clever way around it:
+
+- **Do not raise the request rate.** Every speed-up this session made it worse;
+  the 2–3s crawl cadence is the one that survives 96 lists untouched.
+- **Do not attempt the CAPTCHA.** Ever.
+- Full coverage arrives across runs. Each weekly pass proves another slice and
+  skips what is already settled, so the number climbs on its own.
+
+If coverage ever needs to be complete in one sitting, the honest fix is a
+residential-proxy pool or an agreement with easy — not a tighter loop.
+
 Known limits of the scraper (deliberate):
 - Results are geo-ranked around easy's default location; each list caps at
   ~100 businesses. Pass `--lat/--lng/--rad` to sweep other cities — coverage

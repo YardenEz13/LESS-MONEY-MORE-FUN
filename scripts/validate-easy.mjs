@@ -41,17 +41,25 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** HEAD the page. 200 = live, 404/410 = gone, anything else = don't know. */
 async function checkUrl(url) {
+  // `-L` because easy 302s /page/<id> to its canonical SEO url. A redirect
+  // means the link works — following it is what the app's browser would do,
+  // and without this every redirecting link counted as a refusal.
+  //
   // No `-o /dev/null`: curl runs directly here, not under a shell, so that path
   // does not exist on Windows. `-I` means the body is never sent anyway.
   const { stdout } = await execFileP(
     'curl',
-    ['-s', '-I', '-w', '\n%{http_code}', '-A', UA, '--max-time', '20', url],
+    ['-s', '-I', '-L', '--max-redirs', '5', '-w', '\n%{http_code}', '-A', UA, '--max-time', '20', url],
     { maxBuffer: 1024 * 1024 },
   );
   const status = stdout.slice(stdout.lastIndexOf('\n') + 1).trim();
   if (status === '200') return { state: 'live' };
   if (status === '404' || status === '410') return { state: 'gone' };
-  return { state: 'unreachable', detail: status };
+  // 429, or a redirect into /captcha, means easy has decided we are asking too
+  // much — not that anything is wrong with the link. Surfaced separately so a
+  // throttled run says so plainly instead of blaming the data.
+  const throttled = status === '429' || /captcha/i.test(stdout);
+  return { state: 'unreachable', detail: throttled ? 'rate-limited' : status || 'no response' };
 }
 
 /**
@@ -116,8 +124,13 @@ for (const [index, url] of todo.entries()) {
     if ((consecutiveFailures += 1) >= GIVE_UP_AFTER) {
       abandoned = true;
       console.warn(
-        `\n${GIVE_UP_AFTER} refusals in a row — stopping this pass and keeping what was proven. ` +
-          'Run again later; settled links are skipped, so it resumes.',
+        verdict.detail === 'rate-limited'
+          ? `\neasy is rate-limiting us (429 / captcha) after ${GIVE_UP_AFTER} refusals in a row.\n` +
+            'Stopping. This is a quota, not a fault in the data — wait a few hours and run\n' +
+            'again; settled links are skipped, so each pass picks up where the last stopped.\n' +
+            'Do not raise the request rate to compensate: that is what caused it.'
+          : `\n${GIVE_UP_AFTER} refusals in a row — stopping this pass and keeping what was proven. ` +
+            'Run again later; settled links are skipped, so it resumes.',
       );
       break;
     }
