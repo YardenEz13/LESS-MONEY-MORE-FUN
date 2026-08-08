@@ -115,6 +115,7 @@ async function scrapeList(slug, extraParams) {
   const rows = new Map(first.list.filter((b) => b.id).map((b) => [b.id, b]));
 
   const missing = allIds.filter((id) => !rows.has(id));
+  let complete = true;
   for (let i = 0; i < missing.length; i += 25) {
     await sleep(2000); // be polite; Cloudflare challenges bursts
     const batch = missing.slice(i, i + 25);
@@ -123,7 +124,8 @@ async function scrapeList(slug, extraParams) {
       const page = (await api(extraParams ? `${extraParams}&${params}` : params)).bizlist;
       for (const b of page.list ?? []) if (b.id) rows.set(b.id, b);
     } catch (err) {
-      console.warn(`  batch ${i / 25 + 1} failed, keeping what we have: ${err.message}`);
+      console.warn(`  batch ${i / 25 + 1} of ${Math.ceil(missing.length / 25)} failed: ${err.message}`);
+      complete = false;
       break;
     }
   }
@@ -133,7 +135,7 @@ async function scrapeList(slug, extraParams) {
   console.log(
     `${slug}: ${allIds.length} listed, ${all.length} fetched, ${withDeal.length} carry a deal in the subtitle (${all.length - withDeal.length} skipped)`,
   );
-  return withDeal.map((b) => toRecord(slug, b));
+  return { records: withDeal.map((b) => toRecord(slug, b)), complete };
 }
 
 async function main() {
@@ -150,10 +152,17 @@ async function main() {
   for (const [slug, program] of Object.entries(LISTS)) {
     if (only && only !== slug) continue;
     try {
-      const records = await scrapeList(slug, geo.toString());
+      const { records, complete } = await scrapeList(slug, geo.toString());
       const path = `collected/easy/${slug}.jsonl`;
-      await writeFile(path, records.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
-      console.log(`  wrote ${path} -> npm run extract -- --collected ${path} --program ${program}`);
+      // A crawl cut short mid-way is not a smaller catalog — overwriting here
+      // would read downstream as "these deals were removed" and delete real rows.
+      if (complete) {
+        await writeFile(path, records.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
+        console.log(`  wrote ${path} -> npm run extract -- --collected ${path} --program ${program}`);
+      } else {
+        console.error(`  ${path} NOT written: crawl incomplete, keeping the previous file`);
+        process.exitCode = 1;
+      }
     } catch (err) {
       console.error(`${slug}: FAILED — ${err.message}`);
       process.exitCode = 1;
