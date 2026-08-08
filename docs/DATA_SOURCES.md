@@ -86,15 +86,29 @@ Staleness rule: the app already treats old `last_verified_at` as a trust
 signal. A benefit whose source URL 404s twice in a row gets deleted, not
 patched — the source *is* the record.
 
-Scheduling: the weekly pair **is** scheduled — cloud routine
-`trig_01AEToRq65jECsxYHChuokTR`, Sundays 06:00 Asia/Jerusalem, manageable at
-https://claude.ai/code/routines. It re-scrapes, diffs, verifies, and opens a PR;
-it stops before extraction because the cloud sandbox has no `ANTHROPIC_API_KEY`,
-so the model-judgement half stays a local step you run on the merged JSONL.
+Scheduling: a cloud routine exists — `trig_01AEToRq65jECsxYHChuokTR`, Sundays
+06:00 Asia/Jerusalem, at https://claude.ai/code/routines — but it is currently
+**disabled**, because the cloud sandbox cannot reach easy.co.il:
 
-**How to read it.** The run is unattended, so it always leaves exactly one
-visible artifact, and you never have to open a cloud transcript to know what
-happened:
+```
+curl -sS https://easy.co.il/list/MAX
+curl: (56) CONNECT tunnel failed, response 403
+```
+
+The environment's outbound proxy refuses the CONNECT tunnel, so the request
+never reaches the site (issue #1 has the full run report). This is network
+policy, not rate-limiting — retries and delays cannot help, and the same block
+applies to `verify:catalog --sources`, which also has to reach Israeli retail
+domains. **Until easy.co.il is allowlisted for that environment, the weekly
+refresh has to run somewhere with real egress — your machine.** The routine is
+left in place, disabled, so it can be re-enabled the moment egress is granted.
+
+Note the cloud sandbox also has no `ANTHROPIC_API_KEY`, so even with egress it
+could only collect; extraction stays a local step either way.
+
+**How to read it, once it can run.** The run is unattended, so it always leaves
+exactly one visible artifact, and you never have to open a cloud transcript to
+know what happened:
 
 | You see | It means |
 |---|---|
@@ -106,7 +120,7 @@ That mapping only works because failures are loud. If you ever find the routine
 has been quiet for weeks, check that it is still enabled rather than assuming
 the catalog is stable — silence from a *disabled* routine looks identical to
 silence from a healthy one, and that is the one ambiguity this design cannot
-close from inside.
+close from inside. It is disabled right now, so that caveat is live.
 
 Route B can be scheduled once the Cowork chat is saved as a skill; route C stays
 manual by design — never store credentials to automate it.
