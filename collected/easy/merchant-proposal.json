@@ -1,0 +1,2346 @@
+{
+ "enrich": [
+  {
+   "id": "arcadia",
+   "name": "ארקדיה",
+   "add_venue_ids": [
+    "dizengoff_center"
+   ],
+   "evidence": [
+    "dizengoff_center: דיזנגוף סנטר, תל אביב יפו — 67m from centroid"
+   ]
+  },
+  {
+   "id": "burger_king",
+   "name": "ברגר קינג",
+   "add_venue_ids": [
+    "azrieli_tlv"
+   ],
+   "evidence": [
+    "azrieli_tlv: קניון עזריאלי, תל אביב יפו — 80m from centroid"
+   ]
+  },
+  {
+   "id": "mcdonalds",
+   "name": "מקדונלד'ס",
+   "add_venue_ids": [
+    "dizengoff_center"
+   ],
+   "evidence": [
+    "dizengoff_center: דיזנגוף סנטר, תל אביב יפו — 91m from centroid"
+   ]
+  },
+  {
+   "id": "tsomet_sfarim",
+   "name": "צומת ספרים",
+   "add_venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "evidence": [
+    "ramat_aviv_mall: ברודצקי 43 ב, תל אביב יפו — 128m from centroid"
+   ]
+  },
+  {
+   "id": "fox",
+   "name": "FOX",
+   "add_venue_ids": [
+    "azrieli_tlv"
+   ],
+   "evidence": [
+    "azrieli_tlv: קניון עזריאלי, תל אביב יפו — 72m from centroid"
+   ]
+  },
+  {
+   "id": "ksp",
+   "name": "KSP",
+   "add_venue_ids": [
+    "dizengoff_center"
+   ],
+   "evidence": [
+    "dizengoff_center: דיזנגוף סנטר, תל אביב יפו — 79m from centroid"
+   ]
+  },
+  {
+   "id": "sweetime",
+   "name": "Sweetime",
+   "add_venue_ids": [
+    "dizengoff_center"
+   ],
+   "evidence": [
+    "dizengoff_center: דיזנגוף סנטר, תל אביב יפו — 59m from centroid"
+   ]
+  }
+ ],
+ "new_merchants": [
+  {
+   "proposed_id": null,
+   "name": "א.ל.מ.",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת מוצרי חשמל",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אבולעפיה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מאפיות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אברהמי מנעולים",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "מנעולן",
+   "address": "המלך ג'ורג' 64, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אדידס",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת אופנת ספורט",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אדידס",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת אופנת ספורט",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אדידס",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת אופנת ספורט",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אופטיקה הלפרין",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת אופטיקה ומשקפיים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אופטיקנה",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת אופטיקה ומשקפיים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אופטיקנה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת אופטיקה ומשקפיים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אופטיקנה",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת אופטיקה ומשקפיים",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אורבניקה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות בגדים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אוריבל",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": null,
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אושי אושי",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת סושי",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אי.די.סי. מילניום ישראל",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "חנות תכשיטים ושעונים",
+   "address": "דרך זאב ז'בוטינסקי 1, רמת גן (בורסת היהלומים)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אמריקן איגל",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות בגדים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אמריקן איגל",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות בגדים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אפרודיטה",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת הלבשה תחתונה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אפריל",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": null,
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ארט סנטר",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "חנות אמנות ויצירה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ארי",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת הלבשה תחתונה",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ארקפה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת קפה מסעדה",
+   "address": "דרך מנחם בגין 144, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ארקפה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת קפה מסעדה",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ארקפה",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "רשת קפה מסעדה",
+   "address": "דרך מנחם בגין 11, רמת גן",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "אשלי תכשיטים",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "חנות תכשיטים",
+   "address": "תובל 21, רמת גן",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "באג",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מחשבים וציוד היקפי",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "באג",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת מחשבים וציוד היקפי",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "באג",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת מחשבים וציוד היקפי",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בובי בראון",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מוצרי איפור",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בובי בראון",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת מוצרי איפור",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בורגר ראנץ'",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת המבורגריות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בורגרס בר",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת המבורגריות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בורדרליין",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות גלישה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בן אינסטלציה וביובית",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "אינסטלטור",
+   "address": "דיזנגוף, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בנק מזרחי טפחות",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "בנק",
+   "address": "דרך מנחם בגין 146, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בנק מזרחי טפחות",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "בנק",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בנק מזרחי טפחות",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "בנק",
+   "address": "דרך זאב ז'בוטינסקי 1, רמת גן (בורסת היהלומים)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "בראדלי",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "בית קפה",
+   "address": "דרך מנחם בגין 132, תל אביב יפו (קניון עזריאלי)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ברוריה תחפושות",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "תחפושות",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ג'ק קובה",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת הלבשה תחתונה",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "גו קנטינה אסייתית",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת נודלס בר",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "גוד פארם",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות פארם",
+   "address": "דיזנגוף 45, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "גולדה גלידה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת גלידריות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "גיורא שביט",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "לימודי מקצועות הטיפוח",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "גל שור",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "עיסוי ספורטאים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "גלי",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "דיזנגוף 55, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "גן סטודיו",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "חנות מתנות ומזכרות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "גרג דיזנגוף סנטר",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "קפה מסעדה",
+   "address": "דיזנגוף 55, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ד\"ר גב",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות שיווק מזרנים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ד\"ר מיכל רביד",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רדיולוגיה אבחנתית",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ד\"ר רון בן יצחק",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "גריאטריה",
+   "address": "דיזנגוף 61, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "דודי המדביר סיירת הדברה",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "שירות הדברה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "דורון ניהול מבנים",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "אחזקה וניהול מבנים",
+   "address": "דרך זאב ז'בוטינסקי 1, רמת גן (בורסת היהלומים)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "דיאנה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "מסעדת מזון מהיר",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "דים סאם שופ",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "מסעדה אסייתית",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "דלתא",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת הלבשה תחתונה",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "דלתא",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת הלבשה תחתונה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "דלתא",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת הלבשה תחתונה",
+   "address": "ברודצקי 43, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "דר. יהורם מלמד",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "טיפול בהבעה ויצירה",
+   "address": "דרך מנחם בגין, רמת גן",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "האוס אוף מארלי",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "חנות ציוד הגברה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "הוויאנס",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "דיזנגוף 81, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "הוט",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת שידור וטלוויזיה",
+   "address": "דרך מנחם בגין 132, תל אביב יפו (קניון עזריאלי)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "הוט",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת שידור וטלוויזיה",
+   "address": "דיזנגוף 50, תל אביב יפו (דיזנגוף סנטר)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "הולמס פלייס ספא",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מרכזי בריאות וספא",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "הום סנטר",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת עשה זאת בעצמך",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "הלוחש לסירים",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "אוכל מוכן הביתה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "המשביר לצרכן",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות בגדים",
+   "address": "דיזנגוף 65, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "הפנינג",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מתנות ומזכרות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "הפריקסה של חיימיקו",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "פריקסה",
+   "address": "המלך ג'ורג' 81, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "וטרינר בסנטר Medical Vet",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "וטרינרים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "וניליה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת גלידריות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "זלמנ'ס",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת נקניקיות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "חומוס אליהו",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "חומוסיה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "חנות שיאומי MI STORE",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "חנות סלולר ואביזרים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "חניון בית שאפ תחתון",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "חניון",
+   "address": "היצירה 3, רמת גן",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "חניון עזריאלי",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "חניון",
+   "address": "דרך מנחם בגין 132, תל אביב יפו (קניון עזריאלי)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "טבע נאות",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "טבע נאות",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "טופ טן",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות אקססוריז ואופנה",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "טופ טן",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות אקססוריז ואופנה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "טוקיו סושי",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "סושיה",
+   "address": "תובל 21, רמת גן",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "יהלומי הבורסה",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "חנות תכשיטים",
+   "address": "תובל 21, רמת גן",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "יהלומי ש.ג.י",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "חנות תכשיטים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "כיתן",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות כלי מיטה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "כפריס",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "רשת חנויות תכשיטים",
+   "address": "דרך זאב ז'בוטינסקי 5, רמת גן (בית אבגד)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "לב תל אביב",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "בית קולנוע",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "לגו סטור",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות צעצועים ומשחקים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "לגו סטור",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות צעצועים ומשחקים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ללין",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת מוצרי טיפוח",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ללין",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מוצרי טיפוח",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ללין",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת מוצרי טיפוח",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "למטייל",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות מטיילים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מאפיית לחמים",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מאפיות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מאק",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת מוצרי איפור",
+   "address": "דיזנגוף 55, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מאק",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מוצרי איפור",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מאק",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת מוצרי איפור",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מאק",
+   "venue_ids": [
+    "malha_mall"
+   ],
+   "easy_category": "רשת מוצרי איפור",
+   "address": "קניון מלחה, ירושלים",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מגה ספורט",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת ציוד ספורט וכושר",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מגה ספורט",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת ציוד ספורט וכושר",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מגנוליה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות תכשיטים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מחסני חשמל",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מוצרי חשמל",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מיכאלס' גיפטס",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "חנות מתנות ומזכרות",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מיסטר פרצל",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת בייגלס",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מיקי בוגנים",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "לימודי איפור",
+   "address": "דרך זאב ז'בוטינסקי 1, רמת גן (בורסת היהלומים)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מלון סוואנה",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "בית מלון",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מנטור",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "מכללה",
+   "address": "דרך זאב ז'בוטינסקי 1, רמת גן (בורסת היהלומים)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מרכזי שירות סלקום",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חברות סלולריות",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "מרפאות מוסקונה",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת מנתחים פלסטיים",
+   "address": "ברודצקי 43, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "משתלה אורבנית",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "משתלה",
+   "address": "המלך ג'ורג' 55, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "נורה דיימונדס",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "טבעות אירוסין ונישואין",
+   "address": "תובל 23, רמת גן (בניין נועם)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "נייקי",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת אופנת ספורט",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "נייקי",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת אופנת ספורט",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "נימרוד",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת נעלי ילדים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ניקוי פלוס+",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "ניקוי ריפודים",
+   "address": "דיזנגוף 50, תל אביב יפו (דיזנגוף סנטר)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "נעלי אלדו",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "נעמן",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת כלי בית ומטבח",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סוהו דיזיין שופ",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת הום סטיילינג",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סוהו דיזיין שופ",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת הום סטיילינג",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סוויט טיים",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת שוקולד ומתוקים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סוויט טיים",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת שוקולד ומתוקים",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סולתם",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת כלי בית ומטבח",
+   "address": "ברודצקי 43, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סטיב מאדן",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מעצבי נעליים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סטימצקי",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות ספרים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סטימצקי",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות ספרים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סטימצקי",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת חנויות ספרים",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סמסונג סלולר",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות סלולר",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "סמסונג סלולר",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות סלולר",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ספידוס",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "שירות שליחויות",
+   "address": "עזריאלי המגדל העגול, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ספיידרמן יום חדש סרט",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "סרט",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ספייסי הובלות",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "הובלת דירות",
+   "address": "דיזנגוף 50, תל אביב יפו (דיזנגוף סנטר)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "עגבניה",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת פיצה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "עגבניה",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת פיצה",
+   "address": "ברודצקי 43, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "עמינח סנטר",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות שיווק מזרנים",
+   "address": "המלך ג'ורג' 71, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "פולגת",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת בגדי גברים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "פי. אנד פי. מחשבים",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "מעבדת מחשבים",
+   "address": "דרך מנחם בגין 16, רמת גן (בית גמא)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "פיצה האט",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת פיצה",
+   "address": "המלך ג'ורג' 79, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "פיצה X דיזינגוף",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "פיצריה",
+   "address": "דיזנגוף 70, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "פלאנט",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "חנות תכשיטים ושעונים",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "פעלטון",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת ג'ימבורי",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "צבאן תכשיטים",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "רשת חנויות תכשיטים",
+   "address": "הרקון 1, רמת גן",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קומיקאזה 20",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "חנות קומיקס",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קורקיסיטר",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "תיקון קורקינטים",
+   "address": "תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קידום בגרות",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת הכנה לבגרויות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קלוק",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": null,
+   "address": "דיזנגוף 65, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קניון רמת אביב",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "מרכז קניות",
+   "address": "איינשטיין 40, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קפה כרמי ורנר",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "בית קפה",
+   "address": "בר גיורא 26, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קפה נטו",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "רשת קפה מסעדה",
+   "address": "תחנת רכבת ארלוזורוב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קפה קוקו",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "בר מסעדה",
+   "address": "דיזנגוף 83, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קפה קפה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת קפה מסעדה",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קראון פלזה סיטי סנטר",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "בית מלון",
+   "address": "דרך מנחם בגין 136, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קרביץ",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות ציוד משרדי",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קרביץ",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות ציוד משרדי",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קרביץ",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת חנויות ציוד משרדי",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קרולינה למקה",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת אופטיקה ומשקפיים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קרולינה למקה",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת אופטיקה ומשקפיים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "קרפור",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת מזון",
+   "address": "דיזנגוף 65, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "רביעי טבעוני",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "לוח אירועים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "רוברטו",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת בגדי גברים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "רוית אסף",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מוצרי איפור",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "רולדין",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת קונדיטוריות",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "רולדין",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת קונדיטוריות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ריקושט",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות מטיילים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "רמפאייג'",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": null,
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "רנואר",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות בגדים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "שופרסל אקספרס",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת שופרסל",
+   "address": "המלך ג'ורג' 58, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "שופרסל שלי",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת שופרסל",
+   "address": "ברזיל 15, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "שחר בדק בית",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "בדק בית",
+   "address": "דרך מנחם בגין 5, רמת גן",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "שילב",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מוצרי תינוקות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "שילב",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת מוצרי תינוקות",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "שירי יהלומים",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "חנות תכשיטים",
+   "address": "בצלאל 12, רמת גן (בנין יהלום)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "תכשיטי ספירים",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "עיצוב תכשיטים",
+   "address": "תובל 23, רמת גן (בניין נועם)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "APRIL",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת מוצרי טיפוח",
+   "address": "דיזנגוף 45, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ARIBAR",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "חנות תכשיטים",
+   "address": "דרך זאב ז'בוטינסקי 1, רמת גן (בורסת היהלומים)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "At8",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "בית קפה",
+   "address": "דיזנגוף 88, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "barber show",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "מספרת גברים",
+   "address": "דיזנגוף 76, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Billabong",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות גלישה",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Billabong",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות גלישה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Billabong",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת חנויות גלישה",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Buy digitli",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "מעבדת סלולר",
+   "address": "דיזנגוף 50, תל אביב יפו (דיזנגוף סנטר)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Cook and Bake קוק אנד בייק",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת כלי בית ומטבח",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "DANON",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "חנות תכשיטים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Denim",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "בר",
+   "address": "המלך ג'ורג' 83, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ediamonds",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "חנות תכשיטים",
+   "address": "תובל 23, רמת גן (בניין נועם)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Erroca",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת אופטיקה ומשקפיים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Escape Room",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "מתחם חדרי בריחה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Fix",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת הלבשה תחתונה",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "fixit ישראל",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "הנדימן",
+   "address": "תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Flying Tiger",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מתנות ומזכרות",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Flying Tiger",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת מתנות ומזכרות",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Foot Locker",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Foot Locker",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Foot Locker",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Fox Home",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת הום סטיילינג",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "gin club supreme",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "בר קוקטיילים",
+   "address": "המלך ג'ורג' 83, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Golf",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות בגדים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Hoodies",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות בגדים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Hoodies",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות בגדים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ILAN'S",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "רשת בתי קפה",
+   "address": "דרך מנחם בגין 7, רמת גן (בית גיבור ספורט)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Intima",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת הלבשה תחתונה",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "JEZ V",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "מוצרי קוסמטיקה טבעיים",
+   "address": "דרך מנחם בגין 144, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "KIKO MILANO",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מוצרי איפור",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "London Vapes",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "חנויות סיגריות אלקטרוניות",
+   "address": "בר גיורא 26, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "MANGO",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת בגדי נשים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Matteo",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "מסעדה איטלקית",
+   "address": "בוגרשוב 87, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "MAYMOND JEWELRY",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "עיצוב תכשיטים",
+   "address": "דרך זאב ז'בוטינסקי 1, רמת גן (בורסת היהלומים)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Nautica",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות בגדים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "New Era",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "חנות בגדים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Olio",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "מסעדה איטלקית",
+   "address": "בוגרשוב 106, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Re Bar",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת בר מיצים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Re Bar",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת בר מיצים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "s wear",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת אופנת ספורט",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "s wear",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת אופנת ספורט",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "s wear",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת אופנת ספורט",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Sabon",
+   "venue_ids": [
+    "ramat_aviv_mall"
+   ],
+   "easy_category": "רשת מוצרי טיפוח",
+   "address": "קניון רמת אביב, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Slacks גרביים ממותגות",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "מוצרים ממותגים",
+   "address": "דרך מנחם בגין 132, תל אביב יפו (קניון עזריאלי)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Speedo",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת אופנת חוף ובגדי ים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "The North Face",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות מטיילים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Timberland",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Timberland",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Twentyfour Seven",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת בגדי נשים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Vans",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "חנות נעליים",
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "Vans",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "VOODOO",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "בר",
+   "address": "שדרות בן ציון 1, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "We Shoes",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": null,
+   "address": "קניון עזריאלי, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "We Shoes",
+   "venue_ids": [
+    "dizengoff_center"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "דיזנגוף סנטר, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "We Shoes",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת חנויות נעליים",
+   "address": "דרך מנחם בגין 132, תל אביב יפו (קניון עזריאלי)",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "wework",
+   "venue_ids": [
+    "azrieli_tlv"
+   ],
+   "easy_category": "רשת מתחמי עבודה",
+   "address": "דרך מנחם בגין 146, תל אביב יפו",
+   "domains": []
+  },
+  {
+   "proposed_id": null,
+   "name": "ZOY תכשיטי יהלומים",
+   "venue_ids": [
+    "ayalon_mall"
+   ],
+   "easy_category": "חנות תכשיטים",
+   "address": "תובל 21, רמת גן",
+   "domains": []
+  }
+ ]
+}

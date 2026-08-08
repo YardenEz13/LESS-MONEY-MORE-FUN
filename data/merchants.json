@@ -46,6 +46,7 @@
     ],
     "venue_ids": [
       "azrieli_tlv",
+      "dizengoff_center",
       "grand_kanyon_haifa"
     ],
     "categories": [
@@ -91,8 +92,9 @@
       "fox.co.il"
     ],
     "venue_ids": [
-      "dizengoff_center",
       "ayalon_mall",
+      "azrieli_tlv",
+      "dizengoff_center",
       "grand_canyon_beersheva"
     ],
     "categories": [
@@ -122,10 +124,11 @@
       "mcdonalds.co.il"
     ],
     "venue_ids": [
-      "azrieli_tlv",
       "ayalon_mall",
-      "malha_mall",
-      "grand_canyon_beersheva"
+      "azrieli_tlv",
+      "dizengoff_center",
+      "grand_canyon_beersheva",
+      "malha_mall"
     ],
     "categories": [
       "dining"
@@ -307,7 +310,9 @@
     "domains": [
       "arcadia.co.il"
     ],
-    "venue_ids": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
     "categories": [
       "electronics"
     ]
@@ -316,7 +321,9 @@
     "id": "burger_king",
     "name": "ברגר קינג",
     "domains": [],
-    "venue_ids": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
     "categories": [
       "dining"
     ]
@@ -325,7 +332,9 @@
     "id": "sweetime",
     "name": "Sweetime",
     "domains": [],
-    "venue_ids": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
     "categories": [
       "dining"
     ]
@@ -371,7 +380,8 @@
     ],
     "venue_ids": [
       "azrieli_tlv",
-      "dizengoff_center"
+      "dizengoff_center",
+      "ramat_aviv_mall"
     ],
     "categories": [
       "books"
