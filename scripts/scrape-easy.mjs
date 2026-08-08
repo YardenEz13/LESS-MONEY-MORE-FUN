@@ -14,7 +14,7 @@
  * ponytail: results are geo-ranked around easy's default location (no lat/lng
  * sent). Pass --lat/--lng/--rad if coverage outside Gush Dan matters.
  */
-import { writeFile, mkdir } from 'node:fs/promises';
+import { writeFile, readFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -135,7 +135,42 @@ async function scrapeList(slug, extraParams) {
   console.log(
     `${slug}: ${allIds.length} listed, ${all.length} fetched, ${withDeal.length} carry a deal in the subtitle (${all.length - withDeal.length} skipped)`,
   );
-  return { records: withDeal.map((b) => toRecord(slug, b)), complete };
+  return {
+    records: withDeal.map((b) => toRecord(slug, b)),
+    // Merchant identity is worth keeping for every business on a discount list,
+    // deal text or not — coordinates are what the geofence needs, and the
+    // extraction JSONL throws them away.
+    merchants: all.map((b) => ({
+      easy_id: b.id,
+      name: b.bizname,
+      easy_category: b.category ?? null,
+      address: b.address ?? null,
+      city: b.city ?? null,
+      lat: b.lat ?? null,
+      lng: b.lng ?? null,
+      lists: [slug],
+    })),
+    complete,
+  };
+}
+
+/** Merge candidates into the sidecar, keyed by easy id so a re-run updates. */
+async function mergeMerchants(found) {
+  const path = 'collected/easy/merchants-raw.json';
+  let existing = [];
+  try {
+    existing = JSON.parse(await readFile(path, 'utf8'));
+  } catch {
+    // First run.
+  }
+  const byId = new Map(existing.map((m) => [m.easy_id, m]));
+  for (const m of found) {
+    const prior = byId.get(m.easy_id);
+    byId.set(m.easy_id, prior ? { ...m, lists: [...new Set([...prior.lists, ...m.lists])] } : m);
+  }
+  const merged = [...byId.values()].sort((a, b) => a.name.localeCompare(b.name, 'he'));
+  await writeFile(path, JSON.stringify(merged, null, 1), 'utf8');
+  console.log(`\n${merged.length} merchant candidates -> ${path}`);
 }
 
 async function main() {
@@ -149,10 +184,14 @@ async function main() {
   for (const k of ['lat', 'lng', 'rad']) if (opt(k)) geo.set(k, opt(k));
 
   await mkdir('collected/easy', { recursive: true });
+  const candidates = [];
   for (const [slug, program] of Object.entries(LISTS)) {
     if (only && only !== slug) continue;
     try {
-      const { records, complete } = await scrapeList(slug, geo.toString());
+      const { records, merchants, complete } = await scrapeList(slug, geo.toString());
+      // Kept even from an incomplete crawl: merchant identity is additive, so a
+      // short list under-reports rather than falsely retracting anything.
+      candidates.push(...merchants);
       const path = `collected/easy/${slug}.jsonl`;
       // A crawl cut short mid-way is not a smaller catalog — overwriting here
       // would read downstream as "these deals were removed" and delete real rows.
@@ -169,6 +208,7 @@ async function main() {
     }
     await sleep(3000);
   }
+  if (candidates.length > 0) await mergeMerchants(candidates);
 }
 
 main();
