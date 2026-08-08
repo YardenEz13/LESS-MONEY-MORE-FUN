@@ -150,7 +150,9 @@
     "domains": [
       "ivory.co.il"
     ],
-    "venue_ids": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
     "categories": [
       "electronics"
     ]
@@ -367,7 +369,10 @@
     "domains": [
       "booknet.co.il"
     ],
-    "venue_ids": [],
+    "venue_ids": [
+      "azrieli_tlv",
+      "dizengoff_center"
+    ],
     "categories": [
       "books"
     ]
