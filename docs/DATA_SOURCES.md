@@ -86,9 +86,26 @@ Staleness rule: the app already treats old `last_verified_at` as a trust
 signal. A benefit whose source URL 404s twice in a row gets deleted, not
 patched — the source *is* the record.
 
-Scheduling: a cloud routine exists — `trig_01AEToRq65jECsxYHChuokTR`, Sundays
-06:00 Asia/Jerusalem, at https://claude.ai/code/routines — but it is currently
-**disabled**, because the cloud sandbox cannot reach easy.co.il:
+**Scheduling: the weekly refresh runs locally**, as Windows scheduled task
+`LessMoneyMoreFun weekly refresh` — Sundays 06:00, running
+`scripts/weekly-refresh.ps1` against this repo. It is set `StartWhenAvailable`,
+so a run missed because the machine was off fires when it next wakes instead of
+being skipped. It appends to `data/generated/weekly-refresh.log` (git-ignored),
+ending in one of:
+
+```
+RESULT: no changes
+RESULT: CHANGED         (followed by the modified files)
+RESULT: FAILED (exit N) - existing catalog left untouched
+```
+
+It deliberately stops after refreshing the JSONL: extraction costs money and
+judgement, so `npm run extract` stays a keyboard decision. Inspect, remove, or
+retime it with `Get-ScheduledTask`/`Unregister-ScheduledTask`.
+
+A cloud routine also exists — `trig_01AEToRq65jECsxYHChuokTR` at
+https://claude.ai/code/routines — but it is **disabled**, because the cloud
+sandbox cannot reach easy.co.il:
 
 ```
 curl -sS https://easy.co.il/list/MAX
@@ -99,9 +116,10 @@ The environment's outbound proxy refuses the CONNECT tunnel, so the request
 never reaches the site (issue #1 has the full run report). This is network
 policy, not rate-limiting — retries and delays cannot help, and the same block
 applies to `verify:catalog --sources`, which also has to reach Israeli retail
-domains. **Until easy.co.il is allowlisted for that environment, the weekly
-refresh has to run somewhere with real egress — your machine.** The routine is
-left in place, disabled, so it can be re-enabled the moment egress is granted.
+domains. The routine is left in place, disabled, so it can be re-enabled the
+moment easy.co.il is allowlisted for that environment — at which point it
+becomes the better home for this job, since it does not depend on one laptop
+being awake.
 
 Note the cloud sandbox also has no `ANTHROPIC_API_KEY`, so even with egress it
 could only collect; extraction stays a local step either way.
