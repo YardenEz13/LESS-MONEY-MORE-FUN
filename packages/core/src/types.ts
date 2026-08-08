@@ -105,6 +105,14 @@ export const MerchantCategory = z.enum([
   'dining',
   'home',
   'leisure',
+  /**
+   * `beauty` and `books` are separate rather than folded into pharmacy and
+   * leisure because they are separate *errands*: mapping books onto leisure
+   * would answer "where do I buy a book" with a trampoline park. Added when
+   * real catalog data (גילטי ביוטי, צומת ספרים) demanded them, not upfront.
+   */
+  'beauty',
+  'books',
 ]);
 export type MerchantCategory = z.infer<typeof MerchantCategory>;
 

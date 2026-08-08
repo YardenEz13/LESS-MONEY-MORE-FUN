@@ -17,10 +17,15 @@ const read = async (name) => JSON.parse(await readFile(resolve(repoRoot, 'data',
 const errors = [];
 const fail = (message) => errors.push(message);
 
-const [programs, merchants, venues, benefits] = await Promise.all([
+// `benefits.json` is the catalog the app actually bundles, so that is the one
+// that has to be sound — validating the sample instead would let a bad promote
+// reach a phone unchecked. The sample is validated too: it is the seed a fresh
+// catalog is created from, and a broken seed is a broken first build.
+const [programs, merchants, venues, benefits, sample] = await Promise.all([
   read('programs.json'),
   read('merchants.json'),
   read('venues.json'),
+  read('benefits.json'),
   read('benefits.sample.json'),
 ]);
 
@@ -59,28 +64,73 @@ for (const venue of venues) {
   }
 }
 
-for (const benefit of benefits) {
-  if (!programIds.has(benefit.program_id)) {
-    fail(`benefit ${benefit.id}: unknown program ${benefit.program_id}`);
-  }
-  if (!merchantIds.has(benefit.merchant_id)) {
-    fail(`benefit ${benefit.id}: unknown merchant ${benefit.merchant_id}`);
-  }
-  if (benefit.type === 'percent' && benefit.value > 100) {
-    fail(`benefit ${benefit.id}: ${benefit.value}% discount`);
-  }
-  if (!/^https?:\/\//.test(benefit.source_url)) {
-    fail(`benefit ${benefit.id}: source_url must be a URL a user can open`);
-  }
-  if (Number.isNaN(Date.parse(benefit.last_verified_at))) {
-    fail(`benefit ${benefit.id}: last_verified_at is not a date`);
+let unmapped = 0;
+for (const [file, list] of [
+  ['benefits.json', benefits],
+  ['benefits.sample.json', sample],
+]) {
+  for (const benefit of list) {
+    if (!programIds.has(benefit.program_id)) {
+      fail(`${file} ${benefit.id}: unknown program ${benefit.program_id}`);
+    }
+    // An `unmapped_*` id is what the extractor mints when a scraped merchant
+    // isn't in merchants.json yet. That is a supported state, not an error —
+    // the benefit still lists, it just can't fire a geofence or match a share
+    // until someone adds the merchant. Counted so the number stays visible.
+    if (benefit.merchant_id.startsWith('unmapped_')) {
+      unmapped += 1;
+    } else if (!merchantIds.has(benefit.merchant_id)) {
+      fail(`${file} ${benefit.id}: unknown merchant ${benefit.merchant_id}`);
+    }
+    if (benefit.type === 'percent' && benefit.value > 100) {
+      fail(`${file} ${benefit.id}: ${benefit.value}% discount`);
+    }
+    if (!/^https?:\/\//.test(benefit.source_url)) {
+      fail(`${file} ${benefit.id}: source_url must be a URL a user can open`);
+    }
+    if (Number.isNaN(Date.parse(benefit.last_verified_at))) {
+      fail(`${file} ${benefit.id}: last_verified_at is not a date`);
+    }
+    for (const field of ['valid_from', 'valid_until']) {
+      const value = benefit[field];
+      if (value != null && Number.isNaN(Date.parse(value))) {
+        fail(`${file} ${benefit.id}: ${field} "${value}" is not a parseable instant`);
+      }
+    }
   }
 }
 
-const unreachable = merchants.filter((m) => m.venue_ids.length === 0 && m.domains.length === 0);
-for (const merchant of unreachable) {
-  fail(`merchant ${merchant.id}: no domains and no venues — it can never be surfaced`);
+// A merchant with neither a domain nor a venue is not useless — its benefits
+// still appear in the list. What it cannot do is be surfaced *proactively*: no
+// domain means a shared URL won't match it, no venue means walking into the mall
+// won't remind you. So the hard failure is reserved for a merchant that carries
+// no benefits either, which is genuinely dead weight; the rest is a note, and
+// the note is the backlog of what to go and verify.
+//
+// `any_merchant` is exempt outright: a flat cashback card applies everywhere
+// rather than at a shop, and is reached by combining with another merchant's
+// offer (see UNIVERSAL_MERCHANT_ID in @sbr/core).
+const UNIVERSAL_MERCHANT_ID = 'any_merchant';
+const merchantsWithBenefits = new Set([...benefits, ...sample].map((b) => b.merchant_id));
+const noReach = merchants.filter(
+  (m) => m.id !== UNIVERSAL_MERCHANT_ID && m.venue_ids.length === 0 && m.domains.length === 0,
+);
+for (const merchant of noReach) {
+  if (!merchantsWithBenefits.has(merchant.id)) {
+    fail(`merchant ${merchant.id}: no domains, no venues and no benefits — nothing can reach it`);
+  }
 }
+const listOnly = noReach.filter((m) => merchantsWithBenefits.has(m.id));
+
+// Every merchant that has benefits but no venue can never fire a geofence.
+// Worth stating separately: it is the gap between "we know about this shop" and
+// "we can remind you when you walk into it".
+const noVenue = merchants.filter(
+  (m) =>
+    m.id !== UNIVERSAL_MERCHANT_ID &&
+    m.venue_ids.length === 0 &&
+    merchantsWithBenefits.has(m.id),
+);
 
 if (errors.length > 0) {
   console.error(`data validation failed (${errors.length}):`);
@@ -90,5 +140,21 @@ if (errors.length > 0) {
 
 console.log(
   `data ok: ${programs.length} programs, ${merchants.length} merchants, ` +
-    `${venues.length} venues, ${benefits.length} sample benefits`,
+    `${venues.length} venues, ${benefits.length} shipped benefits ` +
+    `(+${sample.length} in the sample seed)`,
 );
+if (unmapped > 0) {
+  console.log(
+    `note: ${unmapped} benefits point at an unmapped merchant — they list, but ` +
+      'cannot fire a geofence or match a share until added to merchants.json',
+  );
+}
+if (listOnly.length > 0) {
+  console.log(
+    `note: ${listOnly.length} merchants have no domain and no venue — their benefits ` +
+      `list but are never surfaced proactively: ${listOnly.map((m) => m.id).join(', ')}`,
+  );
+}
+if (noVenue.length > 0) {
+  console.log(`note: ${noVenue.length} merchants with benefits have no venue — no geofence reminder`);
+}

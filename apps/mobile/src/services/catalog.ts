@@ -1,14 +1,21 @@
 import { Benefit, Merchant, Program, Venue, expandOwnedPrograms } from '@sbr/core';
-import benefitsJson from '@sbr/data/benefits.sample.json';
+import benefitsJson from '@sbr/data/benefits.json';
 import merchantsJson from '@sbr/data/merchants.json';
 import programsJson from '@sbr/data/programs.json';
 import venuesJson from '@sbr/data/venues.json';
 
 /**
  * The MVP ships the catalog in the bundle. There is no server yet: the
- * extraction pipeline writes JSON, the JSON is committed, the app is rebuilt.
+ * extraction pipeline writes JSON, a human promotes it, the app is rebuilt.
  * A `last_verified_at` older than the freshness policy is what stops a stale
  * bundle from quietly showing expired benefits — see `evaluateBenefit`.
+ *
+ * `benefits.json` is the shipped catalog and is committed, so a fresh clone
+ * builds without ever running the pipeline. Pipeline output lands in
+ * `data/generated/` (git-ignored) and only reaches this file via
+ * `npm run publish:catalog`, which is the last point a human sees what is
+ * about to appear at a till. `benefits.sample.json` stays as the synthetic
+ * seed that file was created from.
  *
  * Parsing at load is intentional: a malformed catalog should fail loudly on a
  * dogfood build rather than surface a half-formed benefit at a till.
