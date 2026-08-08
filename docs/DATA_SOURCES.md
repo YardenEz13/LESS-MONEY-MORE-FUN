@@ -59,23 +59,32 @@ and honest low confidence. **Mine it for merchants; get conditions from Tier 1.*
 ### Proving the deals are real
 
 ```bash
-node scripts/validate-easy.mjs     # after every scrape
+npm run validate:easy     # after every scrape
 ```
 
-Every record's `offer_url` is `easy.co.il/page/<bizid>`, and
-`/n/jsons/bizpage?bizid=N` answers whether that id is alive: the business JSON,
-or HTTP **410** when it is gone. That is a stronger check than fetching the HTML
-page, which returns a soft shell for anything.
+A `HEAD` on the record's own `offer_url` is the whole check: easy answers **200**
+for a live business and **404** for one that is gone, and sends no body either
+way. It tests exactly the URL the app will open rather than a proxy for it.
 
-- passes → the record gains `verified_at`, and a `merchant_name` easy has since
-  changed is corrected to match
-- 410 → the record is **removed**; a deal you cannot open is worse than no deal
-- network failure → the record is left exactly as it was and counted as
-  `unreachable`. A Cloudflare bad day is not evidence a business closed, and
-  must never be allowed to empty the catalog
+- 200 → the record gains `verified_at`
+- 404 → the record is **removed**; a deal you cannot open is worse than no deal
+- anything else → left exactly as it was and counted as `unproven`. A refusal is
+  the network talking, not evidence a business closed, and must never be
+  allowed to empty the catalog
 
-The script exits non-zero if *nothing* verified, because a run where the check
-itself is broken must not be read as a clean bill of health.
+**Why not `/n/jsons/bizpage`,** which also answers this and returns 410: easy
+rate-limits the JSON API hard. A pass of ~2300 per-id calls got 70% of itself
+403'd and then locked us out of the whole JSON API for hours — while ordinary
+page requests kept working throughout. The validator also does not correct
+renamed businesses; the crawler rewrites `merchant_name` from `bizlist` every
+run, so that would be a second, slower source for something already fresh.
+
+The run is **incremental and checkpointed**: settled links are skipped and
+verdicts are flushed to `collected/easy/.verified-cache.json` (git-ignored) as
+they land, so a pass that gets throttled resumes rather than restarting. Twenty
+refusals in a row aborts it. It prints `COVERAGE: N%`, and exits non-zero if
+*nothing* verified — a run where the check itself is broken must not read as a
+clean bill of health.
 
 Known limits of the scraper (deliberate):
 - Results are geo-ranked around easy's default location; each list caps at

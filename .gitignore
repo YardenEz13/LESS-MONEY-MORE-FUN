@@ -13,3 +13,6 @@ data/generated/
 # profiles with live session cookies — never commit one.
 local_*/
 **/.browser-profiles/
+
+# Validation progress cache (regenerable, chatty)
+collected/easy/.verified-cache.json
