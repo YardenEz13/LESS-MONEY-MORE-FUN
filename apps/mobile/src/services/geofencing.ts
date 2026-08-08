@@ -150,6 +150,15 @@ export async function startGeofencing(): Promise<GeofenceStartResult> {
   // Re-registering an already-running task throws on Android.
   await stopGeofencing();
 
+  // ponytail: iOS monitors at most 20 regions and silently ignores the rest;
+  // Android's ceiling is 100. Ten venues fits both. If the venue list ever
+  // outgrows this, register only the nearest 20 to the user instead of the
+  // whole catalog — the failure mode otherwise is a fence that never fires and
+  // no error anywhere.
+  if (venues.length > 20) {
+    console.warn(`[geofence] ${venues.length} venues — iOS will only monitor 20`);
+  }
+
   await Location.startGeofencingAsync(
     GEOFENCE_TASK,
     venues.map((venue) => ({
