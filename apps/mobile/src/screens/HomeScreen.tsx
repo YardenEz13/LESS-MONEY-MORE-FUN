@@ -84,6 +84,22 @@ export function HomeScreen({
   );
   const shown = hereIds ? byFilter.filter((e) => hereIds.has(e.benefit.id)) : byFilter;
 
+  /**
+   * How many benefits a venue is worth *to this user*.
+   *
+   * Counting the catalog instead would advertise a mall as having 8 when the
+   * list below it shows 5 — the other three belong to clubs they do not hold
+   * or are blocked right now. A count that disagrees with the list under it
+   * teaches the reader to distrust both.
+   */
+  const countAt = useCallback(
+    (venueId: string) => {
+      const ids = new Set(benefitsAtVenue(venueId).map((b) => b.id));
+      return evaluations.filter((e) => ids.has(e.benefit.id)).length;
+    },
+    [evaluations],
+  );
+
   return (
     <View style={styles.screen}>
       {/* The hero: the one dominant green surface, per the design system. */}
@@ -107,6 +123,7 @@ export function HomeScreen({
 
         <WhereAmI
           venue={venue}
+          count={venue ? countAt(venue.id) : 0}
           locating={locating}
           onLocate={locate}
           onPick={() => setPicking(true)}
@@ -116,6 +133,7 @@ export function HomeScreen({
 
       {picking && (
         <VenueSheet
+          countAt={countAt}
           onChoose={(chosen) => {
             setVenue(chosen);
             setPicking(false);
@@ -246,19 +264,20 @@ function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
  */
 function WhereAmI({
   venue,
+  count,
   locating,
   onLocate,
   onPick,
   onClear,
 }: {
   venue: Venue | null;
+  count: number;
   locating: boolean;
   onLocate: () => void;
   onPick: () => void;
   onClear: () => void;
 }) {
   if (venue) {
-    const count = benefitsAtVenue(venue.id).length;
     return (
       <View style={styles.whereRow}>
         <View style={styles.whereActive}>
@@ -266,7 +285,12 @@ function WhereAmI({
             {venue.name} · {count} הטבות כאן
           </Text>
         </View>
-        <Pressable accessibilityRole="button" onPress={onClear} style={styles.whereGhost}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="הצג הטבות מכל המיקומים"
+          onPress={onClear}
+          style={styles.whereGhost}
+        >
           <Text style={styles.whereGhostLabel}>הכול</Text>
         </Pressable>
       </View>
@@ -287,7 +311,12 @@ function WhereAmI({
           <Text style={styles.whereGhostLabel}>איפה אני?</Text>
         )}
       </Pressable>
-      <Pressable accessibilityRole="button" onPress={onPick} style={styles.whereGhost}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="בחר מיקום מתוך רשימה"
+        onPress={onPick}
+        style={styles.whereGhost}
+      >
         <Text style={styles.whereGhostLabel}>בחר מיקום</Text>
       </Pressable>
     </View>
@@ -296,9 +325,11 @@ function WhereAmI({
 
 /** The manual fallback: every tracked venue, tap to pin. */
 function VenueSheet({
+  countAt,
   onChoose,
   onClose,
 }: {
+  countAt: (venueId: string) => number;
   onChoose: (venue: Venue) => void;
   onClose: () => void;
 }) {
@@ -322,7 +353,7 @@ function VenueSheet({
             ]}
           >
             <Text style={type.body}>{v.name}</Text>
-            <Text style={type.caption}>{benefitsAtVenue(v.id).length}</Text>
+            <Text style={type.caption}>{countAt(v.id)}</Text>
           </Pressable>
         ))}
       </ScrollView>
