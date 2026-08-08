@@ -28,6 +28,28 @@ const DIR = process.env.EASY_DIR ?? 'collected/easy';
 const BASE = process.env.EASY_BASE ?? 'https://easy.co.il';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Cloudflare throttles this endpoint hard. Retry a refusal a couple of times
+ * with a long backoff before writing the id off as unreachable — a 403 is the
+ * edge saying "slow down", not the site saying "no such business".
+ */
+async function bizpageWithRetry(bizid, attempt = 0) {
+  const result = await bizpage(bizid);
+  if (result.state !== 'unreachable' || attempt >= 1) return result;
+  await sleep(20000);
+  return bizpageWithRetry(bizid, attempt + 1);
+}
+
+/**
+ * Stop a pass that is being blocked wholesale.
+ *
+ * Once Cloudflare closes the door, every remaining id costs its full backoff
+ * and still fails — grinding through 800 of those takes hours to learn what
+ * the first twenty already said. Better to stop, keep what was proven, and let
+ * the next run pick up where this one left off.
+ */
+const GIVE_UP_AFTER = 20;
+
 /** curl, for the same TLS-fingerprint reason as the scraper. */
 async function bizpage(bizid) {
   const url = `${BASE}/n/jsons/bizpage?bizid=${bizid}`;
@@ -49,8 +71,12 @@ async function bizpage(bizid) {
   }
 }
 
-/** Two workers: enough to finish in minutes, slow enough not to get blocked. */
-async function pooled(items, worker, workers = 2, gapMs = 1200) {
+/**
+ * One worker, ~2.5s apart — the same cadence the crawler sustains across 96
+ * lists without a single block. Two workers at 1.2s got 70% of a run 403'd,
+ * which is slower than going slowly.
+ */
+async function pooled(items, worker, workers = 1, gapMs = 2500) {
   let cursor = 0;
   let done = 0;
   await Promise.all(
@@ -66,9 +92,14 @@ async function pooled(items, worker, workers = 2, gapMs = 1200) {
   );
 }
 
+/** Re-verify a record this old or older. A business does not vanish hourly. */
+const MAX_AGE_MS = Number(process.env.EASY_MAX_AGE_DAYS ?? 7) * 24 * 60 * 60 * 1000;
+const FRESH_BEFORE = Date.now() - MAX_AGE_MS;
+
 const files = (await readdir(DIR)).filter((f) => f.endsWith('.jsonl'));
 const byFile = new Map();
 const ids = new Set();
+const fresh = new Set();
 
 for (const file of files) {
   const rows = (await readFile(`${DIR}/${file}`, 'utf8'))
@@ -78,19 +109,47 @@ for (const file of files) {
   byFile.set(file, rows);
   for (const r of rows) {
     const id = r.offer_url?.match(/\/page\/(\d+)/)?.[1];
-    if (id) ids.add(id);
+    if (!id) continue;
+    ids.add(id);
+    if (r.verified_at && Date.parse(r.verified_at) > FRESH_BEFORE) fresh.add(id);
   }
 }
 
+// Incremental on purpose. Cloudflare rations this endpoint, so a run that had
+// to re-prove everything from scratch would never finish; skipping what is
+// already proven lets successive runs converge on full coverage.
+const todo = [...ids].filter((id) => !fresh.has(id));
 const total = [...byFile.values()].reduce((n, rows) => n + rows.length, 0);
-console.log(`${total} records across ${files.length} lists — ${ids.size} distinct businesses\n`);
+console.log(
+  `${total} records across ${files.length} lists — ${ids.size} distinct businesses\n` +
+    `${fresh.size} already verified within ${MAX_AGE_MS / 86400000}d, ${todo.length} to check\n`,
+);
 
 const verdicts = new Map();
-await pooled([...ids], async (id) => {
+let consecutiveFailures = 0;
+let abandoned = false;
+
+await pooled(todo, async (id) => {
+  if (abandoned) return;
+  let verdict;
   try {
-    verdicts.set(id, await bizpage(id));
+    verdict = await bizpageWithRetry(id);
   } catch (err) {
-    verdicts.set(id, { state: 'unreachable', detail: err.message });
+    verdict = { state: 'unreachable', detail: err.message };
+  }
+  verdicts.set(id, verdict);
+
+  if (verdict.state === 'unreachable') {
+    consecutiveFailures += 1;
+    if (consecutiveFailures >= GIVE_UP_AFTER) {
+      abandoned = true;
+      console.warn(
+        `\n${GIVE_UP_AFTER} refusals in a row — the endpoint is throttling us. ` +
+          'Stopping this pass and keeping what was proven; run again later.',
+      );
+    }
+  } else {
+    consecutiveFailures = 0;
   }
 });
 
@@ -121,6 +180,8 @@ for (const [file, rows] of byFile) {
       }
       r.verified_at = now;
       kept += 1;
+    } else if (id && fresh.has(id)) {
+      kept += 1; // proven by an earlier run and still inside the freshness window
     } else {
       unreachable += 1; // left untouched, keeps whatever verified_at it had
     }
@@ -129,10 +190,15 @@ for (const [file, rows] of byFile) {
   await writeFile(`${DIR}/${file}`, out.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
 }
 
+const coverage = kept + unreachable > 0 ? Math.round((kept / (kept + unreachable)) * 100) : 0;
 console.log(`\nverified live:  ${kept}`);
 console.log(`removed (410):  ${removed}`);
 console.log(`renamed:        ${renamed}`);
 console.log(`unreachable:    ${unreachable}  (kept as-is — network, not proof of death)`);
+console.log(`COVERAGE:       ${coverage}% of records carry a proven link`);
+if (unreachable > 0) {
+  console.log('Re-run to chase the rest; verified records are skipped, so it converges.');
+}
 
 if (goneList.length) {
   console.log('\ndelisted businesses:');
