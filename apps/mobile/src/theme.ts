@@ -53,20 +53,29 @@ export const colors = {
    * The second voice. Green states what you keep; blue states what is yours to
    * do — selected filters, errands, anything the reader acts on rather than
    * banks. Two hues carry twice the meaning one hue plus grey ever could.
+   *
+   * Deeper and less cyan than it was: against the warm paper the old mid-blue
+   * sat at the same visual weight as the green and the two competed. At 7.9:1
+   * on paper it now reads as the second voice rather than a rival first.
    */
-  surfaceAccent: '#0E6BA8',
-  surfaceAccentRaised: '#1583C7',
-  surfaceAccentDeep: '#094B75',
+  surfaceAccent: '#0A4A8F',
+  surfaceAccentRaised: '#0E5CAE',
+  surfaceAccentDeep: '#063463',
 
-  /** The number plate — now navy rather than neutral, so figures read cool. */
-  surfacePlate: '#0B2434',
-  surfacePlateSoft: '#143349',
+  /**
+   * The number plate. Near-black with a green cast rather than navy: the blue
+   * became a surface family of its own above, and a navy plate behind a blue
+   * chip read as two blues disagreeing. Ink is nobody's hue, so the figure on
+   * it belongs to whatever colour the card assigns.
+   */
+  surfacePlate: '#111310',
+  surfacePlateSoft: '#1C1F1A',
 
-  textPrimary: '#12202B',
-  textMuted: '#55606B',
-  textDisabled: '#8A939C',
+  textPrimary: '#111310',
+  textMuted: '#5C6157',
+  textDisabled: '#8A8C82',
   textInverse: '#F5F3EE',
-  textMutedInverse: '#9FB3C4',
+  textMutedInverse: '#A8B2A4',
   /** Muted text that has to sit on the green. */
   textMutedOnPrimary: '#A8CFBB',
 
@@ -74,14 +83,20 @@ export const colors = {
   /** Interior separators inside an already-bordered block. */
   borderHairlineSoft: '#E6E2D9',
   /** Separators drawn on the dark plate. */
-  borderOnPlate: '#1E3E56',
+  borderOnPlate: '#2A2E27',
 
   /**
    * Expiry and violation. Never set as text directly on the green — that pair
-   * is 2.0:1. On green or plate it appears as a full fill with near-black text.
+   * is 1.9:1. On green or plate it appears as a full fill with near-black text.
+   *
+   * Warmer and lighter than the old brick: at 5.4:1 under near-black it now
+   * clears 4.5 as a fill at any size, so urgency no longer needs the bright
+   * variant to stay legible on paper.
    */
-  accentUrgent: '#C2410C',
-  accentUrgentBright: '#F2622B',
+  accentUrgent: '#E1651B',
+  /** Pressed-into and dark-background states. */
+  accentUrgentBright: '#FF7A29',
+  accentUrgentDeep: '#B34A0E',
 } as const;
 
 export const fonts = {
@@ -94,7 +109,31 @@ export const fonts = {
   textMedium: 'EFT_Artzisraeli',
   textSemibold: 'EFT_Artzisraeli',
   textBold: 'EFT_Artzisraeli',
+
+  /**
+   * Latin runs — "Terminal X", "Cash כאל Pro", "שופרסל LIFE".
+   *
+   * Both EFT faces do carry A–Z, so nothing ever falls back; the text engine
+   * simply draws their Latin, and their Latin is a bookish serif that shares
+   * nothing with the Hebrew beside it. Their `&` is also mapped to a shekel
+   * glyph, so "Golf & Co" renders as "Golf ₪ Co". Neither is a hierarchy
+   * a reader can use, so Latin gets its own pair of faces.
+   *
+   * These two are the faces the design system already names — the Hebrew
+   * simply moved to EFT and left them holding only the Latin half of the job.
+   */
+  latinDisplay: 'Karantina_700Bold',
+  latinText: 'NotoSansHebrew_400Regular',
 } as const;
+
+/**
+ * Which Latin face stands in for which Hebrew one. Two entries because the
+ * weight aliases above all resolve to two real files.
+ */
+export const latinFace: Record<string, string> = {
+  [fonts.display]: fonts.latinDisplay,
+  [fonts.text]: fonts.latinText,
+};
 
 /**
  * Every figure in the system: aligned columns, and a countdown that doesn't
@@ -112,8 +151,8 @@ const numeric = {
  * The design-system page specifies display leading as tight as 0.78. That is a
  * browser line box; RN clips a glyph whose line box is shorter than the font's
  * own ascent + descent, and Android clips hardest. So display leading here sits
- * at ~1.0 — visually tight because Karantina is condensed, not because the box
- * is being squeezed past what the text engine will draw.
+ * at ~1.0 — visually tight because the display face is condensed, not because
+ * the box is being squeezed past what the text engine will draw.
  */
 export const type = {
   display: {
@@ -191,8 +230,16 @@ export const space = { s1: 4, s2: 8, s3: 16, s4: 24, s5: 32, s6: 48, s7: 64 } as
  */
 export const radius = { sharp: 0, soft: 4 } as const;
 
-/** Hairline separates, rule heads a section, marker states "active". */
-export const border = { hairline: 1, rule: 2, marker: 4 } as const;
+/**
+ * Hairline separates, rule heads a section, marker states "active".
+ *
+ * `band` is the heavy one: it closes a full-width band — the section head, the
+ * edge under a plate strip. At 6px it is thick enough to read as a structural
+ * edge rather than a border, which is the whole point of a system that gets its
+ * elevation from lines instead of shadows. Not a substitute for `rule`: `rule`
+ * still draws inside a block, `band` only ever ends one.
+ */
+export const border = { hairline: 1, rule: 2, marker: 4, band: 6 } as const;
 
 /**
  * Four tones, not three. A pending gate splits by whether the user can do
@@ -206,13 +253,13 @@ export const gateTone = {
   note: { bg: 'transparent', border: colors.borderHairline, fg: colors.textMuted },
   /**
    * Urgent as a fill with near-black on top — never as text on a coloured field.
-   * The bright variant, not the deep one: the design system pairs deep urgent
-   * with dark text only under a 46px figure, where 3:1 is the bar. At chip size
-   * that pair is 3.6:1 and fails; bright takes it to 5.2:1.
+   * The base tone, not the bright one: the warmer orange carries near-black at
+   * 5.4:1, so a chip clears 4.5 without borrowing the variant reserved for
+   * pressed states and dark backgrounds.
    */
   blocked: {
-    bg: colors.accentUrgentBright,
-    border: colors.accentUrgentBright,
+    bg: colors.accentUrgent,
+    border: colors.accentUrgent,
     fg: colors.textPrimary,
   },
 } as const;

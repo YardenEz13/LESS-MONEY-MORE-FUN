@@ -77,6 +77,41 @@ export function conditionLines(evaluation: Evaluation): Array<{ tone: 'blocked' 
   ];
 }
 
+/**
+ * A Latin run: letters, plus the punctuation that lives inside a name — the
+ * ampersand in "Golf & Co", the dot in "co.il", the hyphen in "Terminal-X" —
+ * and the single spaces between them, so a multi-word name stays one run.
+ *
+ * Digits are deliberately excluded. A figure belongs to the display face and
+ * its tabular figures, so "40%" and "₪119.90" keep the Hebrew face's numerals;
+ * only the letters beside them move.
+ */
+const LATIN_RUN = /[A-Za-z][A-Za-z'’&.\-]*(?: [A-Za-z'’&.\-]+)*/g;
+
+/**
+ * Split a label into Latin and non-Latin runs.
+ *
+ * The catalogue is full of mixed strings — "Cash כאל Pro", "שופרסל LIFE",
+ * "סניפי Terminal X" — and the Hebrew face draws Latin in a serif that belongs
+ * to no part of this system. Splitting here lets the renderer hand each run the
+ * face that suits it; see `Text` in the mobile app's ui.tsx.
+ *
+ * Returns a single non-Latin run for a string with no Latin in it, so the
+ * caller can skip the work when `runs.length === 1 && !runs[0].latin`.
+ */
+export function latinRuns(text: string): Array<{ text: string; latin: boolean }> {
+  const runs: Array<{ text: string; latin: boolean }> = [];
+  let last = 0;
+  for (const match of text.matchAll(LATIN_RUN)) {
+    const at = match.index ?? 0;
+    if (at > last) runs.push({ text: text.slice(last, at), latin: false });
+    runs.push({ text: match[0], latin: true });
+    last = at + match[0].length;
+  }
+  if (last < text.length) runs.push({ text: text.slice(last), latin: false });
+  return runs;
+}
+
 export function formatLastVerified(benefit: Benefit, now: Date = new Date()): string {
   const days = Math.floor((now.getTime() - new Date(benefit.last_verified_at).getTime()) / 86_400_000);
   if (days <= 0) return 'אומת היום';

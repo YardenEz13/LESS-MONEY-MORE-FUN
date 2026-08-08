@@ -1,8 +1,8 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import type { Evaluation } from '@sbr/core';
 import { BenefitCard } from '../components/BenefitCard';
-import { PrimaryButton, ScreenHeader } from '../components/ui';
+import { PrimaryButton, ScreenHeader, Text } from '../components/ui';
 import type { ShareResult } from '../services/shareIntent';
 import { border, colors, radius, space, type } from '../theme';
 

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { formatLastVerified, formatSaving, formatValue, type Evaluation } from '@sbr/core';
 import { GateList, gateSummary } from '../components/Gates';
-import { GhostButton, PrimaryButton, ScreenHeader, Section } from '../components/ui';
+import { GhostButton, PrimaryButton, ScreenHeader, Section, Text } from '../components/ui';
 import { programNames } from '../services/catalog';
 import { border, colors, radius, space, type } from '../theme';
 

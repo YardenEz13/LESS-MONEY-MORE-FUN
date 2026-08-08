@@ -4,13 +4,12 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   View,
 } from 'react-native';
 import type { Evaluation, UserProfile } from '@sbr/core';
 import { BenefitCard } from '../components/BenefitCard';
-import { PrimaryButton, ScreenHeader, Section } from '../components/ui';
+import { PrimaryButton, ScreenHeader, Section, Text } from '../components/ui';
 import { askAdvisor, isAdvisorConfigured, type AdvisorAnswer } from '../services/advisor';
 import { border, colors, radius, space, type } from '../theme';
 

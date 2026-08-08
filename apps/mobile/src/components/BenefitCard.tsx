@@ -1,7 +1,8 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { formatSaving, formatValue, type Evaluation } from '@sbr/core';
 import { ConditionStrip } from './Gates';
+import { Text } from './ui';
 import { programNames } from '../services/catalog';
 import { border, colors, radius, space, type } from '../theme';
 
