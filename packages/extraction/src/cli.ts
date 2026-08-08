@@ -1,5 +1,7 @@
+import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { runCollected } from './collected';
 import { importExtraction, runPipeline } from './pipeline';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -20,6 +22,15 @@ Importing benefits collected by a browser agent (see docs/COWORK_SCRAPE_PROMPT.m
   --import <path>    JSON file shaped like ExtractionResult
   --program <id>     program the benefits belong to   (required with --import)
   --source-url <url> page they were read from         (required with --import)
+
+Extracting a collector's raw JSONL dump (discount_scraper output):
+
+  --collected <path> JSONL, one raw offer page per line
+  --program <id>     program the offers belong to     (required with --collected)
+  --limit <n>        cap model calls this run (default 25; cache hits are free)
+  --all              no cap — extracts every uncached offer
+  --refresh          re-extract even offers already in the cache
+  --concurrency <n>  parallel model calls (default 4)
 `;
 
 function parseArgs(argv: string[]) {
@@ -66,6 +77,44 @@ async function main(): Promise<void> {
     console.log(`review:    ${imported.queuedForReview}`);
     if (imported.queuedForReview > 0) {
       console.log('\nReview queue is not empty — those benefits will NOT reach the app until approved.');
+    }
+    return;
+  }
+
+  if (typeof args.collected === 'string') {
+    if (typeof args.program !== 'string') {
+      throw new Error('--collected also needs --program <id>');
+    }
+    const programs = JSON.parse(
+      await readFile(resolve(repoRoot, 'data/programs.json'), 'utf8'),
+    ) as Array<{ id: string; name: string }>;
+    const program = programs.find((p) => p.id === args.program);
+    if (!program) throw new Error(`unknown program '${String(args.program)}' — see data/programs.json`);
+
+    const collected = await runCollected({
+      dataDir: resolve(repoRoot, 'data'),
+      outDir,
+      file: resolve(repoRoot, args.collected),
+      programId: program.id,
+      programName: program.name,
+      threshold: typeof args.threshold === 'string' ? Number(args.threshold) : undefined,
+      // Default to a small cap: this spends money per page, and a first run
+      // against an 800-offer catalog should be a deliberate choice, not a typo.
+      limit: args.all === true ? undefined : Number(args.limit ?? 25),
+      concurrency: args.concurrency != null ? Number(args.concurrency) : undefined,
+      refresh: args.refresh === true,
+    });
+    console.log('\n--- extraction summary ---');
+    console.log(`offers:    ${collected.scraped}`);
+    console.log(`benefits:  ${collected.extracted}`);
+    console.log(`published: ${collected.published}`);
+    console.log(`review:    ${collected.queuedForReview}`);
+    console.log(`tokens:    ${collected.usage.inputTokens} in / ${collected.usage.outputTokens} out`);
+    if (collected.failures.length > 0) {
+      console.log(`failures:  ${collected.failures.length}`);
+      for (const failure of collected.failures.slice(0, 10)) {
+        console.log(`  - ${failure.url}: ${failure.error}`);
+      }
     }
     return;
   }
