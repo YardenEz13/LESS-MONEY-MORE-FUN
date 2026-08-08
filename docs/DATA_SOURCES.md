@@ -92,5 +92,21 @@ https://claude.ai/code/routines. It re-scrapes, diffs, verifies, and opens a PR;
 it stops before extraction because the cloud sandbox has no `ANTHROPIC_API_KEY`,
 so the model-judgement half stays a local step you run on the merged JSONL.
 
+**How to read it.** The run is unattended, so it always leaves exactly one
+visible artifact, and you never have to open a cloud transcript to know what
+happened:
+
+| You see | It means |
+|---|---|
+| a PR | deals changed — read the before/after headlines, then extract locally |
+| an issue titled `weekly refresh FAILED: …` | the run broke; body carries the failing command and its real output |
+| nothing | healthy, nothing changed |
+
+That mapping only works because failures are loud. If you ever find the routine
+has been quiet for weeks, check that it is still enabled rather than assuming
+the catalog is stable — silence from a *disabled* routine looks identical to
+silence from a healthy one, and that is the one ambiguity this design cannot
+close from inside.
+
 Route B can be scheduled once the Cowork chat is saved as a skill; route C stays
 manual by design — never store credentials to automate it.
