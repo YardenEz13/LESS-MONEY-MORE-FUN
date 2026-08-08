@@ -1,15 +1,17 @@
-import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   findCombos,
   rankBenefits,
   type Combo,
   type Evaluation,
   type UserProfile,
+  type Venue,
 } from '@sbr/core';
 import { BenefitCard } from '../components/BenefitCard';
-import { FilterRow, GhostButton, LivePill, Text } from '../components/ui';
-import { benefits, ownedProgramIds, programNames } from '../services/catalog';
+import { FilterRow, GhostButton, Hero, LivePill, Text } from '../components/ui';
+import { benefits, benefitsAtVenue, ownedProgramIds, programNames, venues } from '../services/catalog';
+import { currentVenue } from '../services/geofencing';
 import { border, colors, radius, space, type } from '../theme';
 
 type Filter = 'all' | 'ready' | 'conditional';
@@ -35,6 +37,21 @@ export function HomeScreen({
 }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
 
+  /** Where the user is. Null means "everywhere" — the default, not an error. */
+  const [venue, setVenue] = useState<Venue | null>(null);
+  const [picking, setPicking] = useState(false);
+  const [locating, setLocating] = useState(false);
+
+  const locate = useCallback(async () => {
+    setLocating(true);
+    const where = await currentVenue();
+    setLocating(false);
+    // Not in any tracked mall, or no fix: fall through to the manual list
+    // rather than leaving the user with a spinner that resolved to nothing.
+    if (where.ok && where.venue) setVenue(where.venue);
+    else setPicking(true);
+  }, []);
+
   // Channel is left unset here: the user isn't at a till or in a checkout yet,
   // so an in-store-only benefit is a note rather than a blocker.
   const evaluations = useMemo(
@@ -56,40 +73,56 @@ export function HomeScreen({
   // in @sbr/core. Counting caveats here would make the number permanently 0.
   const ready = evaluations.filter((e) => e.actionsRequired.length === 0);
   const conditional = evaluations.filter((e) => e.actionsRequired.length > 0);
-  const shown = filter === 'ready' ? ready : filter === 'conditional' ? conditional : evaluations;
+  const byFilter = filter === 'ready' ? ready : filter === 'conditional' ? conditional : evaluations;
+
+  // A chosen venue narrows whatever the filter already selected, rather than
+  // replacing it — "ready, here" is the question someone standing in a mall
+  // is actually asking.
+  const hereIds = useMemo(
+    () => (venue ? new Set(benefitsAtVenue(venue.id).map((b) => b.id)) : null),
+    [venue],
+  );
+  const shown = hereIds ? byFilter.filter((e) => hereIds.has(e.benefit.id)) : byFilter;
 
   return (
     <View style={styles.screen}>
       {/* The hero: the one dominant green surface, per the design system. */}
-      <View style={styles.header}>
-        {/* The urgent edge. A sibling view rather than `borderStartWidth`: same
-            web/native direction trap the card's rule works around, and flex
-            order puts it on the reading edge in either direction. */}
-        <View style={styles.headerEdge} />
-        <View style={styles.headerBody}>
-          <View style={styles.headerTop}>
-            <View style={styles.headline}>
-              <Text style={styles.headerEyebrow}>מה שכבר יש לך</Text>
-              <Text style={styles.headerTitle}>ההטבות שלך</Text>
-              {/* The band under the display — the device that stops the title
-                  from floating on the green. */}
-              <View style={styles.headerUnderline} />
-            </View>
-            <View style={styles.actions}>
-              <IconAction label="שאל" onPress={onOpenAdvisor} />
-              <IconAction label="מדדים" onPress={onOpenStats} />
-              <IconAction label="הגדרות" onPress={onOpenSettings} />
-            </View>
+      <Hero
+        eyebrow="מה שכבר יש לך"
+        title="ההטבות שלך"
+        right={
+          <View style={styles.actions}>
+            <IconAction label="שאל" onPress={onOpenAdvisor} />
+            <IconAction label="מדדים" onPress={onOpenStats} />
+            <IconAction label="הגדרות" onPress={onOpenSettings} />
           </View>
+        }
+      >
+        {/* The count is the page's thesis: not "12 deals!", but how many of them
+            you can actually use right now. */}
+        <Text style={styles.headerLine}>
+          <Text style={styles.headerFigure}>{ready.length}</Text>
+          {'  '}מוכנות לשימוש מתוך {evaluations.length} רלוונטיות
+        </Text>
 
-          {/* The count is the page's thesis: not "12 deals!", but how many of them
-              you can actually use right now. */}
-          <Text style={styles.headerLine}>
-            <Text style={styles.headerFigure}>{ready.length}</Text>
-            {'  '}מוכנות לשימוש מתוך {evaluations.length} רלוונטיות
-          </Text>
-        </View>
-      </View>
+        <WhereAmI
+          venue={venue}
+          locating={locating}
+          onLocate={locate}
+          onPick={() => setPicking(true)}
+          onClear={() => setVenue(null)}
+        />
+      </Hero>
+
+      {picking && (
+        <VenueSheet
+          onChoose={(chosen) => {
+            setVenue(chosen);
+            setPicking(false);
+          }}
+          onClose={() => setPicking(false)}
+        />
+      )}
 
       <FilterRow<Filter>
         value={filter}
@@ -203,6 +236,100 @@ function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
   );
 }
 
+/**
+ * "Where are you" — the foreground half of location, living inside the hero.
+ *
+ * Two affordances rather than one because GPS is not reliable indoors, which
+ * is exactly where a mall is: the locate button is the fast path, the manual
+ * list is the one that always works. Neither needs background permission, so
+ * this row does its job on a phone that refused it and inside Expo Go.
+ */
+function WhereAmI({
+  venue,
+  locating,
+  onLocate,
+  onPick,
+  onClear,
+}: {
+  venue: Venue | null;
+  locating: boolean;
+  onLocate: () => void;
+  onPick: () => void;
+  onClear: () => void;
+}) {
+  if (venue) {
+    const count = benefitsAtVenue(venue.id).length;
+    return (
+      <View style={styles.whereRow}>
+        <View style={styles.whereActive}>
+          <Text style={styles.whereActiveText} numberOfLines={1}>
+            {venue.name} · {count} הטבות כאן
+          </Text>
+        </View>
+        <Pressable accessibilityRole="button" onPress={onClear} style={styles.whereGhost}>
+          <Text style={styles.whereGhostLabel}>הכול</Text>
+        </Pressable>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.whereRow}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="אתר את המיקום שלי"
+        onPress={onLocate}
+        disabled={locating}
+        style={styles.whereGhost}
+      >
+        {locating ? (
+          <ActivityIndicator size="small" color={colors.textInverse} />
+        ) : (
+          <Text style={styles.whereGhostLabel}>איפה אני?</Text>
+        )}
+      </Pressable>
+      <Pressable accessibilityRole="button" onPress={onPick} style={styles.whereGhost}>
+        <Text style={styles.whereGhostLabel}>בחר מיקום</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+/** The manual fallback: every tracked venue, tap to pin. */
+function VenueSheet({
+  onChoose,
+  onClose,
+}: {
+  onChoose: (venue: Venue) => void;
+  onClose: () => void;
+}) {
+  return (
+    <View style={styles.sheet}>
+      <View style={styles.sheetHead}>
+        <Text style={type.bodyStrong}>איפה אתה עכשיו?</Text>
+        <Pressable accessibilityRole="button" onPress={onClose} hitSlop={12}>
+          <Text style={type.meta}>סגור</Text>
+        </Pressable>
+      </View>
+      <ScrollView style={styles.sheetList} keyboardShouldPersistTaps="handled">
+        {venues.map((v) => (
+          <Pressable
+            key={v.id}
+            accessibilityRole="button"
+            onPress={() => onChoose(v)}
+            style={({ pressed }) => [
+              styles.sheetRow,
+              pressed && { backgroundColor: colors.surfaceRaised },
+            ]}
+          >
+            <Text style={type.body}>{v.name}</Text>
+            <Text style={type.caption}>{benefitsAtVenue(v.id).length}</Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
 function IconAction({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <Pressable accessibilityRole="button" onPress={onPress} style={styles.iconAction}>
@@ -250,31 +377,6 @@ function EmptyState({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surfacePage },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    backgroundColor: colors.surfacePrimary,
-    marginBottom: space.s3,
-  },
-  headerEdge: { width: 10, backgroundColor: colors.accentUrgent },
-  headerBody: {
-    flex: 1,
-    minWidth: 0,
-    paddingHorizontal: space.s4,
-    paddingTop: space.s3,
-    paddingBottom: space.s3,
-    gap: space.s2,
-  },
-  headerTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
-  headline: { gap: space.s1, flexShrink: 1 },
-  headerEyebrow: { ...type.meta, color: colors.textMutedOnPrimary },
-  headerTitle: { ...type.display, color: colors.textInverse, fontSize: 40, lineHeight: 42 },
-  headerUnderline: {
-    height: border.band,
-    width: 132,
-    backgroundColor: colors.textInverse,
-    marginTop: space.s1,
-  },
   headerLine: { ...type.body, color: colors.textMutedOnPrimary },
   headerFigure: { ...type.figureInline, color: colors.textInverse },
   actions: { flexDirection: 'row', gap: space.s2, paddingTop: space.s1 },
@@ -286,7 +388,57 @@ const styles = StyleSheet.create({
     borderColor: colors.surfacePrimaryRaised,
   },
   iconActionLabel: { ...type.caption, color: colors.textInverse },
-  list: { paddingHorizontal: space.s4, paddingBottom: space.s6 },
+
+  whereRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s1 },
+  whereGhost: {
+    paddingHorizontal: space.s3 - 2,
+    paddingVertical: space.s2 - 2,
+    borderWidth: border.hairline,
+    borderColor: colors.textMutedOnPrimary,
+    minHeight: 34,
+    justifyContent: 'center',
+  },
+  whereGhostLabel: { ...type.caption, color: colors.textInverse },
+  /* Pinned location is a fact, so it reads as a filled plate rather than an
+     outline — the same move the geofence band makes when it goes live. */
+  whereActive: {
+    flex: 1,
+    minWidth: 0,
+    backgroundColor: colors.surfacePlate,
+    paddingHorizontal: space.s3 - 2,
+    paddingVertical: space.s2 - 1,
+    justifyContent: 'center',
+  },
+  whereActiveText: { ...type.caption, color: colors.textInverse },
+
+  sheet: {
+    marginHorizontal: space.s4,
+    marginTop: space.s3,
+    borderWidth: border.hairline,
+    borderColor: colors.surfaceAccent,
+    backgroundColor: colors.surfacePage,
+  },
+  sheetHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: space.s3,
+    paddingVertical: space.s2 + 2,
+    borderBottomWidth: border.rule,
+    borderBottomColor: colors.surfaceAccent,
+  },
+  sheetList: { maxHeight: 260 },
+  sheetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: space.s3,
+    paddingVertical: space.s3 - 4,
+    borderBottomWidth: border.hairline,
+    borderBottomColor: colors.borderHairlineSoft,
+  },
+
+  list: { paddingHorizontal: space.s4, paddingBottom: space.s6, paddingTop: space.s3 },
   combo: {
     borderWidth: border.hairline,
     borderColor: colors.surfaceAccent,

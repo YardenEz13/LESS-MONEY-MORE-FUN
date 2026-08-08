@@ -54,6 +54,45 @@ export function Text({ style, children, ...rest }: TextProps) {
   );
 }
 
+/**
+ * The green plate that opens a screen: the system's one dominant fill, the
+ * urgent edge on the reading side, and the band that stops the display type
+ * from floating. `right` takes the screen's actions, `children` anything that
+ * belongs inside the green — a count line, a location picker.
+ *
+ * The edge is a sibling view rather than `borderStartWidth`: RN and web
+ * disagree about which side "start" is under forced RTL, and flex order does
+ * not.
+ */
+export function Hero({
+  eyebrow,
+  title,
+  right,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  right?: React.ReactNode;
+  children?: React.ReactNode;
+}) {
+  return (
+    <View style={styles.hero}>
+      <View style={styles.heroEdge} />
+      <View style={styles.heroBody}>
+        <View style={styles.heroTop}>
+          <View style={styles.heroHeadline}>
+            <Text style={styles.heroEyebrow}>{eyebrow}</Text>
+            <Text style={styles.heroTitle}>{title}</Text>
+            <View style={styles.heroUnderline} />
+          </View>
+          {right}
+        </View>
+        {children}
+      </View>
+    </View>
+  );
+}
+
 /** Back affordance + title. RTL, so "back" points right. */
 export function ScreenHeader({
   title,
@@ -72,8 +111,11 @@ export function ScreenHeader({
           <Text style={type.meta}>חזרה</Text>
         </Pressable>
       )}
-      {eyebrow && <Text style={type.meta}>{eyebrow}</Text>}
+      {eyebrow && <Text style={styles.headerEyebrow}>{eyebrow}</Text>}
       <Text style={type.display}>{title}</Text>
+      {/* The same band the hero uses, at section scale: it ties the inner
+          screens to the green without giving them a second dominant surface. */}
+      <View style={styles.headerRule} />
     </View>
   );
 }
@@ -242,6 +284,36 @@ const styles = StyleSheet.create({
     paddingBottom: space.s2,
     gap: space.s1,
     alignItems: 'flex-start',
+  },
+  hero: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    backgroundColor: colors.surfacePrimary,
+  },
+  heroEdge: { width: 10, backgroundColor: colors.accentUrgent },
+  heroBody: {
+    flex: 1,
+    minWidth: 0,
+    paddingHorizontal: space.s4,
+    paddingVertical: space.s3,
+    gap: space.s2,
+  },
+  heroTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
+  heroHeadline: { gap: space.s1, flexShrink: 1 },
+  heroEyebrow: { ...type.meta, color: colors.textMutedOnPrimary },
+  heroTitle: { ...type.display, color: colors.textInverse, fontSize: 40, lineHeight: 42 },
+  heroUnderline: {
+    height: border.band,
+    width: 132,
+    backgroundColor: colors.textInverse,
+    marginTop: space.s1,
+  },
+  headerEyebrow: { ...type.meta, color: colors.surfacePrimary },
+  headerRule: {
+    height: border.marker,
+    width: 72,
+    backgroundColor: colors.surfacePrimary,
+    marginTop: space.s1,
   },
   back: { flexDirection: 'row', alignItems: 'center', gap: space.s1, marginBottom: space.s2 },
   backGlyph: { fontSize: 22, lineHeight: 24, color: colors.textDisabled },

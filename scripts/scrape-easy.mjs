@@ -22,15 +22,23 @@ import vm from 'node:vm';
 
 const execFileP = promisify(execFile);
 
-// easy list slug -> program id in data/programs.json.
-// Lists with no matching program (Leumi-Goodies, Fly-Card, Diners-Club,
-// CampusCard-Members...) are deliberately absent — add the program first.
-const LISTS = {
+// easy list slug -> program id in data/programs.json. A slug that is not here
+// is still crawled and still validated — it just cannot be handed to `extract`
+// until someone adds the program, because benefit ids hash the program id.
+const PROGRAMS = {
   MAX: 'max',
   'Cal-Discount': 'cal',
   'Isracard-Discounts': 'isracard',
   'Isracard-Chever': 'hever',
+  Behatsdaa: 'behatsdaa',
+  'MAX-Behatsdaa': 'behatsdaa',
+  'Hitech-Zone-members': 'hitechzone',
+  'Kranot-Police': 'shotrim',
+  Shufersal4u: 'shufersal_life',
 };
+
+/** The hub every discount list hangs off. */
+const HUB = '/list/Discounts';
 
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
@@ -154,6 +162,23 @@ async function scrapeList(slug, extraParams) {
   };
 }
 
+/**
+ * Every discount list the hub links to. Discovered rather than hardcoded: easy
+ * adds and retires clubs constantly, and a fixed list silently stops covering
+ * the site the first time they do.
+ */
+async function discoverLists() {
+  const nuxt = decodeNuxt(await get(`${BASE}${HUB}`));
+  const slugs = [];
+  JSON.stringify(nuxt, (_key, value) => {
+    if (value && typeof value.link === 'string' && value.link.startsWith('/list/')) {
+      slugs.push(value.link.slice('/list/'.length).split('?')[0]);
+    }
+    return value;
+  });
+  return [...new Set(slugs)].filter((s) => s && s !== 'Discounts');
+}
+
 /** Merge candidates into the sidecar, keyed by easy id so a re-run updates. */
 async function mergeMerchants(found) {
   const path = 'collected/easy/merchants-raw.json';
@@ -184,9 +209,16 @@ async function main() {
   for (const k of ['lat', 'lng', 'rad']) if (opt(k)) geo.set(k, opt(k));
 
   await mkdir('collected/easy', { recursive: true });
+
+  const slugs = only ? [only] : await discoverLists();
+  console.log(`${slugs.length} discount lists to crawl\n`);
+
   const candidates = [];
-  for (const [slug, program] of Object.entries(LISTS)) {
-    if (only && only !== slug) continue;
+  let done = 0;
+  for (const slug of slugs) {
+    const program = PROGRAMS[slug];
+    done += 1;
+    process.stdout.write(`[${done}/${slugs.length}] `);
     try {
       const { records, merchants, complete } = await scrapeList(slug, geo.toString());
       // Kept even from an incomplete crawl: merchant identity is additive, so a
@@ -196,8 +228,14 @@ async function main() {
       // A crawl cut short mid-way is not a smaller catalog — overwriting here
       // would read downstream as "these deals were removed" and delete real rows.
       if (complete) {
-        await writeFile(path, records.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
-        console.log(`  wrote ${path} -> npm run extract -- --collected ${path} --program ${program}`);
+        if (records.length > 0) {
+          await writeFile(path, records.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
+          console.log(
+            `  wrote ${path}${program ? ` -> --program ${program}` : '  (no program mapped yet)'}`,
+          );
+        } else {
+          console.log('  no deals in this list, nothing written');
+        }
       } else {
         console.error(`  ${path} NOT written: crawl incomplete, keeping the previous file`);
         process.exitCode = 1;

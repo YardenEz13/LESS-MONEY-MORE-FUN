@@ -50,11 +50,14 @@ export function BenefitCard({ evaluation, onPress }: Props) {
           </Text>
         </View>
         <View style={styles.rule} />
-        <View style={styles.plate}>
+        {/* Green is "money kept" in this system, so a benefit with nothing left
+            to do earns the green plate; one still waiting on the reader keeps
+            the neutral ink. Colour states the verdict the footer spells out. */}
+        <View style={[styles.plate, ready && styles.plateReady]}>
           <Text style={type.figure} numberOfLines={1} adjustsFontSizeToFit>
             {figure}
           </Text>
-          <Text style={styles.plateUnit}>{unit}</Text>
+          <Text style={[styles.plateUnit, ready && styles.plateUnitReady]}>{unit}</Text>
         </View>
       </View>
 
@@ -111,7 +114,11 @@ const styles = StyleSheet.create({
     paddingVertical: space.s2 + 4,
     paddingHorizontal: space.s2,
   },
+  plateReady: { backgroundColor: colors.surfacePrimary },
   plateUnit: { ...type.micro, color: colors.textMutedInverse, marginTop: space.s1 + 2 },
+  /* The muted-on-green tone; textMutedInverse is tuned for ink and goes flat
+     against the green. */
+  plateUnitReady: { color: colors.textMutedOnPrimary },
   strip: { paddingVertical: space.s2 + 4, paddingHorizontal: space.s3 },
   footer: {
     flexDirection: 'row',

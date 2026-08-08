@@ -6,10 +6,13 @@ import {
   rankBenefits,
   shouldNotifyForVenue,
   toLocalMoment,
+  venuesContaining,
   type DwellState,
+  type Venue,
 } from '@sbr/core';
 import { benefitsAtVenue, ownedProgramIds, venuesById, venues } from './catalog';
 import { notifyVenue } from './notifications';
+import { canGeofenceInBackground } from './runtime';
 import { loadProfile } from '../state/profile';
 
 export const GEOFENCE_TASK = 'sbr-venue-geofence';
@@ -110,19 +113,42 @@ TaskManager.defineTask(GEOFENCE_TASK, async ({ data, error }) => {
 
 export type GeofenceStartResult =
   | { ok: true; venueCount: number }
-  | { ok: false; reason: 'foreground_denied' | 'background_denied' };
+  | {
+      ok: false;
+      reason:
+        | 'services_disabled'
+        | 'foreground_denied'
+        | 'background_denied'
+        | 'runtime_unsupported';
+    };
 
 /**
  * Register every venue as a native geofence. The OS does the watching — we
  * never poll location ourselves, which is what keeps this from being a
  * battery problem.
+ *
+ * Order matters on Android: the background prompt is only allowed to appear
+ * after foreground has been granted, and asking in the other order silently
+ * returns denied.
  */
 export async function startGeofencing(): Promise<GeofenceStartResult> {
+  // Expo Go has no Android background location at all and only Simulator
+  // support on iOS. Asking for permissions we cannot honour trains the user to
+  // grant something that then does nothing.
+  if (!canGeofenceInBackground) return { ok: false, reason: 'runtime_unsupported' };
+
+  if (!(await Location.hasServicesEnabledAsync())) {
+    return { ok: false, reason: 'services_disabled' };
+  }
+
   const foreground = await Location.requestForegroundPermissionsAsync();
   if (!foreground.granted) return { ok: false, reason: 'foreground_denied' };
 
   const background = await Location.requestBackgroundPermissionsAsync();
   if (!background.granted) return { ok: false, reason: 'background_denied' };
+
+  // Re-registering an already-running task throws on Android.
+  await stopGeofencing();
 
   await Location.startGeofencingAsync(
     GEOFENCE_TASK,
@@ -136,6 +162,39 @@ export async function startGeofencing(): Promise<GeofenceStartResult> {
     })),
   );
   return { ok: true, venueCount: venues.length };
+}
+
+export type WhereAmI =
+  | { ok: true; venue: Venue | null }
+  | { ok: false; reason: 'services_disabled' | 'foreground_denied' | 'unavailable' };
+
+/**
+ * One-shot "which mall am I standing in", using only foreground permission.
+ *
+ * This is the half of location that works everywhere — Expo Go included, and
+ * on a phone whose owner refused background access. Background geofencing can
+ * wake the app when it is closed; this cannot, but it needs far less from the
+ * user, so the home screen can still say something true about where they are.
+ */
+export async function currentVenue(): Promise<WhereAmI> {
+  try {
+    if (!(await Location.hasServicesEnabledAsync())) {
+      return { ok: false, reason: 'services_disabled' };
+    }
+    const foreground = await Location.requestForegroundPermissionsAsync();
+    if (!foreground.granted) return { ok: false, reason: 'foreground_denied' };
+
+    const position = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+    const here = { lat: position.coords.latitude, lng: position.coords.longitude };
+    return { ok: true, venue: venuesContaining(here, venues)[0] ?? null };
+  } catch {
+    // A GPS fix can simply fail — indoors, airplane mode, emulator with no
+    // location set. That is not the same as a refusal, and the caller offers a
+    // manual picker either way.
+    return { ok: false, reason: 'unavailable' };
+  }
 }
 
 export async function stopGeofencing(): Promise<void> {

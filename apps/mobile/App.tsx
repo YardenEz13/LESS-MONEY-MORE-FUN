@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { useFonts } from 'expo-font';
@@ -15,12 +16,25 @@ import { ShareResultScreen } from './src/screens/ShareResultScreen';
 import { StatsScreen } from './src/screens/StatsScreen';
 import { isGeofencingActive, startGeofencing } from './src/services/geofencing';
 import { requestNotificationPermission } from './src/services/notifications';
+import { runtimeLimitation } from './src/services/runtime';
 import { resolveShare, subscribeToShares, type ShareResult } from './src/services/shareIntent';
 import { loadProfile, saveProfile, toggleMuted } from './src/state/profile';
 import { logEvent } from './src/state/events';
 import { colors, enforceRtl } from './src/theme';
 
 enforceRtl();
+
+/**
+ * Why the reminder is off, in the user's terms. Each one names the thing they
+ * would have to change — a refused prompt and a switched-off GPS need
+ * different actions, and "location unavailable" tells them neither.
+ */
+const GEOFENCE_FAILURE: Record<string, string> = {
+  services_disabled: 'שירותי המיקום כבויים במכשיר — ההטבות ברשימה, בלי תזכורת בקניון',
+  foreground_denied: 'אין הרשאת מיקום — ההטבות ברשימה, בלי תזכורת בקניון',
+  background_denied: 'ההרשאה ניתנה רק בזמן שימוש — בחר ״תמיד״ בהגדרות כדי לקבל תזכורת בקניון',
+  runtime_unsupported: 'צריך development build כדי לקבל תזכורת בקניון',
+};
 
 type Screen =
   | { name: 'loading' }
@@ -38,6 +52,14 @@ type Screen =
  * than the whole flow contains.
  */
 export default function App() {
+  return (
+    <SafeAreaProvider>
+      <AppRoot />
+    </SafeAreaProvider>
+  );
+}
+
+function AppRoot() {
   const [screen, setScreen] = useState<Screen>({ name: 'loading' });
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [geofenceStatus, setGeofenceStatus] = useState('תזכורת בקניון כבויה');
@@ -90,6 +112,15 @@ export default function App() {
   }, []);
 
   const enableGeofencing = useCallback(async () => {
+    // Expo Go cannot deliver either half of this, so say so instead of walking
+    // the user through two permission dialogs that buy them nothing.
+    const limitation = runtimeLimitation();
+    if (limitation) {
+      setGeofenceActive(false);
+      setGeofenceStatus(limitation);
+      return;
+    }
+
     const granted = await requestNotificationPermission();
     if (!granted) {
       setGeofenceActive(false);
@@ -101,9 +132,7 @@ export default function App() {
     setGeofenceStatus(
       result.ok
         ? `תזכורת בקניון פעילה · ${result.venueCount} מתחמים`
-        : result.reason === 'foreground_denied'
-          ? 'אין הרשאת מיקום — ההטבות ברשימה, בלי תזכורת בקניון'
-          : 'חסרה הרשאת רקע — התזכורת תעבוד רק כשהאפליקציה פתוחה',
+        : GEOFENCE_FAILURE[result.reason],
     );
   }, []);
 

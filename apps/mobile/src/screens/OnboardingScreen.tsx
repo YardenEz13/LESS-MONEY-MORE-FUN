@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import type { Program, UserProfile } from '@sbr/core';
-import { PrimaryButton, Section, Text } from '../components/ui';
+import { Hero, PrimaryButton, Section, Text } from '../components/ui';
 import { programs } from '../services/catalog';
 import { toggleProgram } from '../state/profile';
 import { border, colors, radius, space, type } from '../theme';
@@ -36,10 +36,18 @@ export function OnboardingScreen({ profile, onChange, onDone }: Props) {
 
   return (
     <View style={styles.screen}>
+      {/* The first thing anyone sees. It used to be this form on bare paper —
+          no colour, no statement, straight into checkboxes. */}
+      <Hero eyebrow="הגדרה חד-פעמית" title="מה יש לך בארנק?">
+        <Text style={styles.heroLine}>
+          <Text style={styles.heroFigure}>{selected}</Text>
+          {'  '}
+          {selected === 1 ? 'מועדון נבחר' : 'מועדונים נבחרו'}
+        </Text>
+      </Hero>
+
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.intro}>
-          <Text style={type.meta}>הגדרה חד-פעמית</Text>
-          <Text style={type.display}>מה יש לך בארנק?</Text>
           <Text style={type.body}>
             סמן את המועדונים והכרטיסים שברשותך. לא נשאל ת״ז, סיסמה או מספר כרטיס — הסימון נשמר
             במכשיר שלך ולא נשלח לשום מקום.
@@ -103,8 +111,10 @@ function ProgramRow({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surfacePage },
-  content: { paddingTop: space.s5, paddingBottom: space.s5, gap: space.s4 },
+  content: { paddingTop: space.s4, paddingBottom: space.s5, gap: space.s4 },
   intro: { paddingHorizontal: space.s4, gap: space.s2 },
+  heroLine: { ...type.body, color: colors.textMutedOnPrimary },
+  heroFigure: { ...type.figureInline, color: colors.textInverse },
   group: {
     marginHorizontal: space.s4,
     borderRadius: radius.sharp,
