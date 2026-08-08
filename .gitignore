@@ -8,3 +8,8 @@ dist/
 
 # Pipeline output (generated, not source of truth for the repo)
 data/generated/
+
+# Cowork session workspaces. These hold .credentials.json and saved browser
+# profiles with live session cookies — never commit one.
+local_*/
+**/.browser-profiles/

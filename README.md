@@ -42,6 +42,35 @@ npm run -w @sbr/extraction review    # work the low-confidence queue
 Output lands in `data/generated/` (git-ignored): `benefits.json` for anything
 that cleared the confidence gate, `review-queue.json` for anything that didn't.
 
+### Collect with a browser, extract separately
+
+Client-rendered catalogs (max.co.il ships 425KB of Angular and 502 chars of
+text) need a real browser. Collection and extraction are split so the expensive
+half can be re-run without re-crawling — see
+[`docs/COWORK_SCRAPE_PROMPT.md`](docs/COWORK_SCRAPE_PROMPT.md).
+
+```bash
+# a collector wrote one raw offer page per line
+npm run extract -- --collected path/to/max.jsonl --program max --limit 25
+npm run extract -- --collected path/to/max.jsonl --program max --all
+```
+
+Offers are keyed by the collector's `content_hash`, so a re-crawl only pays the
+model for pages whose text actually changed. `--limit` defaults to 25 because a
+first run against an 800-offer catalog should be a choice, not a typo.
+
+### Getting a benefit onto a phone
+
+```bash
+npm run publish:catalog -- --dry-run   # what would change
+npm run publish:catalog                # merge into data/benefits.json
+```
+
+`data/benefits.json` is the catalog the app bundles and is **committed**, so a
+fresh clone builds without ever running the pipeline. Promotion is a separate
+step on purpose: it is the last point a human sees what is about to appear at a
+till, and it refuses to publish anything still in the review queue.
+
 ### Run the app
 
 ```bash
