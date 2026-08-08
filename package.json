@@ -11,6 +11,7 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "extract": "npm run -w @sbr/extraction start --",
+    "scrape:easy": "node scripts/scrape-easy.mjs",
     "publish:catalog": "node scripts/publish-catalog.mjs",
     "validate:data": "node scripts/validate-data.mjs",
     "verify:catalog": "node scripts/verify-catalog.mjs"
