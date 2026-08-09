@@ -107,6 +107,16 @@ const files = (await readdir(DIR)).filter((f) => f.endsWith('.jsonl'));
 const byFile = new Map();
 const urls = new Set();
 const fresh = new Set();
+/**
+ * url -> the proof it already carries.
+ *
+ * A popular business appears in a dozen lists, so the same url has a dozen
+ * records. Proof belongs to the url, not to whichever copy happened to be
+ * written when the check ran — without this, one stamped copy marks the url
+ * settled, every other copy is skipped forever, and coverage sticks a few
+ * records short of 100% with no way to ever close the gap.
+ */
+const provenAt = new Map();
 const freshBefore = Date.now() - MAX_AGE_MS;
 
 for (const file of files) {
@@ -118,7 +128,11 @@ for (const file of files) {
   for (const r of rows) {
     if (!r.offer_url) continue;
     urls.add(r.offer_url);
-    if (r.verified_at && Date.parse(r.verified_at) > freshBefore) fresh.add(r.offer_url);
+    if (r.verified_at && Date.parse(r.verified_at) > freshBefore) {
+      fresh.add(r.offer_url);
+      const seen = provenAt.get(r.offer_url);
+      if (!seen || r.verified_at > seen) provenAt.set(r.offer_url, r.verified_at);
+    }
   }
 }
 
@@ -193,8 +207,12 @@ for (const [file, rows] of byFile) {
     if (verdict?.state === 'live') {
       r.verified_at = now;
       kept += 1;
-    } else if (fresh.has(r.offer_url)) {
-      kept += 1; // proven by an earlier run, still inside the freshness window
+    } else if (provenAt.has(r.offer_url)) {
+      // Proven by an earlier run, on some other copy of this same url. Stamp
+      // this copy too rather than merely counting it, or it stays unstamped
+      // forever while the url reads as settled.
+      r.verified_at = provenAt.get(r.offer_url);
+      kept += 1;
     } else {
       unproven += 1; // untouched, keeps whatever verified_at it had
     }
@@ -203,7 +221,9 @@ for (const [file, rows] of byFile) {
   await writeFile(`${DIR}/${file}`, out.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
 }
 
-const coverage = kept + unproven > 0 ? Math.round((kept / (kept + unproven)) * 100) : 0;
+// Floor, not round: 4780/4787 is not 100%, and a coverage number that rounds
+// up to complete is exactly the kind of lie this whole script exists to avoid.
+const coverage = kept + unproven > 0 ? Math.floor((kept / (kept + unproven)) * 100) : 0;
 console.log(`\nverified live:  ${kept}`);
 console.log(`removed (404):  ${removed}`);
 console.log(`unproven:       ${unproven}  (kept as-is — network, not proof of death)`);

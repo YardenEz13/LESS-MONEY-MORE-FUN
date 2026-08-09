@@ -55,7 +55,8 @@ async function tasks() {
 }
 
 const { total, verified, oldest } = await coverage();
-const pct = total ? Math.round((verified / total) * 100) : 0;
+// Floor: 4780/4787 must not print as 100%.
+const pct = total ? Math.floor((verified / total) * 100) : 0;
 const bar = '█'.repeat(Math.round(pct / 5)).padEnd(20, '·');
 
 console.log(`\nlinks proven   ${bar} ${pct}%  (${verified}/${total})`);

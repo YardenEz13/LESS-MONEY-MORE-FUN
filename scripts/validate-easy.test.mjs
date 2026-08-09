@@ -54,6 +54,19 @@ await writeFile(
   'utf8',
 );
 
+// A popular business appears in several lists. Here the same url is already
+// proven in one file and unstamped in another: the url reads as settled, so it
+// is never re-checked, and the unstamped copy has to be stamped from the proof
+// the other copy carries. Miss this and coverage sticks short of 100% forever.
+await writeFile(
+  join(easyDir, 'Other.jsonl'),
+  [
+    JSON.stringify({ ...rec('111', 'עסק חי'), verified_at: new Date().toISOString() }),
+    JSON.stringify(rec('111', 'עסק חי')),
+  ].join('\n') + '\n',
+  'utf8',
+);
+
 const { stdout } = await execFileP(
   process.execPath,
   [join(import.meta.dirname, 'validate-easy.mjs')],
@@ -82,8 +95,20 @@ assert.equal(
 assert.ok(byId.has('444'), 'a redirecting link must count as live, not as a refusal');
 assert.ok(byId.get('444').verified_at, 'a redirecting link must be stamped verified_at');
 
+const other = (await readFile(join(easyDir, 'Other.jsonl'), 'utf8'))
+  .split('\n')
+  .filter((l) => l.trim())
+  .map((l) => JSON.parse(l));
+assert.equal(
+  other.filter((r) => r.verified_at).length,
+  2,
+  'every copy of an already-proven url must end up stamped, not just the one that was checked',
+);
+
 // Coverage is the number that answers "is every deal proven". If it ever
-// reports 100% while a record sits unproven, the metric is lying.
-assert.match(stdout, /COVERAGE:\s+67%/, 'two of three surviving records proven should report 67%');
+// reports 100% while a record sits unproven, the metric is lying — so it is
+// floored, never rounded.
+// Six records, one removed as 404: five survive, four proven -> 80%.
+assert.match(stdout, /COVERAGE:\s+80%/, 'four of five surviving records proven should report 80%');
 
 console.log('ok: 200 + 302 stamped, 404 removed, unreachable untouched, coverage honest');
