@@ -36,8 +36,29 @@ const BASE = process.env.EASY_BASE ?? 'https://easy.co.il';
 const MAX_AGE_MS = Number(process.env.EASY_MAX_AGE_DAYS ?? 7) * 24 * 60 * 60 * 1000;
 /** Stop a pass that is being refused wholesale rather than grinding through it. */
 const GIVE_UP_AFTER = 20;
+/**
+ * Pause between requests. easy allows roughly 500 before it starts refusing,
+ * regardless of how slowly they arrive, so a pass spends that budget and stops;
+ * the recovery window is what actually gates throughput, not this number.
+ */
+const GAP_MS = Number(process.env.EASY_GAP_MS ?? 700);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * HEAD once, and give a non-answer one second chance.
+ *
+ * While easy is throttling, a share of requests come back as dropped
+ * connections (`000`) rather than a clean status — interspersed with perfectly
+ * good 200s. Without this retry those transient drops counted as refusals and
+ * could trip the circuit breaker while the site was in fact still answering.
+ */
+async function checkUrlWithRetry(url) {
+  const first = await checkUrl(url);
+  if (first.state !== 'unreachable') return first;
+  await sleep(4000);
+  return checkUrl(url);
+}
 
 /** HEAD the page. 200 = live, 404/410 = gone, anything else = don't know. */
 async function checkUrl(url) {
@@ -107,7 +128,7 @@ let abandoned = false;
 for (const [index, url] of todo.entries()) {
   let verdict;
   try {
-    verdict = await checkUrl(url);
+    verdict = await checkUrlWithRetry(url);
   } catch (err) {
     verdict = { state: 'unreachable', detail: err.message };
   }
@@ -138,7 +159,7 @@ for (const [index, url] of todo.entries()) {
     consecutiveFailures = 0;
   }
 
-  await sleep(700);
+  await sleep(GAP_MS);
 }
 
 await writeFile(CACHE, JSON.stringify(cache), 'utf8');
