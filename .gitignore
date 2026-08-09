@@ -16,3 +16,4 @@ local_*/
 
 # Validation progress cache (regenerable, chatty)
 collected/easy/.verified-cache.json
+data/generated/link-check.log

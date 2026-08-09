@@ -93,13 +93,23 @@ Past a few thousand requests in a day easy answers **429** and redirects to
 collected and carry a link, but their link is not yet *proven*. Nothing was
 deleted; unproven is not the same as dead.
 
-This is a quota, not a bug, and there is no clever way around it:
+The budget refills with **time**, not with patience inside a run — slowing
+individual requests buys nothing, and six passes 25 minutes apart added one
+record. So this is a quota, and there is no clever way around it:
 
-- **Do not raise the request rate.** Every speed-up this session made it worse;
-  the 2–3s crawl cadence is the one that survives 96 lists untouched.
+- **Do not raise the request rate.** Every speed-up made it worse; the 2–3s
+  crawl cadence is the one that survives 96 lists untouched.
 - **Do not attempt the CAPTCHA.** Ever.
-- Full coverage arrives across runs. Each weekly pass proves another slice and
-  skips what is already settled, so the number climbs on its own.
+- **Do not retry in a tight loop.** Once easy starts refusing, it stays refusing
+  for hours, and continuing to probe is both useless and rude.
+
+Coverage therefore converges **a slice per day**, via the
+`LessMoneyMoreFun daily link check` scheduled task (07:30, running
+`scripts/daily-linkcheck.ps1`). At ~500 links per day the current backlog of
+~1580 clears in about three days, after which the task just re-proves whatever
+has aged past the freshness window. Watch the `COVERAGE:` line in
+`data/generated/link-check.log`. A rate-limited pass exits non-zero and that is
+normal — it means the day's budget ran out, not that anything is wrong.
 
 If coverage ever needs to be complete in one sitting, the honest fix is a
 residential-proxy pool or an agreement with easy — not a tighter loop.
@@ -132,7 +142,8 @@ Each benefit already carries `last_verified_at`, `valid_until`, `source_url`,
 | Cadence | What runs | What it catches |
 |---|---|---|
 | every PR (CI) | `npm run validate:data` | shape breaks, dangling ids |
-| weekly | `npm run scrape:easy` then `node scripts/validate-easy.mjs` | changed/new/removed easy deals, and any whose business has since been delisted |
+| **daily** | `npm run validate:easy` (scheduled task) | delisted businesses, and the slice of unproven links that fits in easy's daily budget |
+| weekly | `npm run scrape:easy` then `npm run validate:easy` | changed/new/removed easy deals |
 | weekly | `npm run verify:catalog -- --sources` | dead domains, source pages that stopped 200ing → candidates for removal |
 | monthly | Cowork session per Tier-1 catalog (Max rotates monthly; חבר needs your login) | condition changes the aggregator can't see |
 | after any import | `npm run -w @sbr/extraction review`, then `npm run publish:catalog` | low-confidence rows never ship un-reviewed |
