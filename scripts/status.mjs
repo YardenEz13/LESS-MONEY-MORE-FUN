@@ -72,7 +72,10 @@ for (const [name, state, next] of await tasks()) {
   console.log(`  ${name.padEnd(36)} ${label}`);
 }
 
-console.log('\nlast outcome');
+// Log lines, not live state: these are whatever the last *scheduled* run wrote,
+// and can lag the bar above if anything ran by hand since. The bar is computed
+// from the data and is the number to trust.
+console.log('\nlast scheduled run (may lag the figure above)');
 const weekly = await lastLine('data/generated/weekly-refresh.log', /^RESULT:/);
 const daily = await lastLine('data/generated/link-check.log', /^COVERAGE:/);
 console.log(`  weekly refresh   ${weekly ?? 'no run yet'}`);
