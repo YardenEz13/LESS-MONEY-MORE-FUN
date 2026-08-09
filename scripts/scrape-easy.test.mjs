@@ -47,17 +47,19 @@ await mkdir(join(dir, 'collected/easy'), { recursive: true });
 const target = join(dir, 'collected/easy/MAX.jsonl');
 await writeFile(target, PREVIOUS, 'utf8');
 
-const src = (await readFile(join(import.meta.dirname, 'scrape-easy.mjs'), 'utf8'))
-  .replace("const BASE = 'https://easy.co.il';", `const BASE = '${base}';`)
-  // Keep the test to one list; the guard is per-list.
-  .replace(/const LISTS = \{[^}]*\};/, "const LISTS = { MAX: 'max' };");
+const src = (await readFile(join(import.meta.dirname, 'scrape-easy.mjs'), 'utf8')).replace(
+  "const BASE = 'https://easy.co.il';",
+  `const BASE = '${base}';`,
+);
 const stub = join(dir, 'scrape-easy.mjs');
 await writeFile(stub, src, 'utf8');
 
 let exitedNonZero = false;
 let stdout = '';
 try {
-  stdout = (await execFileP(process.execPath, [stub], { cwd: dir })).stdout;
+  // `--list` skips hub discovery: the guard under test is per-list, and the
+  // stub server has no hub to discover from.
+  stdout = (await execFileP(process.execPath, [stub, '--list', 'MAX'], { cwd: dir })).stdout;
 } catch (err) {
   exitedNonZero = true;
   stdout = err.stdout ?? '';

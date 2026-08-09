@@ -107,6 +107,35 @@ function toRecord(slug, biz) {
   };
 }
 
+/**
+ * Carry `verified_at` across a re-crawl for records that did not change.
+ *
+ * Without this every weekly crawl silently resets the proof on every list it
+ * refreshes, and because easy only allows ~500 link checks a day, coverage
+ * would be knocked back faster than it could ever climb — it would never reach
+ * 100%. Keyed on `content_hash` as well as url: if the deal text changed the
+ * record is genuinely new and has to earn its proof again.
+ */
+async function keepVerification(path, records) {
+  let previous;
+  try {
+    previous = new Map(
+      (await readFile(path, 'utf8'))
+        .split('\n')
+        .filter((l) => l.trim())
+        .map((l) => JSON.parse(l))
+        .filter((r) => r.verified_at)
+        .map((r) => [`${r.offer_url}|${r.content_hash}`, r.verified_at]),
+    );
+  } catch {
+    return records; // no previous file
+  }
+  return records.map((r) => {
+    const at = previous.get(`${r.offer_url}|${r.content_hash}`);
+    return at ? { ...r, verified_at: at } : r;
+  });
+}
+
 async function scrapeList(slug, extraParams) {
   const listUrl = `${BASE}/list/${slug}`;
   const nuxt = decodeNuxt(await get(listUrl));
@@ -229,7 +258,8 @@ async function main() {
       // would read downstream as "these deals were removed" and delete real rows.
       if (complete) {
         if (records.length > 0) {
-          await writeFile(path, records.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
+          const merged = await keepVerification(path, records);
+          await writeFile(path, merged.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
           console.log(
             `  wrote ${path}${program ? ` -> --program ${program}` : '  (no program mapped yet)'}`,
           );
