@@ -21,7 +21,7 @@
  *
  * Run after `npm run scrape:easy`:  npm run validate:easy
  */
-import { readFile, writeFile, readdir } from 'node:fs/promises';
+import { readFile, writeFile, readdir, rename } from 'node:fs/promises';
 import { join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -92,6 +92,17 @@ const cache = await readFile(CACHE, 'utf8')
   .then(JSON.parse)
   .catch(() => ({}));
 
+/**
+ * Write then rename, so the cache is never observed half-written. It is
+ * rewritten every 50 verdicts across a pass that can run for an hour; a crash
+ * during a plain write would leave truncated JSON, and the next run would fail
+ * to parse it and silently start from zero — throwing away the whole pass.
+ */
+async function saveCache() {
+  await writeFile(`${CACHE}.tmp`, JSON.stringify(cache), 'utf8');
+  await rename(`${CACHE}.tmp`, CACHE);
+}
+
 const files = (await readdir(DIR)).filter((f) => f.endsWith('.jsonl'));
 const byFile = new Map();
 const urls = new Set();
@@ -137,7 +148,7 @@ for (const [index, url] of todo.entries()) {
   if (verdict.state !== 'unreachable') cache[url] = verdict;
   if ((sinceFlush += 1) >= 50) {
     sinceFlush = 0;
-    await writeFile(CACHE, JSON.stringify(cache), 'utf8');
+    await saveCache();
   }
   if ((index + 1) % 200 === 0) console.log(`  ${index + 1}/${todo.length}`);
 
@@ -162,7 +173,7 @@ for (const [index, url] of todo.entries()) {
   await sleep(GAP_MS);
 }
 
-await writeFile(CACHE, JSON.stringify(cache), 'utf8');
+await saveCache();
 
 const now = new Date().toISOString();
 let kept = 0;

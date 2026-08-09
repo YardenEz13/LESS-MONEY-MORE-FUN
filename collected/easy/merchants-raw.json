@@ -576,6 +576,18 @@
   ]
  },
  {
+  "easy_id": "10165767",
+  "name": "א.הענן",
+  "easy_category": "קבלני פינוי פסולת",
+  "address": "תל אביב יפו",
+  "city": "תל אביב יפו",
+  "lat": 32.059925,
+  "lng": 34.785126,
+  "lists": [
+   "Businesses-week-in-Rishon-LeZion"
+  ]
+ },
+ {
   "easy_id": "10043985",
   "name": "א.וקסלר מנעולן",
   "easy_category": "מנעולן",
@@ -1435,6 +1447,18 @@
   "lng": 34.781774,
   "lists": [
    "Student-Discounts"
+  ]
+ },
+ {
+  "easy_id": "10009179",
+  "name": "אבי תיקונים",
+  "easy_category": "טכנאי מכונות כביסה",
+  "address": "אחימעץ 15, תל אביב יפו",
+  "city": "תל אביב יפו",
+  "lat": 32.0483866,
+  "lng": 34.7958752,
+  "lists": [
+   "Security-Forces-Benefit"
   ]
  },
  {
@@ -7034,6 +7058,18 @@
   "lng": 34.9273178,
   "lists": [
    "Cuponofesh"
+  ]
+ },
+ {
+  "easy_id": "10074515",
+  "name": "בונד",
+  "easy_category": "חנות בגדי גברים",
+  "address": "שינקין 45, תל אביב יפו",
+  "city": "תל אביב יפו",
+  "lat": 32.068757,
+  "lng": 34.7760053,
+  "lists": [
+   "Security-Forces-Benefit"
   ]
  },
  {
@@ -22303,7 +22339,8 @@
   "lng": 34.7683185,
   "lists": [
    "Discount-For-Senior-Citizens",
-   "Businesses-week-in-Rishon-LeZion"
+   "Businesses-week-in-Rishon-LeZion",
+   "Security-Forces-Benefit"
   ]
  },
  {
@@ -30726,6 +30763,18 @@
   ]
  },
  {
+  "easy_id": "20102578",
+  "name": "סינקס פתרונות מיחשוב",
+  "easy_category": "טכנאי מחשבים",
+  "address": "חולון",
+  "city": "חולון",
+  "lat": 32.015832,
+  "lng": 34.787386,
+  "lists": [
+   "Businesses-week-in-Rishon-LeZion"
+  ]
+ },
+ {
   "easy_id": "3497288",
   "name": "סיסטרס",
   "easy_category": "חנות אביזרי מין",
@@ -33269,6 +33318,18 @@
   "lng": 34.7874,
   "lists": [
    "FRIENDS-Clube"
+  ]
+ },
+ {
+  "easy_id": "10036031",
+  "name": "פי 2 אלומיניום",
+  "easy_category": "חלונות ותריסים",
+  "address": "יצחק בן צבי 18, ראשון לציון",
+  "city": "ראשון לציון",
+  "lat": 31.983956,
+  "lng": 34.793308,
+  "lists": [
+   "Security-Forces-Benefit"
   ]
  },
  {
@@ -44804,7 +44865,8 @@
   "lat": 32.079742,
   "lng": 34.773828,
   "lists": [
-   "Discount-For-Senior-Citizens"
+   "Discount-For-Senior-Citizens",
+   "Businesses-week-in-Rishon-LeZion"
   ]
  },
  {
@@ -50258,6 +50320,19 @@
   "lng": 34.7689071,
   "lists": [
    "max-Kranot"
+  ]
+ },
+ {
+  "easy_id": "10165116",
+  "name": "Tetris",
+  "easy_category": "שירות הובלות",
+  "address": "תל אביב יפו",
+  "city": "תל אביב יפו",
+  "lat": 32.059925,
+  "lng": 34.785126,
+  "lists": [
+   "Student-Discounts",
+   "Discount-For-Senior-Citizens"
   ]
  },
  {
