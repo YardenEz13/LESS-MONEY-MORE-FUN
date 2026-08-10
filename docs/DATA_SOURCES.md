@@ -251,3 +251,26 @@ excluded — they are not memberships anyone holds.
 
 Onboarding shows only programs that have at least one shipped benefit, so the
 generated long tail stays out of the user's way until review lets it through.
+
+### Order matters: merchants before publish, not after
+
+`scripts/add-easy-merchants.mjs` mints a merchant per easy business that has a
+benefit but no record — 1144 of them, of which 78 sit inside a tracked mall and
+so gain a geofence. Names are copied byte-for-byte (the matcher compares them),
+`domains` stays empty (easy exposes no website, and a wrong domain makes the
+share sheet match the wrong shop), and `venue_ids` is measured from the
+business's own coordinates.
+
+Run it **as part of publishing, not before**. Two rules pull in opposite
+directions and only line up at that moment:
+
+- Benefit ids hash `merchant_id`, so mapping a merchant *after* publishing
+  rebuilds its rows instead of updating them.
+- `validate:data` fails a merchant with no domain, no venue and no *shipped*
+  benefit — "nothing can reach it". Merchants added while their benefits still
+  sit in review trip exactly that, and it is right to: they are unreachable
+  until the benefits ship.
+
+So the sequence is: approve the queue → `add-easy-merchants --write` →
+re-run extraction so ids rehash onto the real merchants → `publish:catalog`.
+Adding them earlier leaves `validate:data` red for as long as review takes.
