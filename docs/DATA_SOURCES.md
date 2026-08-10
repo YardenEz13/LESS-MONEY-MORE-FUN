@@ -44,10 +44,11 @@ the site the first time they do. Last full run: 96 lists, 4787 deals, 3919
 distinct businesses, zero failures.
 
 `PROGRAMS` in the script maps a slug to a program id. A slug that is not in it
-is still crawled and still validated — it just cannot be handed to `extract`
-until someone adds the program, because benefit ids hash the program id. Worth
-adding programs for: `Leumi-Goodies`, `Fly-Card`, `Diners-Club`,
-`Discounts-American-Express`, `Mizrahi-Tefahot-Members`, `Rami-Levy-Club`.
+is still crawled and still validated — it just cannot be handed to `extract`,
+because benefit ids hash the program id. 72 of the 96 slugs are mapped; the
+unmapped remainder are deal-type lists (Happy Hour, Brunch) and local trade
+campaigns, which are not memberships anyone holds. See
+`scripts/add-easy-programs.mjs`.
 
 What easy gives us that officials don't: thousands of *small local businesses*
 ("3.5% הנחה במעמד החיוב" at a print shop), each with address + coordinates —
@@ -89,9 +90,10 @@ clean bill of health.
 ### easy rate-limits, and that is the binding constraint
 
 Past a few thousand requests in a day easy answers **429** and redirects to
-`/captcha`. Current coverage is **31% (1492 of 4787 records)** — the rest are
-collected and carry a link, but their link is not yet *proven*. Nothing was
-deleted; unproven is not the same as dead.
+`/captcha`. Coverage reached **100% (4787/4787)** on 2026-08-09, but only across
+many passes spread over a day — a single sitting cannot get there, and a fresh
+crawl that adds records will drop it again until the daily task catches up.
+Unproven is never the same as dead: nothing is deleted on a refusal.
 
 The budget refills with **time**, not with patience inside a run — slowing
 individual requests buys nothing, and six passes 25 minutes apart added one
@@ -103,11 +105,11 @@ record. So this is a quota, and there is no clever way around it:
 - **Do not retry in a tight loop.** Once easy starts refusing, it stays refusing
   for hours, and continuing to probe is both useless and rude.
 
-Coverage therefore converges **a slice per day**, via the
+Coverage converges **a slice per day**, via the
 `LessMoneyMoreFun daily link check` scheduled task (07:30, running
-`scripts/daily-linkcheck.ps1`). At ~500 links per day the current backlog of
-~1580 clears in about three days, after which the task just re-proves whatever
-has aged past the freshness window. Watch the `COVERAGE:` line in
+`scripts/daily-linkcheck.ps1`), which clears roughly 500 links per pass and
+skips whatever is already settled — so it absorbs new records from a weekly
+crawl on its own. Watch the `COVERAGE:` line in
 `data/generated/link-check.log`. A rate-limited pass exits non-zero and that is
 normal — it means the day's budget ran out, not that anything is wrong.
 
