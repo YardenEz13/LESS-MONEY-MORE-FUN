@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import type { Program, UserProfile } from '@sbr/core';
 import { Hero, PrimaryButton, Section, Text } from '../components/ui';
-import { programs } from '../services/catalog';
+import { benefits, programs } from '../services/catalog';
 import { toggleProgram } from '../state/profile';
 import { border, colors, radius, space, type } from '../theme';
 
@@ -25,10 +25,21 @@ interface Props {
  */
 export function OnboardingScreen({ profile, onChange, onDone }: Props) {
   const sections = useMemo(() => {
+    // Only clubs the catalog can actually pay off on.
+    //
+    // The program list is generated from every discount list easy publishes,
+    // which is far more clubs than we hold benefits for. Offering one with
+    // nothing behind it is a promise the app cannot keep: the user ticks it,
+    // and their list is no longer than before. A program reappears here the
+    // moment a reviewed benefit ships for it, so this needs no maintenance.
+    const withBenefits = new Set(benefits.map((b) => b.program_id));
+    const offered = programs.filter(
+      (p) => withBenefits.has(p.id) || (p.parent_id && withBenefits.has(p.parent_id)),
+    );
     const order: Program['category'][] = ['credit_card', 'employer_club', 'retail_club'];
     return order.map((category) => ({
       category,
-      items: programs.filter((p) => p.category === category),
+      items: offered.filter((p) => p.category === category),
     }));
   }, []);
 

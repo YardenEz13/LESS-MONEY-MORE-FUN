@@ -210,3 +210,42 @@ close from inside. It is disabled right now, so that caveat is live.
 
 Route B can be scheduled once the Cowork chat is saved as a skill; route C stays
 manual by design — never store credentials to automate it.
+
+## Extracting easy's deals
+
+```bash
+npm run extract:easy                      # fills the cache for every mapped list
+npm run extract -- --collected collected/easy/<slug>.jsonl --program <id> --all
+```
+
+`scripts/extract-easy.mjs` writes the **same cache** the model-backed pipeline
+uses (`data/generated/extraction-cache.json`, keyed by `content_hash`), so the
+second command is a pure cache hit: no API calls, and the confidence gate, id
+hashing, merchant resolution and review queue all still run. Nothing bypasses
+review.
+
+**Why a parser instead of the model.** easy publishes no terms. Its deal text is
+one structured line — `3.5% הנחה במעמד החיוב` — where the discount is the only
+fact present and every condition is absent. A model call there is paying per
+page to read a percentage, and it adds variance without adding information.
+Real terms come from the Tier-1 card catalogs, and those *do* go through the
+model. Of 262 easy deals sampled, 4 carried any condition text at all.
+
+**Nothing auto-publishes, by design.** Confidence tops out at 0.8, below the
+0.85 gate, because easy is an aggregator: a legible `5% הנחה` may still omit a
+minimum spend the merchant enforces. The deal is clear; the terms are unknown,
+not absent. So all 4085 extracted benefits sit in
+`data/generated/review-queue.json` awaiting `npm run -w @sbr/extraction review`.
+That queue is the deliverable — approving it is a human judgement, and inflating
+the scores to make the number look better would defeat the one gate protecting
+someone standing at a till.
+
+**Programs.** `scripts/add-easy-programs.mjs` mints a `data/programs.json` entry
+per discount list, since benefit ids hash the program id and an unmapped list is
+simply unextractable. Names come from easy's own hub titles, never invented;
+categories are inferred from the title and the weak ones are printed for a human
+to check. Deal-type lists (Happy Hour, Brunch) and local trade campaigns are
+excluded — they are not memberships anyone holds.
+
+Onboarding shows only programs that have at least one shipped benefit, so the
+generated long tail stays out of the user's way until review lets it through.

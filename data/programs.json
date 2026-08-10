@@ -77,5 +77,453 @@
     "category": "retail_club",
     "catalog_url": "https://www.super-pharm.co.il/",
     "hint": "מועדון LIFESTYLE של סופר-פארם"
+  },
+  {
+    "id": "max_kranot",
+    "name": "כרטיס אשראי קרנות",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/max-Kranot",
+    "hint": "הטבות כרטיס אשראי קרנות — כפי שמופיעות באיזי",
+    "parent_id": "max"
+  },
+  {
+    "id": "fly_card",
+    "name": "Fly Card",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Fly-Card",
+    "hint": "הטבות Fly Card — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "leumi_goodies",
+    "name": "לאומי בונוס",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Leumi-Goodies",
+    "hint": "הטבות לאומי בונוס — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "campus_card_members",
+    "name": "קמפוסכרט",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/CampusCard-Members",
+    "hint": "הטבות קמפוסכרט — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "diners_club",
+    "name": "דיינרס",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Diners-Club",
+    "hint": "הטבות דיינרס — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "mizrahi_tefahot_members",
+    "name": "מזרחי טפחות",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Mizrahi-Tefahot-Members",
+    "hint": "הטבות מזרחי טפחות — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "discounts_american_express",
+    "name": "AMEX",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Discounts-American-Express",
+    "hint": "הטבות AMEX — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "mafteach_discounts",
+    "name": "מפתח דיסקונט",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Mafteach-Discounts",
+    "hint": "הטבות מפתח דיסקונט — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "i_card",
+    "name": "iCard",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/iCard",
+    "hint": "הטבות iCard — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "tau",
+    "name": "TAU",
+    "category": "employer_club",
+    "catalog_url": "https://easy.co.il/list/TAU",
+    "hint": "הטבות TAU — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "isracard_top_members",
+    "name": "ישראכרט TOP",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Isracard-TOP-Members",
+    "hint": "הטבות ישראכרט TOP — כפי שמופיעות באיזי",
+    "parent_id": "isracard"
+  },
+  {
+    "id": "calextra_discounts",
+    "name": "כ.א.ל Extra",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Calextra-Discounts",
+    "hint": "הטבות כ.א.ל Extra — כפי שמופיעות באיזי",
+    "parent_id": "cal"
+  },
+  {
+    "id": "max_tmura",
+    "name": "max תמורה",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/max-Tmura",
+    "hint": "הטבות max תמורה — כפי שמופיעות באיזי",
+    "parent_id": "max"
+  },
+  {
+    "id": "mastercard_day",
+    "name": "מאסטרקארד",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/mastercard-day",
+    "hint": "הטבות מאסטרקארד — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "reut_buy_it_for_me",
+    "name": "רעות תקני לי",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Reut-Buy-It-For-Me",
+    "hint": "הטבות רעות תקני לי — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "youngstyle",
+    "name": "ישראכרט צעיר",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/youngstyle",
+    "hint": "הטבות ישראכרט צעיר — כפי שמופיעות באיזי",
+    "parent_id": "isracard"
+  },
+  {
+    "id": "topcash",
+    "name": "Topcash",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Topcash",
+    "hint": "הטבות Topcash — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "my_max",
+    "name": "My MAX",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/My-MAX",
+    "hint": "הטבות My MAX — כפי שמופיעות באיזי",
+    "parent_id": "max"
+  },
+  {
+    "id": "tefahot_card",
+    "name": "טפחות ישראכרט",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Tefahot-Card",
+    "hint": "הטבות טפחות ישראכרט — כפי שמופיעות באיזי",
+    "parent_id": "isracard"
+  },
+  {
+    "id": "amit_kranot_benefits_card",
+    "name": "קרנות הטבות",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Amit-Kranot-Benefits-Card",
+    "hint": "הטבות קרנות הטבות — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "rami_levy_club",
+    "name": "רמי לוי המועדון",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Rami-Levy-Club",
+    "hint": "הטבות רמי לוי המועדון — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "clalit_fun",
+    "name": "כללית פנאי",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Clalit-Fun",
+    "hint": "הטבות כללית פנאי — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "tov_plus_club",
+    "name": "מועדון טוב פלוס",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Tov-Plus-Club",
+    "hint": "הטבות מועדון טוב פלוס — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "digitel_discounts",
+    "name": "דיגיתל",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Digitel-Discounts",
+    "hint": "הטבות דיגיתל — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "pais_members",
+    "name": "פיס פלוס",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Pais-Members",
+    "hint": "הטבות פיס פלוס — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "cuponofesh",
+    "name": "קופונופש",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Cuponofesh",
+    "hint": "הטבות קופונופש — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "carrefour_club",
+    "name": "Carrefour Club",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Carrefour-Club",
+    "hint": "הטבות Carrefour Club — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "irgoon_hamorim_benefits",
+    "name": "ארגון המורים",
+    "category": "employer_club",
+    "catalog_url": "https://easy.co.il/list/Irgoon-Hamorim-Benefits",
+    "hint": "הטבות ארגון המורים — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "histadrut_for_you",
+    "name": "ביחד בשבילך",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Histadrut-For-You",
+    "hint": "הטבות ביחד בשבילך — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "club_hot_discounts",
+    "name": "הוט",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Club-Hot-Discounts",
+    "hint": "הטבות הוט — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "vegan_active_discounts",
+    "name": "ויגן אקטיב",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Vegan-Active-Discounts",
+    "hint": "הטבות ויגן אקטיב — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "egged_driver_memebers",
+    "name": "מועדון אגד",
+    "category": "employer_club",
+    "catalog_url": "https://easy.co.il/list/Egged-Driver-Memebers",
+    "hint": "הטבות מועדון אגד — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "yours_club",
+    "name": "מועדון שלך",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Yours-Club",
+    "hint": "הטבות מועדון שלך — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "megalean",
+    "name": "מגה לאן",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/megalean",
+    "hint": "הטבות מגה לאן — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "uniq_club",
+    "name": "Uniq",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Uniq-Club",
+    "hint": "הטבות Uniq — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "your_club_for_pensioner",
+    "name": "שלך לגמלאי",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Your-Club-For-Pensioner",
+    "hint": "הטבות שלך לגמלאי — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "ashmoret_membership",
+    "name": "אשמורת",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Ashmoret-Membership",
+    "hint": "הטבות אשמורת — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "friends_clube",
+    "name": "Friends Clube",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/FRIENDS-Clube",
+    "hint": "הטבות Friends Clube — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "living_members",
+    "name": "Living",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Living-Members",
+    "hint": "הטבות Living — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "bezeq_employees_association",
+    "name": "מועדון B Kef",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Bezeq-Employees-Association",
+    "hint": "הטבות מועדון B Kef — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "mystyle_discounts",
+    "name": "Mystyle",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Mystyle-Discounts",
+    "hint": "הטבות Mystyle — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "magiayoter",
+    "name": "מגיע לך יותר",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/magiayoter",
+    "hint": "הטבות מגיע לך יותר — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "dream_card_club",
+    "name": "מועדון Dream Card",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Dream-Card-Club",
+    "hint": "הטבות מועדון Dream Card — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "life_style_members",
+    "name": "LifeStyle",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/LifeStyle-Members",
+    "hint": "הטבות LifeStyle — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "yahad",
+    "name": "יחד",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/yahad",
+    "hint": "הטבות יחד — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "adif_members",
+    "name": "עדיף",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Adif-Members",
+    "hint": "הטבות עדיף — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "p100_members",
+    "name": "P100",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/P100-Members",
+    "hint": "הטבות P100 — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "shachar_club",
+    "name": "מועדון שחר",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Shachar-Club",
+    "hint": "הטבות מועדון שחר — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "student_group",
+    "name": "סטודנט גרופ",
+    "category": "employer_club",
+    "catalog_url": "https://easy.co.il/list/Student-Group",
+    "hint": "הטבות סטודנט גרופ — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "living_plus_members",
+    "name": "Living Plus",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Living-Plus-Members",
+    "hint": "הטבות Living Plus — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "meshekard",
+    "name": "משקארד",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Meshekard",
+    "hint": "הטבות משקארד — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "corporate_members",
+    "name": "Corporate",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Corporate-Members",
+    "hint": "הטבות Corporate — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "mevalim_club",
+    "name": "מבלים",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Mevalim-Club",
+    "hint": "הטבות מבלים — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "poalim_wonder",
+    "name": "Poalim Wonder",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Poalim-Wonder",
+    "hint": "הטבות Poalim Wonder — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "public_accountants_institute_members",
+    "name": "לשכת רו\"ח",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Public-Accountants-Institute-Members",
+    "hint": "הטבות לשכת רו\"ח — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "power_card",
+    "name": "PowerCard",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/PowerCard",
+    "hint": "הטבות PowerCard — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "yoter",
+    "name": "מועדון יותר",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Yoter",
+    "hint": "הטבות מועדון יותר — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "mercantile_smile",
+    "name": "מרכנתיל סמייל",
+    "category": "credit_card",
+    "catalog_url": "https://easy.co.il/list/Mercantile-Smile",
+    "hint": "הטבות מרכנתיל סמייל — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "vegan_bonus",
+    "name": "ויגן בונוס",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Vegan-Bonus",
+    "hint": "הטבות ויגן בונוס — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "insurance_association_members",
+    "name": "לשכת סוכני הביטוח",
+    "category": "employer_club",
+    "catalog_url": "https://easy.co.il/list/Insurance-Association-Members",
+    "hint": "הטבות לשכת סוכני הביטוח — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "security_forces_benefit",
+    "name": "הטבה לכוחות הביטחון",
+    "category": "retail_club",
+    "catalog_url": "https://easy.co.il/list/Security-Forces-Benefit",
+    "hint": "הטבות הטבה לכוחות הביטחון — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "student_discounts",
+    "name": "הטבת סטודנט",
+    "category": "employer_club",
+    "catalog_url": "https://easy.co.il/list/Student-Discounts",
+    "hint": "הטבות הטבת סטודנט — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "discount_for_senior_citizens",
+    "name": "הטבת גמלאי",
+    "category": "employer_club",
+    "catalog_url": "https://easy.co.il/list/Discount-For-Senior-Citizens",
+    "hint": "הטבות הטבת גמלאי — כפי שמופיעות באיזי"
   }
 ]
