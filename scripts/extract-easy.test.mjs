@@ -59,6 +59,36 @@ assert.ok(silly.confidence_score < 0.5, 'an implausible percentage must be flagg
 assert.equal(extractFromHeadline('מקום לאכול • כשר רבנות מקומית', 'מסעדה'), null);
 assert.equal(extractFromHeadline('', 'עסק'), null);
 
+// The bug this test exists for: easy puts descriptive labels in the same bullet
+// list as the offer, and several carry percentages. Reading the first number in
+// the string turned "100% טבעוני" (100% vegan) into a 100% discount — an app
+// telling someone their meal is free.
+const vegan = extractFromHeadline('מעצבי תיקים • 100% טבעוני • 3% הנחה במעמד החיוב', 'Chilla');
+assert.equal(vegan.value, 3, 'the discount is 3%, not the "100% vegan" label');
+const veganOnly = extractFromHeadline('מסעדה טבעונית • ישיבה בחוץ • 100% טבעוני', 'גרין');
+assert.equal(veganOnly, null, 'a headline whose only percentage is a label states no benefit');
+const kosher = extractFromHeadline('רשת מזון • כשר 100% • 5% הנחה', 'רשת');
+assert.equal(kosher.value, 5);
+
+// A number inside quotes is part of a product name. The gift card called
+// ויקטורי 100% is sold at a discount off ₪250 — it is not 100% off anything.
+const named = extractFromHeadline('רשת מזון • תו קניה "ויקטורי 100%" בשווי ₪250 במחיר מוזל', 'ויקטורי');
+assert.notEqual(named.value, 100, 'a percentage inside a quoted name must not become the discount');
+assert.equal(named.type, 'gift_card');
+
+// easy often writes the discount as a bare percentage with no word at all.
+// Requiring a discount word dropped ~185 of these on the floor.
+const bare = extractFromHeadline('אריזות קרטון • 3.5%', 'אריזות');
+assert.equal(bare.value, 3.5, 'a bare percentage is easy\'s shorthand for the discount');
+const phrased = extractFromHeadline('רשת חנויות נעליים • 30% על קניית שתי פריטים', 'נעליים');
+assert.equal(phrased.value, 30);
+
+// "עד 62% הנחה" is a ceiling. Showing it as the rate advertises the best case.
+const upTo = extractFromHeadline('תיאטרון • עד 62% הנחה', 'הבימה');
+assert.equal(upTo.value, 62);
+assert.ok(upTo.confidence_score <= 0.5, '"up to" must score well below a fixed rate');
+assert.match(upTo.confidence_reason, /תקרה/, 'the reason must say it is a ceiling');
+
 const online = extractFromHeadline('3% קאשבק אונליין', 'חנות');
 assert.equal(online.conditions.channel, 'online');
 // "במעמד החיוב" describes how the discount lands, not where you must buy.

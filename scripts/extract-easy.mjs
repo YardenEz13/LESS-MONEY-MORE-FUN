@@ -125,6 +125,53 @@ const VOUCHER = /שובר|תו קנייה|תו קניה|גיפט|gift/i;
 const BOGO = /1\s*\+\s*1|אחד\s*\+\s*אחד/;
 
 /**
+ * Words that make a number a *benefit* rather than a description.
+ * Voucher terms count: "שובר כספי בשווי 200₪" is an offer, not a label.
+ */
+const DISCOUNT_WORD = /הנחה|החזר|קאשבק|צובר|cashback|מבצע|הטבה|זיכוי|שובר|תו קנייה|תו קניה|גיפט|קופון/i;
+
+/**
+ * Descriptions that carry a percentage of their own — "100% טבעוני" (vegan),
+ * "כשר 100%". These sit in the same bullet list as the offer and are the reason
+ * a naive first-number match invented 100% discounts.
+ */
+const LABEL = /טבעוני|צמחוני|כשר|חלאל|אורגני/;
+
+/**
+ * Pick the segment of a headline that actually states the deal.
+ *
+ * easy packs descriptive labels into the same bullet list as the offer, and
+ * several of them carry percentages: "100% טבעוני" (100% vegan), "100% כשר".
+ * Taking the first number in the string read "Chilla • 100% טבעוני • 3% הנחה
+ * במעמד החיוב" as a 100% discount instead of 3% — an app promising a free meal.
+ * So a number only counts when it shares a segment with a discount word.
+ */
+function dealSegment(text) {
+  const segments = text.split('•').map((s) => s.trim()).filter(Boolean);
+  const withValue = (s) => /\d/.test(s);
+  return (
+    // A number next to a discount word is the offer, wherever it sits.
+    segments.find((s) => DISCOUNT_WORD.test(s) && withValue(s)) ??
+    // easy also writes the discount as a bare percentage — "אריזות קרטון • 3.5%"
+    // — so a lone number counts too, unless the segment is one of the labels
+    // that legitimately carries a percentage of its own.
+    segments.find((s) => /[%₪]/.test(s) && withValue(s) && !LABEL.test(s)) ??
+    (segments.length <= 1 && DISCOUNT_WORD.test(text) ? text : null) ??
+    (BOGO.test(text) ? text : null)
+  );
+}
+
+/**
+ * "עד 30% הנחה" is a ceiling, not a rate — the user may get far less.
+ *
+ * The number must be followed by % or ₪. Without that this also matches
+ * "בתוקף עד 31/12/2027", where עד introduces an expiry date and says nothing
+ * about the size of the discount. (`\b` is no help here — JS word boundaries
+ * do not fire against Hebrew.)
+ */
+const UP_TO = /עד\s*-?\s*(?:\d+(?:\.\d+)?\s*[%₪]|₪\s*\d)/;
+
+/**
  * Read one deal line into an ExtractedBenefit, or null if nothing legible.
  *
  * Confidence follows the scale in the extraction prompt, and deliberately
@@ -139,8 +186,20 @@ export function extractFromHeadline(headline, merchantName) {
   if (!text) return null;
 
   const until = validUntil(text);
-  const percent = text.match(/(\d+(?:\.\d+)?)\s*%/);
-  const shekel = text.match(/(\d+(?:\.\d+)?)\s*₪|₪\s*(\d+(?:\.\d+)?)/);
+
+  // Numbers are only read from the segment that states the offer — see
+  // dealSegment. A headline whose only percentages are labels ("100% טבעוני")
+  // yields nothing here, which is the correct answer.
+  const deal = dealSegment(text);
+  if (!deal) return null;
+
+  // A number inside quotes belongs to a name, not to the offer: the gift card
+  // called תו קניה "ויקטורי 100%" is sold at a discount off ₪250 — it is not
+  // 100% off anything. Strip quoted spans before reading any value.
+  const unquoted = deal.replace(/"[^"]*"/g, ' ').replace(/״[^״]*״/g, ' ');
+  const percent = unquoted.match(/(\d+(?:\.\d+)?)\s*%/);
+  const shekel = unquoted.match(/(\d+(?:\.\d+)?)\s*₪|₪\s*(\d+(?:\.\d+)?)/);
+  const upTo = UP_TO.test(unquoted);
 
   const base = {
     merchant_name: merchantName,
@@ -184,7 +243,19 @@ export function extractFromHeadline(headline, merchantName) {
         confidence_reason: `אחוז לא סביר (${percent[1]}%) — צריך בדיקה ידנית.`,
       };
     }
-    const cashback = CASHBACK.test(text);
+    const cashback = CASHBACK.test(deal);
+    // "עד 30% הנחה" promises a ceiling. Treating it as the rate would show the
+    // best case as if it were the offer — the one thing a recall app must not
+    // do — so it is scored well down and a human decides what to say.
+    if (upTo) {
+      return {
+        ...base,
+        type: cashback ? 'cashback' : 'percent',
+        value,
+        confidence_score: 0.5,
+        confidence_reason: `הכותרת אומרת "עד ${percent[1]}%" — זו תקרה ולא שיעור מובטח.`,
+      };
+    }
     return {
       ...base,
       type: cashback ? 'cashback' : 'percent',

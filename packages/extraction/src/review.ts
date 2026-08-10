@@ -34,6 +34,63 @@ function render(benefit: Benefit, reason: string, index: number, total: number):
  * the terms — a wrong extraction gets rejected and fixed at the prompt or the
  * source, not patched by hand into a record that the next run will overwrite.
  */
+/**
+ * Approve a whole class of benefits by a rule the operator states themselves.
+ *
+ * A queue of thousands of aggregator one-liners cannot be read one at a time,
+ * and the realistic alternative — someone holding [a] down — is rubber-stamping
+ * with extra steps. This makes the judgement explicit instead: you name the
+ * shape you trust (`--type percent --min-value 1`), see the count and a sample
+ * first, and only a second run with `--yes` writes anything.
+ *
+ * Deliberately not an `--approve-all`. The rule *is* the review: it has to be
+ * something you could defend afterwards, and it is echoed into the output so
+ * the decision stays recoverable.
+ */
+function parseRule(argv: string[]) {
+  const value = (flag: string) => {
+    const i = argv.indexOf(flag);
+    return i === -1 ? undefined : argv[i + 1];
+  };
+  const type = value('--type');
+  const program = value('--program');
+  const minValue = value('--min-value');
+  const maxValue = value('--max-value');
+  const minConfidence = value('--min-confidence');
+  if (!type && !program && !minValue && !maxValue && !minConfidence) return null;
+
+  const num = (raw: string | undefined, flag: string) => {
+    if (raw == null) return undefined;
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) throw new Error(`${flag} expects a number, got "${raw}"`);
+    return parsed;
+  };
+  const lo = num(minValue, '--min-value');
+  const hi = num(maxValue, '--max-value');
+  const conf = num(minConfidence, '--min-confidence');
+
+  return {
+    describe: () =>
+      [
+        type && `type=${type}`,
+        program && `program=${program}`,
+        lo != null && `value>=${lo}`,
+        hi != null && `value<=${hi}`,
+        conf != null && `confidence>=${conf}`,
+      ]
+        .filter(Boolean)
+        .join(' AND '),
+    matches(benefit: Benefit) {
+      if (type && benefit.type !== type) return false;
+      if (program && benefit.program_id !== program) return false;
+      if (lo != null && benefit.value < lo) return false;
+      if (hi != null && benefit.value > hi) return false;
+      if (conf != null && benefit.confidence_score < conf) return false;
+      return true;
+    },
+  };
+}
+
 async function main(): Promise<void> {
   const outDir = resolve(repoRoot, 'data/generated');
   const store = new JsonStore(outDir);
@@ -41,6 +98,36 @@ async function main(): Promise<void> {
 
   if (state.reviewQueue.length === 0) {
     console.log('תור הבדיקה ריק.');
+    return;
+  }
+
+  const rule = parseRule(process.argv.slice(2));
+  if (rule) {
+    const hit = state.reviewQueue.filter((item) => rule.matches(item.benefit));
+    console.log(`כלל: ${rule.describe()}`);
+    console.log(`תואמים ${hit.length} מתוך ${state.reviewQueue.length} בתור.\n`);
+    for (const item of hit.slice(0, 10)) {
+      const b = item.benefit;
+      console.log(
+        `  ${b.merchant_name} — ${b.type} ${b.value} (${b.confidence_score.toFixed(2)})  ${b.source_url}`,
+      );
+    }
+    if (hit.length > 10) console.log(`  … ועוד ${hit.length - 10}`);
+
+    if (!process.argv.includes('--yes')) {
+      console.log('\nהרצה יבשה — לא נכתב דבר. הוסף --yes כדי לאשר את כל התואמים.');
+      return;
+    }
+
+    const approvedIds = new Set(hit.map((item) => item.benefit.id));
+    await store.write({
+      benefits: mergeBenefits(
+        state.benefits,
+        hit.map((item) => ({ ...item.benefit, reviewed_by_human: true })),
+      ),
+      reviewQueue: state.reviewQueue.filter((item) => !approvedIds.has(item.benefit.id)),
+    });
+    console.log(`\nאושרו ${hit.length} לפי הכלל. נשארו בתור ${state.reviewQueue.length - hit.length}.`);
     return;
   }
 
