@@ -236,6 +236,16 @@ async function main() {
   let records = 0;
   let extracted = 0;
   let skipped = 0;
+  /**
+   * What was dropped, and from where.
+   *
+   * These are real offers — "שוברים למסעדת X", "כרטיסים בהנחה" — that simply
+   * never state a number, so there is no honest `value` to give them and the
+   * app cannot answer its one question, how much you save. Emitting them as
+   * `value: 0` would render as "0% off", which is worse than absent. Writing
+   * them out keeps the gap auditable instead of silent.
+   */
+  const dropped = [];
   for (const file of files) {
     const rows = (await readFile(file, 'utf8'))
       .split('\n')
@@ -250,6 +260,13 @@ async function main() {
         // that has no discount in it.
         cache[r.content_hash] = [];
         skipped += 1;
+        dropped.push({
+          list: file.split('/').pop(),
+          merchant_name: r.merchant_name,
+          listing_headline: r.listing_headline,
+          offer_url: r.offer_url,
+          reason: 'no numeric benefit value stated',
+        });
         continue;
       }
       // source_url rides along so the detail screen opens this offer, not a
@@ -263,8 +280,12 @@ async function main() {
   await mkdir(dirname(CACHE), { recursive: true });
   await writeFile(CACHE, JSON.stringify(cache, null, 1), 'utf8');
 
-  console.log(`\n${records} records — ${extracted} extracted, ${skipped} unreadable (skipped)`);
-  console.log(`cache -> ${CACHE}`);
+  const SKIPPED = 'data/generated/extract-skipped.json';
+  await writeFile(SKIPPED, JSON.stringify(dropped, null, 1), 'utf8');
+
+  console.log(`\n${records} records — ${extracted} extracted, ${skipped} with no stated value`);
+  console.log(`cache   -> ${CACHE}`);
+  console.log(`skipped -> ${SKIPPED}  (real offers, but easy states no number for them)`);
   console.log('\nNow run, per file:');
   for (const file of files) {
     const slug = file.split('/').pop().replace('.jsonl', '');
@@ -274,5 +295,6 @@ async function main() {
 
 // pathToFileURL, not a hand-built `file://` string: on Windows the real url has
 // three slashes and a drive letter, so the naive form never matched and main()
-// silently never ran.
-if (import.meta.url === pathToFileURL(process.argv[1]).href) await main();
+// silently never ran. argv[1] is undefined under `node -e`, where importing this
+// module just for its parser is perfectly reasonable — guard rather than throw.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
