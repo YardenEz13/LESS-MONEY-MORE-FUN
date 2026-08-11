@@ -59,6 +59,16 @@ assert.ok(silly.confidence_score < 0.5, 'an implausible percentage must be flagg
 assert.equal(extractFromHeadline('מקום לאכול • כשר רבנות מקומית', 'מסעדה'), null);
 assert.equal(extractFromHeadline('', 'עסק'), null);
 
+// Not every shekel is written "₪". easy's event listings spell it out, and
+// matching only the symbol dropped 105 real fixed discounts on the floor as
+// though they stated no value at all — the quietest kind of data loss.
+for (const spelling of ['50 ש״ח', '50 ש"ח', '50 שח', '50 שקל']) {
+  const written = extractFromHeadline(`הופעת מוזיקה • הטבה ללקוחות MAX ${spelling} הנחה לכרטיס יחיד`, 'לירן דנינו');
+  assert.ok(written, `"${spelling}" states a discount and must not be skipped`);
+  assert.equal(written.type, 'fixed', `"${spelling}" is a shekel amount, not a percentage`);
+  assert.equal(written.value, 50, `"${spelling}" is ₪50`);
+}
+
 // The bug this test exists for: easy puts descriptive labels in the same bullet
 // list as the offer, and several carry percentages. Reading the first number in
 // the string turned "100% טבעוני" (100% vegan) into a 100% discount — an app

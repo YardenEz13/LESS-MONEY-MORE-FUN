@@ -155,7 +155,7 @@ function dealSegment(text) {
     // easy also writes the discount as a bare percentage — "אריזות קרטון • 3.5%"
     // — so a lone number counts too, unless the segment is one of the labels
     // that legitimately carries a percentage of its own.
-    segments.find((s) => /[%₪]/.test(s) && withValue(s) && !LABEL.test(s)) ??
+    segments.find((s) => (/[%₪]/.test(s) || SHEKEL.test(s)) && withValue(s) && !LABEL.test(s)) ??
     (segments.length <= 1 && DISCOUNT_WORD.test(text) ? text : null) ??
     (BOGO.test(text) ? text : null)
   );
@@ -169,7 +169,20 @@ function dealSegment(text) {
  * about the size of the discount. (`\b` is no help here — JS word boundaries
  * do not fire against Hebrew.)
  */
-const UP_TO = /עד\s*-?\s*(?:\d+(?:\.\d+)?\s*[%₪]|₪\s*\d)/;
+const UP_TO = /עד\s*-?\s*(?:\d+(?:\.\d+)?\s*(?:[%₪]|ש["״']?ח|שקל)|₪\s*\d)/;
+
+/**
+ * A shekel amount, symbol or spelled out.
+ *
+ * easy's event listings write "50 ש״ח הנחה" rather than "₪50". Matching only
+ * the symbol silently classified 105 real fixed discounts as stating no value
+ * — they were skipped entirely rather than flagged, which is the quietest way
+ * to lose data. Both quote marks appear in the wild (ASCII " and Hebrew ״).
+ */
+const SHEKEL_WORD = String.raw`ש["״']?ח|שקלים|שקל`;
+const SHEKEL = new RegExp(String.raw`(\d+(?:\.\d+)?)\s*(?:₪|${SHEKEL_WORD})|₪\s*(\d+(?:\.\d+)?)`);
+/** Global form, for counting how many sums a line quotes. */
+const SHEKEL_ALL = new RegExp(String.raw`\d+(?:\.\d+)?\s*(?:₪|${SHEKEL_WORD})`, 'g');
 
 /**
  * Read one deal line into an ExtractedBenefit, or null if nothing legible.
@@ -198,7 +211,7 @@ export function extractFromHeadline(headline, merchantName) {
   // 100% off anything. Strip quoted spans before reading any value.
   const unquoted = deal.replace(/"[^"]*"/g, ' ').replace(/״[^״]*״/g, ' ');
   const percent = unquoted.match(/(\d+(?:\.\d+)?)\s*%/);
-  const shekel = unquoted.match(/(\d+(?:\.\d+)?)\s*₪|₪\s*(\d+(?:\.\d+)?)/);
+  const shekel = unquoted.match(SHEKEL);
   const upTo = UP_TO.test(unquoted);
 
   const base = {
@@ -271,7 +284,7 @@ export function extractFromHeadline(headline, merchantName) {
     const value = Number(shekel[1] ?? shekel[2]);
     // "שובר בשווי 200₪ ב-159₪" quotes two sums and the saving is the gap, not
     // either number. Too ambiguous to state a value for — score it for review.
-    const sums = text.match(/\d+(?:\.\d+)?\s*₪/g) ?? [];
+    const sums = text.match(SHEKEL_ALL) ?? [];
     const ambiguous = sums.length > 1 || /החל מ/.test(text);
     return {
       ...base,
