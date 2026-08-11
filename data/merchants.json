@@ -7991,5 +7991,441 @@
     "categories": [
       "dining"
     ]
+  },
+  {
+    "id": "easy_27219746",
+    "name": "קרפור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_24910754",
+    "name": "4Chef",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_20322982",
+    "name": "מרכזי שירות פרטנר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_27376216",
+    "name": "רנואר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26679732",
+    "name": "דלתא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26402848",
+    "name": "איי אופטיק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20824318",
+    "name": "carter's",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27396621",
+    "name": "Victoria's Secret",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_27226641",
+    "name": "Bath & Body Works",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_20101333",
+    "name": "Twentyfour Seven",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_8835786",
+    "name": "Cook and Bake קוק אנד בייק",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_24819869",
+    "name": "סטיב מאדן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_2640961",
+    "name": "ד\"ר גב",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_10035182",
+    "name": "חנות שיאומי MI STORE",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_26529849",
+    "name": "חשמל נטו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_3471331",
+    "name": "אביגדור AVG",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27047470",
+    "name": "AHAVA",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_26454243",
+    "name": "Fix",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26586763",
+    "name": "קנסאי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24756534",
+    "name": "נייקי",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_25974647",
+    "name": "מקס ברנר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27165937",
+    "name": "LEVI S TLV",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_24394530",
+    "name": "Levi's",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_3639483",
+    "name": "וורקר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26494309",
+    "name": "קלווין קליין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_3068263",
+    "name": "נעלי אלדו",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_10106722",
+    "name": "טיפ טוב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_25935287",
+    "name": "בורדרליין",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26798232",
+    "name": "סיקיליה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26998539",
+    "name": "Flying Tiger",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_20928833",
+    "name": "אלבי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9069055",
+    "name": "תיק התיקים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26792153",
+    "name": "באבלס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3435501",
+    "name": "עולם הקולנוע",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_10114836",
+    "name": "Swing",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24473115",
+    "name": "ליידי קומפורט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26525120",
+    "name": "מחסני חשמל",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_8100755",
+    "name": "מגה בעיר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_3659904",
+    "name": "דיזנהאוז",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2604932",
+    "name": "HOT CINEMA",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_2609728",
+    "name": "שקם אלקטריק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_20675042",
+    "name": "ג'ק קובה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_1686020",
+    "name": "סאקוני",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_25934596",
+    "name": "אשת טורס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1712880",
+    "name": "Zer4u",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24351130",
+    "name": "Sabon",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_2641300",
+    "name": "טויס אר אס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24803971",
+    "name": "הפיראט האדום",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3625943",
+    "name": "מגה ספורט עודפים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_9201724",
+    "name": "epharma",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
   }
 ]
