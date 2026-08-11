@@ -207,11 +207,27 @@ export async function currentVenue(): Promise<WhereAmI> {
 }
 
 export async function stopGeofencing(): Promise<void> {
-  if (await TaskManager.isTaskRegisteredAsync(GEOFENCE_TASK)) {
-    await Location.stopGeofencingAsync(GEOFENCE_TASK);
+  try {
+    if (await TaskManager.isTaskRegisteredAsync(GEOFENCE_TASK)) {
+      await Location.stopGeofencingAsync(GEOFENCE_TASK);
+    }
+  } catch {
+    // Nothing to stop is the same outcome as stopping it.
   }
 }
 
+/**
+ * Is a fence currently armed?
+ *
+ * Never throws. expo-location has no geofencing on web at all — the native
+ * module simply lacks the method — so an unguarded call rejected on every web
+ * load and aborted the caller's startup sequence partway through. "Cannot ask"
+ * and "not running" lead to the same UI either way.
+ */
 export async function isGeofencingActive(): Promise<boolean> {
-  return Location.hasStartedGeofencingAsync(GEOFENCE_TASK);
+  try {
+    return await Location.hasStartedGeofencingAsync(GEOFENCE_TASK);
+  } catch {
+    return false;
+  }
 }

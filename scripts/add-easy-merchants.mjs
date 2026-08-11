@@ -1,12 +1,19 @@
 #!/usr/bin/env node
 /**
- * Add a `data/merchants.json` entry for every easy.co.il business that has a
- * benefit but no merchant record.
+ * Add a `data/merchants.json` entry for every easy.co.il business behind an
+ * ALREADY-APPROVED benefit (`data/generated/benefits.json`) that has none yet.
  *
- * Without one, extraction mints `unmapped_<slug>`: the benefit still lists, but
- * it can never fire a geofence or match a shared link. Benefit ids hash the
- * merchant id, so doing this BEFORE publishing updates rows in place — doing it
- * after rebuilds every id instead.
+ * Deliberately not the review queue. `validate:data` fails a merchant with no
+ * domain, no venue and no *shipped* benefit — correctly, since nothing can
+ * reach it yet — and every benefit still awaiting review is exactly that kind
+ * of merchant until it clears review. Minting merchants for the whole queue
+ * would fail validation the moment it ran, for names that may never approve.
+ *
+ * Without a merchant record, extraction mints `unmapped_<slug>`: the benefit
+ * still lists, but it can never fire a geofence or match a shared link.
+ * Benefit ids hash the merchant id, so run this BEFORE `publish:catalog` and
+ * re-extract afterwards — ids for the newly-mapped merchants rebuild, they do
+ * not update in place.
  *
  * Three deliberate limits:
  *
@@ -63,9 +70,9 @@ const categoriesFor = (easyCategory) => {
   return hit ? [hit[1]] : [];
 };
 
-const [queue, raw, merchants, venues] = await Promise.all(
+const [published, raw, merchants, venues] = await Promise.all(
   [
-    'data/generated/review-queue.json',
+    'data/generated/benefits.json',
     'collected/easy/merchants-raw.json',
     'data/merchants.json',
     'data/venues.json',
@@ -83,10 +90,7 @@ const usedIds = new Set(merchants.map((m) => m.id));
 
 const wanted = [
   ...new Set(
-    queue
-      .map((item) => item.benefit)
-      .filter((b) => b.merchant_id.startsWith('unmapped_'))
-      .map((b) => b.merchant_name),
+    published.filter((b) => b.merchant_id.startsWith('unmapped_')).map((b) => b.merchant_name),
   ),
 ];
 
@@ -116,7 +120,7 @@ for (const name of wanted) {
   known.add(key);
 }
 
-console.log(`${wanted.length} merchants wanted by the queue`);
+console.log(`${wanted.length} merchants wanted by approved (not-yet-published) benefits`);
 console.log(`  ${added.length} to add`);
 console.log(`  ${noRecord} skipped — no scraped record with coordinates`);
 console.log(`  ${inVenue} of the new ones sit inside a tracked mall`);

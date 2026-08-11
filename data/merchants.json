@@ -386,5 +386,7610 @@
     "categories": [
       "books"
     ]
+  },
+  {
+    "id": "easy_3043658",
+    "name": "דפוס עופר דיגיטל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10162460",
+    "name": "מטרו סנוקר & ביליארד בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24910929",
+    "name": "עקב אכילס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27029740",
+    "name": "לואיזה קפה אורבני",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26512779",
+    "name": "בריאלה מטבח שף בריא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10119584",
+    "name": "אגדה של קבב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10125926",
+    "name": "אוטו נאל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2026641",
+    "name": "אמרד רדיאטורים בע מ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27405165",
+    "name": "TinyHeroStories",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_6898189",
+    "name": "איווקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27130819",
+    "name": "סקסופון אינסטיטיוט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_24725884",
+    "name": "מרפדיית יעקב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2605903",
+    "name": "מוסך רם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27128055",
+    "name": "Yossi Buzin",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10132099",
+    "name": "מוריו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27460756",
+    "name": "דני בויל קוקטיילים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10091710",
+    "name": "JO Hotel",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10038056",
+    "name": "לייזר טאג",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20124932",
+    "name": "טמבורית שפירא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26338705",
+    "name": "MUNCH",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10128032",
+    "name": "Gtrider",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_9057997",
+    "name": "כרמליס בייגל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2026223",
+    "name": "חי קור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27152834",
+    "name": "קורקינט איזיבייק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27128173",
+    "name": "H.Y EXTREME",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10042440",
+    "name": "הגלריה לקפה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10074014",
+    "name": "ZooCity Lev",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10135947",
+    "name": "מסעדת ניסים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10008986",
+    "name": "גילי הדברות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10107399",
+    "name": "W Hotel tlv",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27150839",
+    "name": "NACHSHON",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10013312",
+    "name": "פייפרנט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26411444",
+    "name": "פרנצ'י",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10062298",
+    "name": "חביב מרכז הקובות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26363833",
+    "name": "תבלינסקי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10094787",
+    "name": "רוזיתה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26529484",
+    "name": "GAMZO",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10047829",
+    "name": "Cafe Begins",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10105625",
+    "name": "ביפראחכ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10108119",
+    "name": "די סטור משחקים ופתרונות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5151178",
+    "name": "איי.די מוטורספורט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2025382",
+    "name": "מוסך זוהר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10143125",
+    "name": "ביוטי ליאה Beauty Lia",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_8822980",
+    "name": "מוסך חיבה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9348720",
+    "name": "27 montefiore hotel",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9102648",
+    "name": "רדיו אלקטריק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_26338631",
+    "name": "Retro Game Center",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27355844",
+    "name": "טוילנד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8824770",
+    "name": "שמעיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26452785",
+    "name": "חומוס המשורר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10025823",
+    "name": "דניאל פון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_23756256",
+    "name": "Outside Society",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24931714",
+    "name": "DAYTONA",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26967135",
+    "name": "Daphne Skin",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_26130187",
+    "name": "Barber&Shop מספרת גברים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_27293192",
+    "name": "אקרו יוגה ענבר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10006522",
+    "name": "מפגש הפלאפל והשווארמה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10026991",
+    "name": "שניצל קומפני",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10015210",
+    "name": "Ningym",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2719956",
+    "name": "מיי סאונד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26393139",
+    "name": "חמדה פרחים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8822292",
+    "name": "קראון פלזה סיטי סנטר",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_27491166",
+    "name": "O Lingerie",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3469101",
+    "name": "פור תחפושות פאר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3536788",
+    "name": "קינג אופטיק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10140685",
+    "name": "Vitamin",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_7597265",
+    "name": "השכן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10145949",
+    "name": "עלמא מרקים וקובה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26429727",
+    "name": "Swing DJ'S",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_7716423",
+    "name": "שמואל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10083239",
+    "name": "דוכן לחם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_10038888",
+    "name": "המקום של קובי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1716395",
+    "name": "בורקס עמיקם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10103666",
+    "name": "סוויטבוקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10136959",
+    "name": "טועמים את השוק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_4820940",
+    "name": "מהותי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10080696",
+    "name": "Lulu & Co",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10124107",
+    "name": "Maneki Neko",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27101927",
+    "name": "ISRP",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_1979802",
+    "name": "חיש חי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27241007",
+    "name": "אמ בי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20581748",
+    "name": "מרכז הבשר אבי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3425508",
+    "name": "הודנא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26381220",
+    "name": "מלון פולי האוס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26631683",
+    "name": "מובי סל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_3459134",
+    "name": "אדר סוכנויות אודיו שיווק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27164818",
+    "name": "Ice guru",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25030542",
+    "name": "מרכזי שרות שגריר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3546612",
+    "name": "פגסוס תיירות Pegasus",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3082974",
+    "name": "בול מטווחים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27194728",
+    "name": "The George",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26524142",
+    "name": "הדקה ה 90",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20185982",
+    "name": "טיקטיק חבילות ספורט והופעות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27263384",
+    "name": "ג'אסט מיוזיק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26559296",
+    "name": "בריקסטון כספות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9203674",
+    "name": "גוטקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3058680",
+    "name": "מכללת עתיד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9283642",
+    "name": "דקורדו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10029501",
+    "name": "MOBI CELL",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_27568553",
+    "name": "קלרינס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26792170",
+    "name": "קואליטה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10114040",
+    "name": "Levinski Market Hotel",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_24512251",
+    "name": "תבליני פרג",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24334388",
+    "name": "אופטיקה בליסימה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26514214",
+    "name": "קליניק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_26403082",
+    "name": "IMPRESS",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26024001",
+    "name": "קשרי תעופה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5671729",
+    "name": "פאנץ' ליין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26869469",
+    "name": "מלון בראון בובו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_27433775",
+    "name": "סופר יודה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26364997",
+    "name": "אסיקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_2672172",
+    "name": "אילון בן יוסף",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27277738",
+    "name": "DELI VINO",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24968119",
+    "name": "Osteopath ארי אביטל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10109182",
+    "name": "PANDA 925",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20664747",
+    "name": "מלון שינקין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26553808",
+    "name": "THE SAUL",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10116813",
+    "name": "אלקונין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26415055",
+    "name": "LONGCHAMP",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_3369763",
+    "name": "אפריל",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_24969110",
+    "name": "מרפאת ביאליק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27214819",
+    "name": "אלבי פלורנטין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_25984898",
+    "name": "שיניים רשת ד\"ר בוחניק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3538735",
+    "name": "רימון טיולים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24880810",
+    "name": "טיילת טרוול",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2609651",
+    "name": "בית מרקחת שלאין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "pharmacy"
+    ]
+  },
+  {
+    "id": "easy_26795314",
+    "name": "ברליץ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2640963",
+    "name": "Body Shop",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_3458968",
+    "name": "אינטרנשיונל תיירות וכנסים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27195461",
+    "name": "מלון סוואנה",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_27032908",
+    "name": "מונוכרום רוטשילד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26452241",
+    "name": "Originals",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_27134181",
+    "name": "ללדת",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26232480",
+    "name": "טוי דיפו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1694470",
+    "name": "רוברטו",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_24823720",
+    "name": "האוס אוף מארלי",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_24714384",
+    "name": "אופיס דיפו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26511235",
+    "name": "Jo Malone London",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_2670003",
+    "name": "מכללת תילתן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27168459",
+    "name": "DANON",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26434349",
+    "name": "מאק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_26994886",
+    "name": "מלון PLAY מידטאון תל אביב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10155510",
+    "name": "CALMA SPA",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27032974",
+    "name": "Malu Wilz",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2025812",
+    "name": "רכטמן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8826100",
+    "name": "מרכז שירות אמיר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1724365",
+    "name": "י.א.מ.י שרותי רכב בע מ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27534279",
+    "name": "KUNI",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27134807",
+    "name": "פוד אפיל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2640390",
+    "name": "לאופרד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_2025755",
+    "name": "פחחות הצפון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26123473",
+    "name": "כלבטוש מספרת כלבים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_20297009",
+    "name": "מוסך לין י.ד.",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26321876",
+    "name": "אומן השיער ליאור ניסימוב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_10081132",
+    "name": "אקס אקספרס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5825481",
+    "name": "שכל שיפור כלכלי לצרכן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10093653",
+    "name": "טמבוריה בקליק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3605122",
+    "name": "plastag",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3460823",
+    "name": "גאולה עיצוב שיער",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_10092173",
+    "name": "שטיפה מכל הלב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10049603",
+    "name": "Orshina",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2025462",
+    "name": "יופלסט פגושים לרכב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8824983",
+    "name": "מוסך גרוסמן אריה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24671819",
+    "name": "מטרו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26208271",
+    "name": "יגאל חלפים איכותיים לרכב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26478116",
+    "name": "Different Pulses tattoo",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10007008",
+    "name": "באבלס& סיפורי בגדים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26323043",
+    "name": "כהן שמעון סי.אר.איי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26249481",
+    "name": "פרח השכונות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3043599",
+    "name": "דפוס בני שמעון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2606880",
+    "name": "יעקב קונצ'ק מוסך מגן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5560747",
+    "name": "אלפיין סטייל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24306777",
+    "name": "משקאות דוידי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10123068",
+    "name": "Vanta Tattoo Gallery",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26396011",
+    "name": "מכבסת מונסון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_6604190",
+    "name": "אליהו יהושע מוסך מיכון 93",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10052295",
+    "name": "סון רון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24433477",
+    "name": "פלאפל המושבה 4 טעמים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27103030",
+    "name": "Shin shin",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10129170",
+    "name": "וויל אי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_9214157",
+    "name": "חפצי עיצוב שיער",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10116249",
+    "name": "האקדמיה לקומדיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8821791",
+    "name": "פיצה דומינו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26827963",
+    "name": "Chilla תיקים טבעוניים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_9333186",
+    "name": "טמבור לילנבלום",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25938160",
+    "name": "ארטה אמנות הגלידה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26000228",
+    "name": "ג'רוזלם ננו תנ\"ך",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2641693",
+    "name": "מרכז הקסמים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9100972",
+    "name": "שירות לצמיגים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27392553",
+    "name": "HAPPY HEMPY",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24346608",
+    "name": "קופילאב קליית קפה ארטיזן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26570774",
+    "name": "פלורנטינו רהיטים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_20589647",
+    "name": "מרכז הטונר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10042998",
+    "name": "מושלמת HOUSE OF BEAUTY",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_10036231",
+    "name": "איי לאב סנדוויץ'",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1719423",
+    "name": "סביח טשרניחובסקי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24824206",
+    "name": "בראונפילד BrownField",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2664419",
+    "name": "ג'פניקה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26797068",
+    "name": "מרכז נא לגעת",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26109820",
+    "name": "יהלומי הבורסה",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26792129",
+    "name": "טיטניום יבוא ושיווק תיקים ומזוודות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27032811",
+    "name": "TRYIT",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26826992",
+    "name": "ריל טיים סלולאר בע מ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26277479",
+    "name": "מדי קל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5557894",
+    "name": "פיצ'פקעס לקנות נכון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3561620",
+    "name": "מכללת אתגר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26071950",
+    "name": "אברהם הוסטל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10023486",
+    "name": "ש.פון הדרכות קורס סלולר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26807040",
+    "name": "פנטזיות בעץ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27342247",
+    "name": "ביקור רופא יגאל אלון מוקד ארצי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5158099",
+    "name": "קפה קדמה אספרסו סנטר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24353758",
+    "name": "SLEEP4U",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3633996",
+    "name": "גאפ מכון אורטופדי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_20585358",
+    "name": "פרובודי 26",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27342753",
+    "name": "קרדיטלי טכנולוגיות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27152695",
+    "name": "Zetz",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10072389",
+    "name": "א ישראלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10138563",
+    "name": "קיוסק דל פסטה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8812962",
+    "name": "אלכסנדרה קולקשיין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3606598",
+    "name": "דיאנה מותגים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8821549",
+    "name": "בישולים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26004627",
+    "name": "הכפתור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8824636",
+    "name": "דב לובלינסקי ובנו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_26525281",
+    "name": "סופט קוקיז",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26531194",
+    "name": "המרכז ללימודי פסיכומטרי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26610317",
+    "name": "גל שור",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_24782005",
+    "name": "כלבו גבריאל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8823748",
+    "name": "אווזי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10125495",
+    "name": "לונל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_23756430",
+    "name": "גלריית פחות מאלף",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27456377",
+    "name": "סיפורו של גרגר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25398795",
+    "name": "י. שלום",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_24478441",
+    "name": "המרכז הרב תחומי לביטחון אבטחה וחקירות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3564245",
+    "name": "אורלי אורטופדיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_23890300",
+    "name": "טבע הדברות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26209155",
+    "name": "משקפיים בשינקין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8835721",
+    "name": "בריינפופ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10106541",
+    "name": "Coffee Brands",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26311557",
+    "name": "קפה נמרוד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_9098940",
+    "name": "המרכז לתיירות בינלאומית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26490660",
+    "name": "גו קנטינה אסייתית",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26030509",
+    "name": "אופיר טורס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3546232",
+    "name": "דנלר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24404528",
+    "name": "פנקיירשופ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_2640543",
+    "name": "אורתופדיקה שטיינר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24315935",
+    "name": "מוסך מוטקה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26340380",
+    "name": "גרעיני עפולה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_27342469",
+    "name": "מנחם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8413749",
+    "name": "מלון פרימה תל אביב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_2769758",
+    "name": "ספורט סנטר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_8826146",
+    "name": "מסיעי כל גיל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_23948887",
+    "name": "פול פוזישן השכרה וסיורי אופניים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27032785",
+    "name": "סיליקאט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_24693126",
+    "name": "אי.די.סי. מילניום ישראל",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_23841263",
+    "name": "TELLAVISTA",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3595990",
+    "name": "אחים נוריאלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10044322",
+    "name": "צור מרקט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27077986",
+    "name": "Loginn",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10149562",
+    "name": "מירב סופר משרד עורכי דין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_23106855",
+    "name": "MY Division משה יצחקי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27189241",
+    "name": "MARONMILANO",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10008841",
+    "name": "שירי יהלומים",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_27341250",
+    "name": "48 שעות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3533789",
+    "name": "אופנת אפריל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2769769",
+    "name": "טרטל מערכות הגברה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20621350",
+    "name": "אביבים הפצות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2609726",
+    "name": "מחסני תאורה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2641511",
+    "name": "מאיר כהן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27146029",
+    "name": "Take A Nap",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24939238",
+    "name": "ISRAEL UNLIMITED",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20850167",
+    "name": "אקוסאפ EcoSupp",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3548698",
+    "name": "BOUTON Studio",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10056986",
+    "name": "George de boeuf",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8826433",
+    "name": "תיאטרון קרוב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_2675461",
+    "name": "קמרה אובסקורה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8812825",
+    "name": "שוקולוקו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1720676",
+    "name": "התרבוש",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5580142",
+    "name": "הבריאות שבפינוק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3448818",
+    "name": "יפעת מכרזים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8825806",
+    "name": "קפה ברזילי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_9402696",
+    "name": "להקת הפלמנקו הישראלית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26826904",
+    "name": "אייקאסט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "books"
+    ]
+  },
+  {
+    "id": "easy_20332931",
+    "name": "מלון ברדיצ'בסקי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_27196111",
+    "name": "PLAY Levontin",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26122554",
+    "name": "בית חבד שכונת התקוה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10127531",
+    "name": "גירפה חוויות אורבניות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10012734",
+    "name": "lorlen cosmetics",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_26785523",
+    "name": "כל בו סימה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26773794",
+    "name": "Gida Tattoo Tlv",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26520053",
+    "name": "מכללת אנימאיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27049390",
+    "name": "קסם החלבה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27222650",
+    "name": "אסי גרף",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26823675",
+    "name": "Lee clinic",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26338634",
+    "name": "מולקולה פרפיום",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26050063",
+    "name": "ברטון קרפרי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10040802",
+    "name": "שקד סלסה וריקודים לטינים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26047543",
+    "name": "חד וחלק עיצוב שיער פיני",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24344769",
+    "name": "ארדון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20775371",
+    "name": "ספא נווה צדק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20121551",
+    "name": "אינטרפט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8826315",
+    "name": "מרכז דוהל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_9071428",
+    "name": "בי\"ס למשחק ענת ברזילי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10138920",
+    "name": "מרחביה 7",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10079954",
+    "name": "דוד אקספרס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26553702",
+    "name": "לוק לייק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3660619",
+    "name": "דרך החופש",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26404543",
+    "name": "שלמה Sixt",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_635135",
+    "name": "תיאטרון הקאמרי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_27110037",
+    "name": "בנק מזרחי טפחות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3057796",
+    "name": "תיאטרון אורנה פורת לילדים ונוער",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_2604772",
+    "name": "תיאטרון יידישפיל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26423848",
+    "name": "בובי בראון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_9239113",
+    "name": "unidress",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9115884",
+    "name": "קומדי בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_8822380",
+    "name": "אוויס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_624585",
+    "name": "מדיטק מרכז תרבות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20594691",
+    "name": "קומדי בר סטנדאפ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3068449",
+    "name": "אוטו יורופ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26317998",
+    "name": "דיסקברי טיול עולמי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26794169",
+    "name": "תיאטרון המדיטק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_27217705",
+    "name": "AERO VIP",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26369767",
+    "name": "Estee Lauder",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_5285776",
+    "name": "שלמה סיקסט ליסינג",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26408156",
+    "name": "BizInSpace MerkSpace",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8824557",
+    "name": "חבש",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24813012",
+    "name": "חומוס הכרם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10068418",
+    "name": "קורקיפיקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10016224",
+    "name": "שוקEAT סיורים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10048132",
+    "name": "עולם על גלגלים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26494410",
+    "name": "GLEE",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26820505",
+    "name": "לורד טיקטס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26384562",
+    "name": "זיו מנור סדנאות קוקטיילים לאירועים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27167032",
+    "name": "HADAS GROSS",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3411629",
+    "name": "ביג גרף",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_21763042",
+    "name": "Zorica",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_3202730",
+    "name": "Blush",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26459576",
+    "name": "מיכל אברהמי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_3499864",
+    "name": "שרית בר זוהר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10050687",
+    "name": "Honey lulu",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26796376",
+    "name": "PERFECT KITCHEN",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26233813",
+    "name": "אתר החי של ישראל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10121168",
+    "name": "אלו מציאות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26532007",
+    "name": "ברלינגטון אינגליש",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10056463",
+    "name": "מלון מיוז",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_8826347",
+    "name": "מלון מטרופוליטן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_8822154",
+    "name": "מלון דברה בראון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26584356",
+    "name": "מלון בראון לייטהאוס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10138921",
+    "name": "Wrangler",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_1694311",
+    "name": "אופטיקה הלפרין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26972233",
+    "name": "לחם ארז",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24409063",
+    "name": "טבע נאות",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26985163",
+    "name": "מלון בראון ברוט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10026565",
+    "name": "Ice cube עודפים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8833135",
+    "name": "אצה סושי בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_4926648",
+    "name": "פרשופ Freshop",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_25985513",
+    "name": "בראון ביץ' האוס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26570928",
+    "name": "מיסטר פרצל",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26524804",
+    "name": "סמסונג סלולר",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_1695241",
+    "name": "הולמס פלייס ספא",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_10141940",
+    "name": "LEE",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_10067252",
+    "name": "LEE IL",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26960229",
+    "name": "מלון בראון סיסייד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26549314",
+    "name": "סקצ'רס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_27154776",
+    "name": "טרקלין חשמל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_27092102",
+    "name": "עגליס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_22145301",
+    "name": "אצה סושי בר חולון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24429531",
+    "name": "הום סטייל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10029667",
+    "name": "קיסר ריהוט משרדי ארגונומי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27301305",
+    "name": "צבאן תכשיטים",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_3037028",
+    "name": "סחוט freshop",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_3580610",
+    "name": "בוניטה דה מאס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26158692",
+    "name": "Daphne's fitness",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10092671",
+    "name": "ויקטור בקנרוט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10010872",
+    "name": "חומוס אליהו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9095599",
+    "name": "Square Island",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10006653",
+    "name": "מכבסת הכבשה השחורה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26374213",
+    "name": "מחסני הטבעונות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5274338",
+    "name": "אופנועי הגשר בע מ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10116887",
+    "name": "קפה עברי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_6384852",
+    "name": "אוקטובר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25975072",
+    "name": "תמרה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10072854",
+    "name": "קצביה בשינקין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2642158",
+    "name": "קומיקאזה 20",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_10097885",
+    "name": "L.O.K.A.L",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10031897",
+    "name": "Beer Shop ביר שופ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20854333",
+    "name": "Beer Garden",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3374953",
+    "name": "אופטיקה שביט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9143635",
+    "name": "Denim",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_20856761",
+    "name": "אבולעפיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_9147050",
+    "name": "ניצת הדובדבן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3388180",
+    "name": "פרי סטייל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_9232067",
+    "name": "LGB לה גרדיה גריל בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10044921",
+    "name": "תכשיטי ננו Nano Jewelry",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20234383",
+    "name": "סביח השרון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3644964",
+    "name": "ציצו גריל ישראלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26785571",
+    "name": "פריזר גלידות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20768150",
+    "name": "Olive Korner אוליב קורנר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26372994",
+    "name": "TOUS",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_635128",
+    "name": "הסימטה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_27120175",
+    "name": "ארט סנטר",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26794311",
+    "name": "מועדון לב הים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26577672",
+    "name": "ARIBAR",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26506145",
+    "name": "קפה נטו",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_8826011",
+    "name": "רוזה פארקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1696327",
+    "name": "בריו 66",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26115623",
+    "name": "קרוספיט נמל תל אביב FitHub CrossFit Namal Tel Aviv",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_4006955",
+    "name": "קפה קאימאק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26888805",
+    "name": "אלברט 1943",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26958528",
+    "name": "KETERLION",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8413944",
+    "name": "Top labels",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10137875",
+    "name": "סדנאות כיפוף בחוטי ברזל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1686126",
+    "name": "יהלומי ש.ג.י",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_25389247",
+    "name": "שרלי חומרי בנין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27094873",
+    "name": "תאטרון דוואי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26523770",
+    "name": "Shospeople",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3537837",
+    "name": "LB La Belle",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_2641430",
+    "name": "מיכאלס' גיפטס",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_3628714",
+    "name": "נינה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_2630998",
+    "name": "וילונות יפה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26401561",
+    "name": "פינוקיו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26505637",
+    "name": "רוית אסף",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_2605046",
+    "name": "אופנועי הקריה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3529098",
+    "name": "ביטחון המפתח",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8823080",
+    "name": "החומה הסינית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24488400",
+    "name": "סלקום מישקה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_3035843",
+    "name": "פוטו קולומביה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20961791",
+    "name": "A TEAM",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3531920",
+    "name": "ד\"ר סגל אלכס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1713340",
+    "name": "יש לי בוטן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3625273",
+    "name": "פנצ'רית אחים חילו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_21005930",
+    "name": "Lak Perfect לק פרפקט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_2641017",
+    "name": "דליה עיצובים בכובעים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9063649",
+    "name": "Sea time סי טיים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3622752",
+    "name": "פרח בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3032570",
+    "name": "עיסוי מרפא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24101900",
+    "name": "עידן כהן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_21626113",
+    "name": "הנשמה היהודית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24360135",
+    "name": "הכל לתעשייה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3490862",
+    "name": "אצל בועז",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24934305",
+    "name": "ד\"ר סמי סמייל דנט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24378852",
+    "name": "YARON",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_24416455",
+    "name": "IN OUT",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1713361",
+    "name": "כמו פרח בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24479225",
+    "name": "מאפיית הודיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_647837",
+    "name": "אגם הפארק בע\"מ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_3661320",
+    "name": "צילום שי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2606184",
+    "name": "א.ב. רם גלס זגגות רכב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26059549",
+    "name": "מרכז נופך",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2640438",
+    "name": "א.א.א. לבטחון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_21743249",
+    "name": "הרשקו בית מאפה וקפה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_9177993",
+    "name": "מרפאות מוסקונה",
+    "domains": [],
+    "venue_ids": [
+      "ramat_aviv_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_3514476",
+    "name": "אופטיקה ליבוב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2877396",
+    "name": "הומינר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2806439",
+    "name": "אולגה רז",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2025461",
+    "name": "מוסך יוסף ושמעון דהן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3562781",
+    "name": "ליאת מירב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25935038",
+    "name": "פוטו ציון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26399157",
+    "name": "בריכת מיטל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3459802",
+    "name": "SUPER PHONE",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_8820130",
+    "name": "גלידה אנדרי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10004803",
+    "name": "דר' דפנה מנספלד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2807848",
+    "name": "ד\"ר בבייב מרק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3479694",
+    "name": "קרן תאורה וחשמל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3039031",
+    "name": "גבעולים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24372808",
+    "name": "כל בו לבית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24443466",
+    "name": "פעמי סנטר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_6070292",
+    "name": "בוטיק התבלין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_3481937",
+    "name": "ד\"ר אלינה אנגלר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3082854",
+    "name": "מינימרקט קרן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_3029892",
+    "name": "פרחי חמד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24409356",
+    "name": "פטמקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24431056",
+    "name": "פאות מוטי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_6323988",
+    "name": "שיבולי התקווה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_1686061",
+    "name": "אופני ראובן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26075983",
+    "name": "בוקריה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_2731195",
+    "name": "אופיר ביכורים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3041768",
+    "name": "מינה סטייל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2607053",
+    "name": "וויס אברהם מוסך גחלת",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8828047",
+    "name": "קאראס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_20314396",
+    "name": "אורלי קוסמטיקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_3060057",
+    "name": "גרין פאלאס אלון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2694319",
+    "name": "עד עיצובים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9242989",
+    "name": "iFly",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9086855",
+    "name": "מכללת ביטוי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3625255",
+    "name": "קובי ורסנו קלאסיק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3564122",
+    "name": "פריסו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8836793",
+    "name": "סיאני אברהם מוסך הציר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3379574",
+    "name": "כל בו ויטלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8830041",
+    "name": "פיצה דן דן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_1686081",
+    "name": "משתלת המושבה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10007811",
+    "name": "קלין פיקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25904396",
+    "name": "דויטשמן טפטים ווילונות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3060600",
+    "name": "המספרה של עמי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_3585243",
+    "name": "קומפיו דיפו מעבדת מחשבים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_2001115",
+    "name": "אמריקן פיצה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9108024",
+    "name": "דרים ספא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24489369",
+    "name": "מפגשולה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_22988685",
+    "name": "רוני מירון מקום לאמנות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_4862170",
+    "name": "מירב טבקמן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3445562",
+    "name": "מכללת המסלול הנכון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20188988",
+    "name": "לימא ארומתרפיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_2630962",
+    "name": "רשת פלקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3490376",
+    "name": "עמי מוצרי נוי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24476575",
+    "name": "אבי הסנדלר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_23464152",
+    "name": "ד\"ר פישמן בוריס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5847096",
+    "name": "ויט סק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9402450",
+    "name": "מיינדפולנס להפחתת לחצים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5795681",
+    "name": "טכנומוטור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3055825",
+    "name": "אלאב שירותי דפוס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24715138",
+    "name": "זוהר קוסמטיקה וטיפוח",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_23114441",
+    "name": "סלפון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_3420478",
+    "name": "פרקט ושטיח ישיר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8822908",
+    "name": "צילום דן הדפסת תמונות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3492389",
+    "name": "מכון יופי שיין חן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_3438595",
+    "name": "ד\"ר ג'ריס חנחן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5987459",
+    "name": "מפתח בשרון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25443664",
+    "name": "DRAGON FOOD",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26954511",
+    "name": "דרגון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3147975",
+    "name": "שופרסל דיל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_22184246",
+    "name": "שופרסל אקספרס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2672930",
+    "name": "ediamonds",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_3661603",
+    "name": "YOOPI",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_10146177",
+    "name": "ZOY תכשיטי יהלומים",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_20945844",
+    "name": "שופרסל שלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27534402",
+    "name": "אירופלקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27089853",
+    "name": "סילי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27296410",
+    "name": "גרמין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26889758",
+    "name": "פלורה בלום",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2641949",
+    "name": "עמינח סנטר",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_10081838",
+    "name": "גריל מאסטר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27228289",
+    "name": "מדיקסקייר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5630206",
+    "name": "ארבעה קצבים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20959926",
+    "name": "הגרה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26490763",
+    "name": "העץ הנדיב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_27216963",
+    "name": "שוק העיר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_27193103",
+    "name": "קאזה בלה עיצוב הבית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26871198",
+    "name": "ניו פיט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10144088",
+    "name": "רד סטאר Red Star",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_25996278",
+    "name": "וינופו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26999909",
+    "name": "סימונס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10114841",
+    "name": "ערד טקסטיל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2641580",
+    "name": "מטבחי זיו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_27198850",
+    "name": "דרגון פוד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_26014262",
+    "name": "איי קייק icake",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26799253",
+    "name": "ואהבת",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27222586",
+    "name": "לגו סטור",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_3544684",
+    "name": "באג",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_26829990",
+    "name": "אמפוריום",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_24412935",
+    "name": "לי קופר קידס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27022935",
+    "name": "Shape Patissier",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20760799",
+    "name": "מומה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_24388440",
+    "name": "Hoodies",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_7612522",
+    "name": "זוהרה גרביונים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_20066640",
+    "name": "Roy שוקולד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27216458",
+    "name": "אופנת מומה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26014267",
+    "name": "BuyCarpet",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10034575",
+    "name": "אמיגו חנות צעצועים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26793639",
+    "name": "סבוקלם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8839253",
+    "name": "יקב טוליפ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27190291",
+    "name": "Linenz",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2641888",
+    "name": "ספרינג נחל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10120545",
+    "name": "מכבסת מונטיפיורי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26789998",
+    "name": "סוויט טיים",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26278831",
+    "name": "Sky Jump",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10014902",
+    "name": "גלידה גולדה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20819535",
+    "name": "שבירו ריהוט גן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_2631461",
+    "name": "קמחי תאורה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3383372",
+    "name": "ניקולטי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26125034",
+    "name": "האוס אין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_24793840",
+    "name": "רב בריח",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26971215",
+    "name": "א.ל.מ. בילו סנטר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_10045258",
+    "name": "קפה גרג",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_8821561",
+    "name": "באבא יאגה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26995519",
+    "name": "קיצ'וקאי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_9017658",
+    "name": "גרג דיזנגוף סנטר",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_8836209",
+    "name": "קפה קפה",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_6352197",
+    "name": "התרנגול הכחול",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10151443",
+    "name": "SRF Park TLV",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10001131",
+    "name": "טיליה מרכז רפואה משלימה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9164334",
+    "name": "מלון בל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_5756791",
+    "name": "מוזיאון ארץ ישראל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10006690",
+    "name": "TLV Balloon",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9230478",
+    "name": "נמל תל אביב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27249232",
+    "name": "טריפי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27036436",
+    "name": "סינמקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1695630",
+    "name": "מוזיאון הילדים הישראלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10067701",
+    "name": "Sky Town",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10032598",
+    "name": "סיטי באולינג",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26236356",
+    "name": "היכל הקרח",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10089950",
+    "name": "נינג'ה SWING",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26529544",
+    "name": "Mixta Cocktails",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26466932",
+    "name": "ASIM",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27117290",
+    "name": "נינג'ה סטאר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27390661",
+    "name": "קוקידס Cokids",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8830016",
+    "name": "אינדירה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26338813",
+    "name": "iron core",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25141353",
+    "name": "ויקינג",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26525296",
+    "name": "אייל בפסאג'",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26813326",
+    "name": "החברה להגנת הטבע",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3660231",
+    "name": "פרוחזאד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2673156",
+    "name": "טונר פלוס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3396408",
+    "name": "נופים ואתרים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24864420",
+    "name": "מוסך צדוק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26189477",
+    "name": "מלון 65",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_24376722",
+    "name": "איתיאל מעבדת מחשבים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_26545770",
+    "name": "קאר פיקס השבחת רכבים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3034911",
+    "name": "פטיפול מרפאה לחיות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2024849",
+    "name": "קומפיוטסט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26520078",
+    "name": "beltshop",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_3549261",
+    "name": "רדיו לוינסקי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8824853",
+    "name": "מוסך ונטורה בע מ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24096497",
+    "name": "תאטרון אלפא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_2024972",
+    "name": "מוסך הסדר פחחות וצבע בסגנון 2000",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2026636",
+    "name": "חבר איציק כיווני פרונט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24485924",
+    "name": "דני תיקונים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_26309284",
+    "name": "ממפיס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10121718",
+    "name": "Sho",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10058000",
+    "name": "NEOVISION",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26346799",
+    "name": "QuestAir",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10162587",
+    "name": "vapepoint",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3396376",
+    "name": "יורי שען",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27023752",
+    "name": "טיב טעם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_10032980",
+    "name": "מלון פבריק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_9240898",
+    "name": "אופנת שבא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3030049",
+    "name": "Fantasyshop",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10102937",
+    "name": "קרנה בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27149232",
+    "name": "מנאל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_2641052",
+    "name": "דרך מסורת",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5625825",
+    "name": "סופר תיבות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2807480",
+    "name": "ד\"ר חיים קפלן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25376042",
+    "name": "צמיגי טופ דרייב פנצ'ריה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26796316",
+    "name": "אבזריון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10045095",
+    "name": "ארט פיצה בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_23704683",
+    "name": "החתול הירוק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26182080",
+    "name": "טעם לחיים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26023584",
+    "name": "באלינג'רה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_8816891",
+    "name": "משק ברזילי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26317576",
+    "name": "Rama",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10051091",
+    "name": "שטפן בייקרי אוסטרי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_10108575",
+    "name": "חומוס אסי ועדנן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26447073",
+    "name": "פנדה פיתה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27344024",
+    "name": "Paula Fay",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_10061333",
+    "name": "Almaz Mendel",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_23934596",
+    "name": "אנסטסיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26959340",
+    "name": "סימונצ'ו קייקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_21003868",
+    "name": "Madi's",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10014863",
+    "name": "קפה עלמה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_25932062",
+    "name": "מרקט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_25039322",
+    "name": "מיץ מרק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24338454",
+    "name": "קפה מוגי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24763372",
+    "name": "ארלה פיצה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10079106",
+    "name": "Pizzaiolo",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_20856032",
+    "name": "6 במאי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10064167",
+    "name": "כנאפה אלג'מילה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10035276",
+    "name": "אנרג'וסר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10029662",
+    "name": "Kermeet bar קרמיט בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_25924537",
+    "name": "ג'אסיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_6231495",
+    "name": "בוטיק סנטרל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25965430",
+    "name": "לבובסקי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_25974072",
+    "name": "דים סאם שופ",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27248620",
+    "name": "רביעי טבעוני",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26371981",
+    "name": "Veggie",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26367315",
+    "name": "ויטופיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10019016",
+    "name": "Breadberry",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_8827610",
+    "name": "אינגה בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5797719",
+    "name": "גלידה פרדו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8817704",
+    "name": "סייבר טאטו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27368561",
+    "name": "הדס בר דוד פולק סו ג'וק NLP דמיון מודרך וביואורגונומי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8818468",
+    "name": "מי קאסה קפה בחצר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10039327",
+    "name": "מעדניית אופוריה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26787513",
+    "name": "בלנד קפה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_6316507",
+    "name": "פיצה סלייס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_7743167",
+    "name": "פיצה בלה PIZZA BELLA",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_3044751",
+    "name": "פיצה אנג'ל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10008772",
+    "name": "הבית של חומוס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2633914",
+    "name": "קאן קאי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27328564",
+    "name": "יפעת מושקוביץ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26525202",
+    "name": "לוצ'נה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10121530",
+    "name": "אפרת שרעבי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26489393",
+    "name": "5.91",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10118372",
+    "name": "סימביוזה אמזונס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25942168",
+    "name": "קופינאס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_9100245",
+    "name": "מאמארוני",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26190672",
+    "name": "בטבע של בני בצל התאנה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_8837810",
+    "name": "נוקטורנו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27344020",
+    "name": "שני רשמן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10064522",
+    "name": "sunny soul'sfood",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26340230",
+    "name": "מסעדת פרגמון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27307899",
+    "name": "וורטקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27344021",
+    "name": "תמיר קורן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27002291",
+    "name": "נענע",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27330580",
+    "name": "טלי גאון חכמת המעגל אירוח ביתי מנדלות וסדנאות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10131629",
+    "name": "לה בלאגן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26777763",
+    "name": "טבע שוק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10104033",
+    "name": "Infused JLM",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26271943",
+    "name": "זה כל הסיפור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_26378308",
+    "name": "גלידריה קוקי קרים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27307901",
+    "name": "יניב אייזנברג",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10030314",
+    "name": "מסעדת מזאג'",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26199748",
+    "name": "קפה יודפת",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27151502",
+    "name": "Le Miel",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26813707",
+    "name": "פסטה בסטה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26632614",
+    "name": "פוקישופ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2640318",
+    "name": "גאיה משחקי חשיבה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26514168",
+    "name": "Billabong",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3052388",
+    "name": "מוסך מושון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10105480",
+    "name": "אלזס שרקוטרי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27102076",
+    "name": "Talking English",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3648142",
+    "name": "בית הצמיג",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8822195",
+    "name": "סיני סטור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3663737",
+    "name": "גרף",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10142897",
+    "name": "Goosto Store",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27163075",
+    "name": "קימונו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3515980",
+    "name": "יעקב גלס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_5274252",
+    "name": "אילן המהיר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2738916",
+    "name": "דוגלה יבוא ושיווק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_8822719",
+    "name": "תיאטרון קליפה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_5981429",
+    "name": "ד\"ר רון בן יצחק",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_22144000",
+    "name": "Beer & Beyond",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9068427",
+    "name": "פרנק נקניקיה עם כבוד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3640896",
+    "name": "התיאטרון שלנו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_5925525",
+    "name": "טכנו כל עוזי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10111999",
+    "name": "מוביליטי ברנדס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_10033603",
+    "name": "Night Cookie",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10083250",
+    "name": "Player 1",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26118929",
+    "name": "אוטו מיני",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26510796",
+    "name": "אלברט טמבור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26999481",
+    "name": "סמוקד קיטשן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10074673",
+    "name": "שיטפון של ניקיון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10022831",
+    "name": "ג'וני מנעולים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10077992",
+    "name": "ללה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10048301",
+    "name": "פקה פקה paca paca",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24510927",
+    "name": "אסי סטרט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26995149",
+    "name": "Yoyo Thai Massage",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10071873",
+    "name": "אלכוהום alcohome",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26475520",
+    "name": "בן חור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10009487",
+    "name": "חבד סנטר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10136436",
+    "name": "קפה פיורי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10044273",
+    "name": "גריל בר מבית הפלאנצ'ה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_9099722",
+    "name": "מוטומן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3455512",
+    "name": "מכללת בית נלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10100106",
+    "name": "מדילנד עולם של צעצועים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10119064",
+    "name": "9 TO 5",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26991454",
+    "name": "מינימרקט עזיז",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_3436687",
+    "name": "חנות הבשר של דני",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10110457",
+    "name": "טופ קלין TLV",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26529483",
+    "name": "M2 מחשבים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_10145285",
+    "name": "קפה נומי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_24483438",
+    "name": "נעלי עופר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_10010421",
+    "name": "נוריב'ס NURIBS",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25975158",
+    "name": "Joias",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27047692",
+    "name": "Wildflower",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10117510",
+    "name": "Olish עינת אולשבר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_10133978",
+    "name": "Gaston Crep&Galette",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3659337",
+    "name": "פרשריף",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10093614",
+    "name": "Babaloon",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1713520",
+    "name": "פיצוחי מאיר קלייה יפואית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_10141494",
+    "name": "הבריסטה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10135785",
+    "name": "הפלח",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26533742",
+    "name": "AMA LURRA",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_25967041",
+    "name": "קניון עזריאלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_4018584",
+    "name": "המרכז לשוק ההון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25439118",
+    "name": "אלי כהן הדברות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20625998",
+    "name": "דילייט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3440043",
+    "name": "מוטו תקשורת",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8822928",
+    "name": "מרכז שירות קלעי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3552117",
+    "name": "תרבות לעם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2674074",
+    "name": "איי גרין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8813261",
+    "name": "פודסטפס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20625822",
+    "name": "תל אביב הקטנה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2640685",
+    "name": "ארטא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27571219",
+    "name": "טיפולוג מערכת ניהול לעוסקים בטיפול",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27189417",
+    "name": "אינוקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24349402",
+    "name": "אוריבל",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_27226801",
+    "name": "רמפאייג'",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26870423",
+    "name": "אורנה א.א",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9183104",
+    "name": "אופיר ארבל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20125473",
+    "name": "רונן רוזנבלט דיקור סיני",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24311060",
+    "name": "Bouquet",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27217925",
+    "name": "קלוק",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_27189772",
+    "name": "התזמורת האנדלוסית הישראלית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26489192",
+    "name": "אקו בייקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_9201544",
+    "name": "אלן קאר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3504382",
+    "name": "נשיונל ג'יאוגרפיק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20626059",
+    "name": "משקאות ג'ורג' חינאוי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27189730",
+    "name": "sea of life",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1711877",
+    "name": "מלון סבוי תל אביב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_1727577",
+    "name": "מלון BY14 TLV",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26386740",
+    "name": "Piccell סדנת צילום בסמארטפון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24379847",
+    "name": "נוסטלגי לכל מי שהיה פעם ילד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25896095",
+    "name": "ליברל Liberal",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3654931",
+    "name": "דניאלה די נור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_8823292",
+    "name": "מיקי בוגנים",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_9020881",
+    "name": "אבידור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_24507244",
+    "name": "הבלט הישראלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20627557",
+    "name": "לייף ספא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10092817",
+    "name": "פירסינגס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26322179",
+    "name": "Sheva Spa",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20982297",
+    "name": "נורה דיימונדס",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_24913365",
+    "name": "סבונל'ה זר של ריח",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3584571",
+    "name": "אורפרק ניהול ופיקוח",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9025101",
+    "name": "תכשיטי ספירים",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_2810025",
+    "name": "ד\"ר מיכל רביד",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_24391142",
+    "name": "פרופר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27226639",
+    "name": "גולדן טורס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3355117",
+    "name": "יוניק",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26369338",
+    "name": "SAGE",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20628195",
+    "name": "דרך הטבע",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_6410888",
+    "name": "Gaby's",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9176688",
+    "name": "Feincook",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24588115",
+    "name": "המרכז הארצי ללקויות למידה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20625966",
+    "name": "מדיקל אור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24454901",
+    "name": "הכל לבית אלי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24372194",
+    "name": "לב הגבר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10103696",
+    "name": "גן סטודיו",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_3554819",
+    "name": "וילונות אלינור",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_7076848",
+    "name": "כתר דוד גאלרי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3561362",
+    "name": "Art Point",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3087912",
+    "name": "SPORTCOM",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_3481220",
+    "name": "ראש גדול",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2669652",
+    "name": "קידום בגרות",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_3071714",
+    "name": "אייל ונטורה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_20626068",
+    "name": "פרידום",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24937525",
+    "name": "מרפאת CPAP",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2669648",
+    "name": "קמפוס לימודים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3038648",
+    "name": "ברון טורס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3580413",
+    "name": "אופטיקה זמיר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9201636",
+    "name": "זאוס ספא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27226587",
+    "name": "מגזין סיינטיפיק אמריקן ישראל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1694673",
+    "name": "גיורא שביט",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_10012296",
+    "name": "dot ink tattoo",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26511934",
+    "name": "Street dolls",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26107028",
+    "name": "Joseph 'N' Sons",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9165432",
+    "name": "שלומית אופיר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27367257",
+    "name": "קפאין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27103814",
+    "name": "Alo Yoga",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10000242",
+    "name": "עולם צמחי המרפא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27300191",
+    "name": "זו ארץ Zoo",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26992824",
+    "name": "ברא צמחים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25031786",
+    "name": "בייבי סטאר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1715495",
+    "name": "שמרת הזורע",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_27392936",
+    "name": "The Clean Dot",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25382290",
+    "name": "דרורת myherbs",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27554327",
+    "name": "שמעון פנחסוב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25377001",
+    "name": "בידוד פלוס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27412838",
+    "name": "הטמבוריה של יוסי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3650055",
+    "name": "MD האחים מנדלבוים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27427699",
+    "name": "Diamonds workshop",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10026461",
+    "name": "הפלודה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10090817",
+    "name": "בבל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9176725",
+    "name": "למטייל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27326043",
+    "name": "מסגרת",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3375119",
+    "name": "הוצאת ספרים עם עובד",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27002628",
+    "name": "קניבל מדיה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10133979",
+    "name": "ג'רוזלם פוסט",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2662110",
+    "name": "מנטור",
+    "domains": [],
+    "venue_ids": [
+      "ayalon_mall"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_27189484",
+    "name": "APRIL",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_27194719",
+    "name": "היי קיו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_633639",
+    "name": "בית צבי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10067607",
+    "name": "JEZ V",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_9149132",
+    "name": "עדשות",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26813977",
+    "name": "מכון נועם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26497373",
+    "name": "Speedo",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_27223524",
+    "name": "We smile",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27164962",
+    "name": "ישראייר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26281922",
+    "name": "Escape Sign",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_20854261",
+    "name": "פלאג אין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_4058471",
+    "name": "ברוקס מרתוניה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_10075906",
+    "name": "פריחת הסחלב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10026868",
+    "name": "למטייל עודפים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27301247",
+    "name": "פאפא ג'ונס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26029704",
+    "name": "מאפה נאמן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10121630",
+    "name": "חומוס 7",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10100326",
+    "name": "המשביר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10094549",
+    "name": "ארץ בראשית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26247065",
+    "name": "ריינבו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_25995895",
+    "name": "בראדלי",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10120623",
+    "name": "מתחת לעץ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_8826522",
+    "name": "החנוונית",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10118052",
+    "name": "צ'ונטי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26246447",
+    "name": "מקסיקנה גריל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10105998",
+    "name": "התסביח בורקס טורקי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10013891",
+    "name": "חוביזה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26972328",
+    "name": "פיצה רונדו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10046161",
+    "name": "Piece of nature",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10133408",
+    "name": "איטס ויגן Eat's Vegan",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10059106",
+    "name": "פיצה גזוזטרא",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10120315",
+    "name": "Vancake",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26888429",
+    "name": "פלנטי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10067727",
+    "name": "מימוניס שף בפיתה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10094403",
+    "name": "בבושקפה עגלת קפה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10076225",
+    "name": "יוגלך קפה ובייקרי טבעוני",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10036710",
+    "name": "קפה יובלים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10129421",
+    "name": "קפה דאז",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10119552",
+    "name": "שובולנה בית של אוכל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_27032703",
+    "name": "באלי טאלי מאמא לינה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_2670579",
+    "name": "אהבה בטעם ביתי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10090164",
+    "name": "גברת פוטטו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10043901",
+    "name": "חומוס BAR",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_23947315",
+    "name": "סיפור חוזר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "books"
+    ]
+  },
+  {
+    "id": "easy_1715388",
+    "name": "ריקושט",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_3369050",
+    "name": "סטימצקי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "books"
+    ]
+  },
+  {
+    "id": "easy_24818581",
+    "name": "outsiders",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10148306",
+    "name": "ibags",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_3501233",
+    "name": "אייס ואוטודיפו",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_26836463",
+    "name": "The North Face",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26146279",
+    "name": "פרנקו אורו תכשיטים",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26973730",
+    "name": "גוד פארם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "pharmacy"
+    ]
+  },
+  {
+    "id": "easy_10052279",
+    "name": "גרעיני עפולה well green",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10058204",
+    "name": "א.ל.מ. TLV",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_10113839",
+    "name": "אופטיק סנטר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26500320",
+    "name": "נעלי ברוקס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26814284",
+    "name": "דיל תאורה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27189780",
+    "name": "אופטיקל סנטר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_23331115",
+    "name": "סוהו דיזיין שופ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3562887",
+    "name": "Chill",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_25437267",
+    "name": "אודיו מדיק סניף ראשי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26366841",
+    "name": "אופטיקנה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10014701",
+    "name": "Vans",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_8825419",
+    "name": "סינמטק תל אביב",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26867938",
+    "name": "פריים שף וסושי בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26871178",
+    "name": "נעמן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_10067997",
+    "name": "פיתה בשר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_26559906",
+    "name": "Be",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "pharmacy"
+    ]
+  },
+  {
+    "id": "easy_3538881",
+    "name": "Erroca",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26794584",
+    "name": "שטיינר מכשירי שמיעה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26890148",
+    "name": "ARTIKIM TLV",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9071638",
+    "name": "תיאטרון גשר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_634913",
+    "name": "תיאטרון בית ליסין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_3587827",
+    "name": "א.ל.מ.",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "electronics"
+    ]
+  },
+  {
+    "id": "easy_20573002",
+    "name": "כיתן",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_3531101",
+    "name": "MANGO",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24880630",
+    "name": "עגבניה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_1742292",
+    "name": "מגה ספורט",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_26866005",
+    "name": "הוויאנס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_27265224",
+    "name": "New Era",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26371062",
+    "name": "Fox Home",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26814969",
+    "name": "פקטורי 54",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26884113",
+    "name": "הום סנטר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_26612084",
+    "name": "Foot Locker",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26365114",
+    "name": "ללין",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_27124441",
+    "name": "שילב",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_5780359",
+    "name": "קפה אטלס",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26775629",
+    "name": "סולתם",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "home"
+    ]
+  },
+  {
+    "id": "easy_24408443",
+    "name": "לי קופר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_20297872",
+    "name": "nine west",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_3390297",
+    "name": "Timberland",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_5495755",
+    "name": "אדידס",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_25884114",
+    "name": "גלי",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_8807769",
+    "name": "Nautica",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26955585",
+    "name": "גולדה גלידה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_25948523",
+    "name": "דומינוס פיצה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10033758",
+    "name": "גולדה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10089915",
+    "name": "גולדה דיזנגוף 107 פרישמן",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_24824083",
+    "name": "גרין רול",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_10100048",
+    "name": "סאי סושי בר",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_3505430",
+    "name": "קרביץ",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2715176",
+    "name": "איל מקיאג'",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "beauty"
+    ]
+  },
+  {
+    "id": "easy_26383743",
+    "name": "מקסיקנה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_9221119",
+    "name": "תיאטרון הבימה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "leisure"
+    ]
+  },
+  {
+    "id": "easy_24798874",
+    "name": "ויקטורי",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "grocery"
+    ]
+  },
+  {
+    "id": "easy_2640582",
+    "name": "Golf",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_2640882",
+    "name": "Golf&Co",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_2641998",
+    "name": "פולגת",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_9117245",
+    "name": "Golf&Kids",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_26429428",
+    "name": "אמריקן איגל",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26035604",
+    "name": "THE SPA",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27411714",
+    "name": "We Shoes",
+    "domains": [],
+    "venue_ids": [
+      "azrieli_tlv"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_9100927",
+    "name": "ורדינון",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_3421786",
+    "name": "המשביר לצרכן",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": [
+      "fashion"
+    ]
+  },
+  {
+    "id": "easy_26490272",
+    "name": "בורגר ראנץ'",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
+  },
+  {
+    "id": "easy_3468316",
+    "name": "H&O",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_27137147",
+    "name": "קולומביה",
+    "domains": [],
+    "venue_ids": [],
+    "categories": []
+  },
+  {
+    "id": "easy_10122586",
+    "name": "הפריקסה של חיימיקו",
+    "domains": [],
+    "venue_ids": [
+      "dizengoff_center"
+    ],
+    "categories": []
+  },
+  {
+    "id": "easy_26451883",
+    "name": "J17",
+    "domains": [],
+    "venue_ids": [],
+    "categories": [
+      "dining"
+    ]
   }
 ]

@@ -199,20 +199,53 @@ export async function runCollected(options: CollectedOptions): Promise<PipelineR
     }
   }
 
-  const { publish, review } = partitionByConfidence(candidates, options.threshold);
+  // A benefit a human already approved must not be re-gated by a later run.
+  // benefitId is stable across a re-scrape *by design* (see its docstring) so
+  // that review survives the next pipeline run — but confidence never rises
+  // above ~0.8 here, so blindly re-running partitionByConfidence on every
+  // candidate would re-queue every approved row every single time. Anything
+  // whose id and terms are unchanged from an already-published, human-approved
+  // record is left published; only genuinely new or changed candidates go
+  // through the confidence gate.
+  const publishedById = new Map(existing.benefits.map((b) => [b.id, b]));
+  const alreadyApproved = (benefit: (typeof candidates)[number]['benefit']) => {
+    const prior = publishedById.get(benefit.id);
+    return (
+      prior?.reviewed_by_human === true &&
+      JSON.stringify(prior.conditions) === JSON.stringify(benefit.conditions) &&
+      prior.value === benefit.value &&
+      prior.type === benefit.type
+    );
+  };
+  const toGate = candidates.filter((c) => !alreadyApproved(c.benefit));
+
+  const { publish, review } = partitionByConfidence(toGate, options.threshold);
   report.published = publish.length;
   report.queuedForReview = review.length;
 
   const queuedAt = now.toISOString();
-  const touchedIds = new Set(candidates.map((c) => c.benefit.id));
+  const touchedIds = new Set(toGate.map((c) => c.benefit.id));
   const newQueue: ReviewItem[] = review.map((item) => ({ ...item, queued_at: queuedAt }));
 
+  const mergedBenefits = mergeBenefits(existing.benefits, publish);
+
+  // Two things a queue must never contain: two rows for the same id (a chain
+  // with five branches at an identical discount is one benefit, not five —
+  // the id is deliberately shared, see benefitId's docstring) and a row whose
+  // id is already sitting in `benefits` as a human-approved publish. Both are
+  // collapsed the same way `mergeBenefits` already collapses its own array:
+  // last write wins per id, via a Map.
+  const publishedIds = new Set(mergedBenefits.map((b) => b.id));
+  const rawQueue = [
+    ...existing.reviewQueue.filter((item) => !touchedIds.has(item.benefit.id)),
+    ...newQueue,
+  ];
+  const queueById = new Map(rawQueue.map((item) => [item.benefit.id, item]));
+  const dedupedQueue = [...queueById.values()].filter((item) => !publishedIds.has(item.benefit.id));
+
   await store.write({
-    benefits: mergeBenefits(existing.benefits, publish),
-    reviewQueue: [
-      ...existing.reviewQueue.filter((item) => !touchedIds.has(item.benefit.id)),
-      ...newQueue,
-    ],
+    benefits: mergedBenefits,
+    reviewQueue: dedupedQueue,
   });
 
   return report;
