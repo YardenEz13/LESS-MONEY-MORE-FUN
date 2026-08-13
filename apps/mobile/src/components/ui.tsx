@@ -10,6 +10,34 @@ import {
 import { latinRuns } from '@sbr/core';
 import { border, colors, fonts, latinFace, radius, space, type } from '../theme';
 
+/**
+ * The other thing the EFT faces get wrong, alongside the `&` → ₪ mapping in
+ * theme.ts: U+00B7 MIDDLE DOT — the app's separator, in gate summaries, combo
+ * lines and trust rows — carries an advance of about 65em in both faces. One
+ * of them makes its line ~1000px wide, and because that width becomes the
+ * automatic minimum size of a flex item, the row it sits in cannot shrink back:
+ * the value runs off the screen and its neighbours collapse to nothing.
+ *
+ * So the middot joins the Latin runs: drawn in the Latin face beside it, which
+ * measures it at a quarter of an em like every other font does. Fixed here
+ * rather than by swapping the character at each call site, because separators
+ * also arrive from the catalogue — `raw_text_summary` is scraped text, and
+ * nothing in this app chooses what is in it.
+ */
+const EFT_BROKEN = /(·+)/;
+
+/** Latin runs, plus the characters the Hebrew faces mismeasure. */
+function faceRuns(text: string): Array<{ text: string; latin: boolean }> {
+  return latinRuns(text).flatMap((run) =>
+    run.latin
+      ? [run]
+      : run.text
+          .split(EFT_BROKEN)
+          .filter(Boolean)
+          .map((part) => ({ text: part, latin: part.startsWith('·') })),
+  );
+}
+
 function splitLatin(node: React.ReactNode, face: string): React.ReactNode {
   if (Array.isArray(node)) {
     return node.map((child, i) => (
@@ -18,7 +46,7 @@ function splitLatin(node: React.ReactNode, face: string): React.ReactNode {
   }
   if (typeof node !== 'string') return node;
 
-  const runs = latinRuns(node);
+  const runs = faceRuns(node);
   // The common case in a Hebrew app: nothing to swap, so nothing to nest.
   if (runs.length === 1 && !runs[0].latin) return node;
 
