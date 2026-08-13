@@ -48,6 +48,7 @@ export function SettingsScreen({
               <Text style={type.caption}>{geofenceStatus}</Text>
             </View>
             <Switch
+              accessibilityLabel="התראות מיקום"
               value={profile.notifications_enabled}
               trackColor={{ true: colors.surfacePrimary, false: colors.borderHairline }}
               onValueChange={(value) => onChange({ ...profile, notifications_enabled: value })}
