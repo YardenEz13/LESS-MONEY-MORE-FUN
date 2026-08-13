@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   findCombos,
@@ -9,9 +9,10 @@ import {
   type Venue,
 } from '@sbr/core';
 import { BenefitCard } from '../components/BenefitCard';
+import { Crest, PitchStripes, ScarfBand } from '../components/Kit';
 import { FilterRow, GhostButton, Hero, LivePill, Text } from '../components/ui';
 import { benefits, benefitsAtVenue, ownedProgramIds, programNames, venues } from '../services/catalog';
-import { currentVenue } from '../services/geofencing';
+import { currentVenue, dwellMinutes } from '../services/geofencing';
 import { border, colors, radius, space, type } from '../theme';
 
 type Filter = 'all' | 'ready' | 'conditional';
@@ -41,6 +42,26 @@ export function HomeScreen({
   const [venue, setVenue] = useState<Venue | null>(null);
   const [picking, setPicking] = useState(false);
   const [locating, setLocating] = useState(false);
+
+  /**
+   * The match minute: how long the geofence has had you inside this venue.
+   * Null whenever there was no entry event to count from — a manual pin, or a
+   * build with no background permission — and the pill simply says LIVE.
+   */
+  const [minute, setMinute] = useState<number | null>(null);
+  useEffect(() => {
+    if (!venue) {
+      setMinute(null);
+      return;
+    }
+    let cancelled = false;
+    void dwellMinutes(venue.id).then((m) => {
+      if (!cancelled) setMinute(m);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [venue]);
 
   const locate = useCallback(async () => {
     setLocating(true);
@@ -124,6 +145,7 @@ export function HomeScreen({
         <WhereAmI
           venue={venue}
           count={venue ? countAt(venue.id) : 0}
+          minute={minute}
           locating={locating}
           onLocate={locate}
           onPick={() => setPicking(true)}
@@ -157,6 +179,7 @@ export function HomeScreen({
             gets the system's live marker. Off keeps the quiet square — a pill
             that is always there stops meaning "now". */}
         <View style={[styles.geofence, geofenceActive && styles.geofenceOn]}>
+          {geofenceActive && <PitchStripes />}
           {geofenceActive ? <LivePill /> : <View style={[styles.dot, styles.dotOff]} />}
           <Text style={[type.caption, geofenceActive && styles.geofenceOnText]}>
             {geofenceStatus}
@@ -188,6 +211,9 @@ export function HomeScreen({
           ))
         )}
 
+        {/* Full time. The same band that closes the hero closes the list, so
+            the reader knows the scroll ended rather than stalled. */}
+        <ScarfBand style={styles.listEnd} />
         <Text style={styles.footnote}>
           הטבות שתנאי בהן לא מתקיים כרגע — יום, שעה, תוקף או אימות ישן — לא מוצגות כאן בכלל.
         </Text>
@@ -214,7 +240,15 @@ function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
     >
       <View style={styles.comboTop}>
         <View style={styles.comboIdentity}>
-          <Text style={styles.comboEyebrow}>אפשר לשלב · {combo.merchantName}</Text>
+          {/* Both crests, because a combo is the one card that belongs to two
+              clubs at once and the pair is the whole point of it. */}
+          <View style={styles.comboCrests}>
+            <Crest programId={first.benefit.program_id} size={20} />
+            <Crest programId={second.benefit.program_id} size={20} />
+            <Text style={styles.comboEyebrow} numberOfLines={1}>
+              אפשר לשלב · {combo.merchantName}
+            </Text>
+          </View>
           <Text style={type.lead} numberOfLines={2}>
             {first.benefit.merchant_name === second.benefit.merchant_name
               ? `${programNames[first.benefit.program_id]} + ${programNames[second.benefit.program_id]}`
@@ -265,6 +299,7 @@ function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
 function WhereAmI({
   venue,
   count,
+  minute,
   locating,
   onLocate,
   onPick,
@@ -272,6 +307,7 @@ function WhereAmI({
 }: {
   venue: Venue | null;
   count: number;
+  minute: number | null;
   locating: boolean;
   onLocate: () => void;
   onPick: () => void;
@@ -281,6 +317,9 @@ function WhereAmI({
     return (
       <View style={styles.whereRow}>
         <View style={styles.whereActive}>
+          {/* Being somewhere is the app's kick-off, so the pinned plate runs the
+              clock. No entry event, no minute — see `dwellMinutes`. */}
+          {minute != null && <LivePill minute={minute} />}
           <Text style={styles.whereActiveText} numberOfLines={1}>
             {venue.name} · {count} הטבות כאן
           </Text>
@@ -395,9 +434,13 @@ function EmptyState({
 
   return (
     <View style={styles.empty}>
-      {/* The mark: a square outlined in the 2px rule, holding a single bar. */}
+      {/* The mark: a penalty area drawn in the 2px rule — box inside box, spot
+          in the middle. The pitch's own markings are the one football device
+          made entirely of 90° lines, so the empty state gets to be a diagram
+          rather than an icon and still obeys the system. */}
       <View style={styles.emptyMark}>
-        <View style={styles.emptyMarkBar} />
+        <View style={styles.emptyMarkInner} />
+        <View style={styles.emptyMarkSpot} />
       </View>
       <Text style={styles.emptyTitle}>{copy.title}</Text>
       <Text style={styles.emptyBody}>{copy.body}</Text>
@@ -435,12 +478,15 @@ const styles = StyleSheet.create({
   whereActive: {
     flex: 1,
     minWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.s2,
     backgroundColor: colors.surfacePlate,
     paddingHorizontal: space.s3 - 2,
     paddingVertical: space.s2 - 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
-  whereActiveText: { ...type.caption, color: colors.textInverse },
+  whereActiveText: { ...type.caption, color: colors.textInverse, flexShrink: 1 },
 
   sheet: {
     marginHorizontal: space.s4,
@@ -490,7 +536,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'flex-start',
   },
-  comboEyebrow: { ...type.meta, color: colors.surfaceAccent },
+  comboCrests: { flexDirection: 'row', alignItems: 'center', gap: space.s1 + 2 },
+  comboEyebrow: { ...type.meta, color: colors.surfaceAccent, flexShrink: 1 },
   comboRule: { width: border.hairline, backgroundColor: colors.borderHairline },
   comboPlate: {
     width: 104,
@@ -529,6 +576,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.sharp,
     borderWidth: border.hairline,
     borderColor: colors.borderHairline,
+    overflow: 'hidden',
   },
   geofenceOn: { backgroundColor: colors.surfacePrimary, borderColor: colors.surfacePrimary },
   geofenceOnText: { color: colors.textInverse },
@@ -545,15 +593,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyMark: {
-    width: 56,
+    width: 76,
     height: 56,
     borderWidth: border.rule,
-    borderColor: colors.textPrimary,
+    borderColor: colors.surfacePrimary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emptyMarkBar: { width: 22, height: border.rule, backgroundColor: colors.textPrimary },
+  emptyMarkInner: {
+    position: 'absolute',
+    width: 34,
+    height: 24,
+    borderWidth: border.rule,
+    borderColor: colors.surfacePrimary,
+  },
+  emptyMarkSpot: { width: 6, height: 6, backgroundColor: colors.surfacePrimary },
   emptyTitle: { ...type.display, textAlign: 'center' },
   emptyBody: { ...type.small, color: colors.textMuted, textAlign: 'center', maxWidth: 280 },
+  listEnd: { marginTop: space.s2 },
   footnote: { ...type.caption, marginTop: space.s3, lineHeight: 18 },
 });

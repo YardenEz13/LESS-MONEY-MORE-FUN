@@ -1,24 +1,34 @@
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import type { UserProfile } from '@sbr/core';
+import { ScarfBand } from '../components/Kit';
 import { GhostButton, ScreenHeader, Section, Text } from '../components/ui';
 import { programsById, venues } from '../services/catalog';
 import { handleVenueEnter } from '../services/geofencing';
-import { border, colors, radius, space, type } from '../theme';
+import { border, colors, radius, space, type, type KitIntensity } from '../theme';
 
 interface Props {
   profile: UserProfile;
   geofenceStatus: string;
+  kitIntensity: KitIntensity;
   onChange: (profile: UserProfile) => void;
+  onChangeKit: (intensity: KitIntensity) => void;
   onEditPrograms: () => void;
   onEnableGeofencing: () => void;
   onBack: () => void;
 }
 
+const KIT_OPTIONS: ReadonlyArray<{ value: KitIntensity; label: string; hint: string }> = [
+  { value: 'full', label: 'מלא', hint: 'פסים גלויים, צעיף מלא, מספרים בגודל לוח תוצאות.' },
+  { value: 'quiet', label: 'מאופק', hint: 'אותם צבעים ואותה פריסה, ברבע עוצמה.' },
+];
+
 export function SettingsScreen({
   profile,
   geofenceStatus,
+  kitIntensity,
   onChange,
+  onChangeKit,
   onEditPrograms,
   onEnableGeofencing,
   onBack,
@@ -37,6 +47,39 @@ export function SettingsScreen({
               : profile.program_ids.map((id) => programsById.get(id)?.name ?? id).join(' · ')}
           </Text>
           <GhostButton label="ערוך רשימה" onPress={onEditPrograms} />
+        </View>
+      </Section>
+
+      {/* Two readings of one screen, both real: nothing moves between them, so
+          this changes the volume and never the layout. Default is מלא — the kit
+          is the product's face, and quiet is a choice rather than a retreat. */}
+      <Section eyebrow="עוצמת המדים">
+        <View style={styles.card}>
+          <View style={styles.kitRow}>
+            {KIT_OPTIONS.map((option) => {
+              const active = option.value === kitIntensity;
+              return (
+                <Pressable
+                  key={option.value}
+                  accessibilityRole="radio"
+                  /* `checked`, not `selected`: a radio announces checkedness,
+                     and react-native-web maps `selected` to an aria attribute
+                     that role="radio" does not carry. */
+                  accessibilityState={{ checked: active }}
+                  onPress={() => onChangeKit(option.value)}
+                  style={[styles.kitOption, active && styles.kitOptionOn]}
+                >
+                  <Text style={[type.bodyStrong, active && styles.kitLabelOn]}>{option.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Text style={type.small}>
+            {KIT_OPTIONS.find((o) => o.value === kitIntensity)?.hint}
+          </Text>
+          {/* The control shows its own result: the scarf below is drawn at the
+              intensity just chosen, so the choice is legible before leaving. */}
+          <ScarfBand />
         </View>
       </Section>
 
@@ -131,6 +174,17 @@ const styles = StyleSheet.create({
     gap: space.s3 - 4,
   },
   switchText: { flex: 1, gap: 2 },
+  kitRow: { flexDirection: 'row', gap: space.s2 },
+  kitOption: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: space.s2 + 2,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
+    borderRadius: radius.sharp,
+  },
+  kitOptionOn: { backgroundColor: colors.surfaceAccent, borderColor: colors.surfaceAccent },
+  kitLabelOn: { color: colors.textInverse },
   venues: {
     marginHorizontal: space.s4,
     borderRadius: radius.sharp,

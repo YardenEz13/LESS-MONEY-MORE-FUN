@@ -10,13 +10,19 @@ import { I18nManager, Platform, TextStyle } from 'react-native';
  *   2. 90° corners. Elevation comes from lines, never from shadows.
  *   3. Hierarchy from weight, size and rule — never from letter-spacing.
  *
- * Three hues, each with one job, so colour carries meaning instead of decoration:
- * green is money kept, blue is yours to act on, orange is running out. Grey is
- * reserved for what you can neither bank nor act on. Anything that cannot be
- * assigned one of those jobs stays on paper.
+ * Colour carries meaning instead of decoration, and the metaphor that assigns
+ * the meanings is football. The pitch is green and green is money kept. The
+ * referee's yellow is an errand you can still run; his red is a condition the
+ * T&C says you fail. Orange is the clock — live now, running out. Blue is the
+ * choice in your hands: a filter, a tab, a combination.
+ *
+ * Two families never mix. **Verdict** hues (green, yellow, red, orange) judge;
+ * **crest** hues (claret, violet, teal) only identify which club a benefit came
+ * from and appear nowhere except inside a crest. So a violet square is never
+ * mistaken for a ruling, and a yellow one always is.
  *
  * Token names are semantic, never source or brand names: a re-skin is three
- * swaps — the urgent accent, the display face, the hero texture. The palette's
+ * swaps — the urgent accent, the display face, the kit stripe. The palette's
  * division of labour, the 8-grid and the figures on the plate are the system.
  */
 
@@ -44,7 +50,7 @@ export const colors = {
   /** Inset wells — image placeholders, empty slots. */
   surfaceInset: '#E4E0D6',
 
-  /** Money kept. Primary actions, satisfied conditions. */
+  /** The pitch. Money kept, primary actions, satisfied conditions. */
   surfacePrimary: '#0B6B45',
   surfacePrimaryRaised: '#0E7A4E',
   surfacePrimaryDeep: '#074A30',
@@ -97,7 +103,59 @@ export const colors = {
   /** Pressed-into and dark-background states. */
   accentUrgentBright: '#FF7A29',
   accentUrgentDeep: '#B34A0E',
+
+  /**
+   * The referee's yellow: a caution, not a sending-off. Every condition the
+   * reader can still do something about — top up the basket, issue the voucher,
+   * switch channel — is booked in this colour.
+   *
+   * Only ever a fill under near-black (10.3:1). Yellow text on paper is 1.7:1
+   * and there is no size at which that becomes readable, so the token has no
+   * text role at all.
+   */
+  cardYellow: '#F2B705',
+  /**
+   * The yellow's ink-side twin: the card's own border, and the one form the
+   * booking may take as *text* on paper (4.9:1). Deep enough to be olive rather
+   * than gold, because anything brighter fails at 13px and the whole point of
+   * having it is that the detail screen can name the verdict in words.
+   */
+  cardYellowDeep: '#8A6500',
+
+  /**
+   * The referee's red: the T&C itself says no. Not "hurry" — orange already
+   * carries hurry — but "this one is off the pitch for now".
+   *
+   * Carries paper at 5.1:1, so unlike the yellow it is a fill with light text.
+   */
+  cardRed: '#C81E2B',
+  cardRedDeep: '#8E121C',
 } as const;
+
+/**
+ * Crest hues — the club badge, and nothing else.
+ *
+ * A benefit comes from somewhere, and in a list of nine cards from six clubs
+ * the source is the fastest thing to scan for. Every other colour in this file
+ * is a ruling, so identity needed hues that can never be read as one: no green,
+ * no yellow, no red, no orange. Three leagues, three kits, each carrying paper
+ * above 5:1.
+ *
+ * Keyed by `Program['category']` rather than by program id on purpose — 74
+ * clubs would need 74 hues nobody can tell apart, and the category is what the
+ * reader is actually distinguishing: a card, a workplace, a shop.
+ */
+export const crestColors: Record<string, string> = {
+  /** Claret — a credit card. */
+  credit_card: '#8A1538',
+  /** Violet — a workplace or union club. */
+  employer_club: '#4B2E83',
+  /** Teal — a retail club. */
+  retail_club: '#0E6E6E',
+};
+
+/** A club with no category, or one added after this file was written. */
+export const crestFallback = colors.surfacePlate;
 
 export const fonts = {
   /** EFT_OffSet — headlines and figures */
@@ -245,23 +303,20 @@ export const border = { hairline: 1, rule: 2, marker: 4, band: 6 } as const;
  * Four tones, not three. A pending gate splits by whether the user can do
  * something about it, so a card full of ordinary caveats reads calm rather
  * than alarming. Each tone is a flat fill — the chip states its own verdict.
+ *
+ * The vocabulary is the referee's, because his is the one everyone already
+ * knows and it happens to be exactly this app's job: a booking is not a
+ * sending-off, and the difference between "bring the voucher" and "not valid
+ * on a Saturday" is precisely the difference between yellow and red. `card`
+ * marks the two tones that get an actual card drawn rather than a square.
  */
 export const gateTone = {
-  met: { bg: colors.surfacePrimary, border: colors.surfacePrimary, fg: colors.textInverse },
-  /** Blue, not black: an errand is something to do, not something wrong. */
-  action: { bg: colors.surfaceAccent, border: colors.surfaceAccent, fg: colors.textInverse },
-  note: { bg: 'transparent', border: colors.borderHairline, fg: colors.textMuted },
-  /**
-   * Urgent as a fill with near-black on top — never as text on a coloured field.
-   * The base tone, not the bright one: the warmer orange carries near-black at
-   * 5.4:1, so a chip clears 4.5 without borrowing the variant reserved for
-   * pressed states and dark backgrounds.
-   */
-  blocked: {
-    bg: colors.accentUrgent,
-    border: colors.accentUrgent,
-    fg: colors.textPrimary,
-  },
+  met: { bg: colors.surfacePrimary, border: colors.surfacePrimary, fg: colors.textInverse, card: false },
+  /** Booked — yellow under near-black. An errand is not a foul. */
+  action: { bg: colors.cardYellow, border: colors.cardYellowDeep, fg: colors.textPrimary, card: true },
+  note: { bg: 'transparent', border: colors.borderHairline, fg: colors.textMuted, card: false },
+  /** Sent off — red under paper. The T&C, not the clock, is what says no. */
+  blocked: { bg: colors.cardRed, border: colors.cardRedDeep, fg: colors.textInverse, card: true },
 } as const;
 
 export type GateTone = keyof typeof gateTone;
@@ -272,3 +327,49 @@ export const gateGlyph: Record<GateTone, string> = {
   note: '•',
   blocked: '✕',
 };
+
+/**
+ * The ruling in two words, for the expanded list where there is room for it.
+ *
+ * The chip on a card cannot afford these — it has the label and the colour and
+ * that is the whole budget — but a reader who opened the detail screen is
+ * asking exactly this question, and "תלוי בכם" answers it in a way a yellow
+ * rectangle alone does not.
+ */
+export const gateVerdict: Record<GateTone, string> = {
+  met: 'מתקיים',
+  action: 'תלוי בכם',
+  note: 'לתשומת לב',
+  blocked: 'לא מתקיים',
+};
+
+/**
+ * The kit — the football half of the system, and the only part of this file
+ * that draws texture rather than states a value.
+ *
+ * Two intensities, both real. `full` is the shirt: stripes at full strength,
+ * the scarf at full depth, display type at scoreboard size. `quiet` keeps every
+ * token and every layout and simply turns the volume down — a quarter-strength
+ * stripe, a thin scarf, smaller display. Nothing moves between them, so a
+ * screen laid out in one is laid out in the other, and the reader who does not
+ * want to be a supporter still gets a system rather than a fan site.
+ *
+ * A stripe is drawn as a row of fixed-width views, not as a gradient: React
+ * Native has no repeating background, and a row of flat fills is what the
+ * design system asks for anyway.
+ */
+export const kit = {
+  /** One stripe plus one gap is the period. Roughly a shirt panel at phone width. */
+  stripeWidth: 26,
+  stripeGap: 26,
+  /** Enough stripes to cross a tablet in landscape; the parent clips the rest. */
+  stripeCount: 40,
+  stripeAlpha: { full: 0.17, quiet: 0.05 },
+  /** The scarf: the band that closes a green surface. */
+  scarfHeight: { full: 16, quiet: 7 },
+  /** Display type is the scoreboard, so it is the first thing intensity moves. */
+  heroSize: { full: 46, quiet: 36 },
+  figureSize: { full: 48, quiet: 40 },
+} as const;
+
+export type KitIntensity = keyof typeof kit.stripeAlpha;

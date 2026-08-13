@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import type { Program, UserProfile } from '@sbr/core';
+import { Crest } from '../components/Kit';
 import { Hero, PrimaryButton, Section, Text } from '../components/ui';
 import { benefits, programs } from '../services/catalog';
 import { toggleProgram } from '../state/profile';
@@ -112,6 +113,10 @@ function ProgramRow({
       <View style={[styles.box, selected && styles.boxOn]}>
         {selected && <Text style={styles.check}>✓</Text>}
       </View>
+      {/* The crest the benefit cards will carry, shown at the moment the reader
+          picks the club — so the badge on a card two screens later is already
+          something they have seen and chosen. */}
+      <Crest programId={program.id} size={24} />
       <View style={styles.rowText}>
         <Text style={type.bodyStrong}>{program.name}</Text>
         {program.hint && <Text style={type.caption}>{program.hint}</Text>}
