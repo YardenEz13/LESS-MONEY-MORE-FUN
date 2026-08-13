@@ -26,6 +26,9 @@ export function BenefitCard({ evaluation, onPress }: Props) {
   const { benefit, gates, actionsRequired } = evaluation;
   const { figure, unit } = formatValue(benefit);
   const ready = actionsRequired.length === 0;
+  // Null whenever the cart is unknown, which on this screen is always — the
+  // footer then ends at the readiness line and the plate figure stands alone.
+  const saving = formatSaving(evaluation);
 
   return (
     <Pressable
@@ -71,9 +74,11 @@ export function BenefitCard({ evaluation, onPress }: Props) {
         <Text style={styles.readiness} numberOfLines={1}>
           {ready ? 'אפשר ללכת לקופה' : actionsRequired.map((g) => g.label).join(' · ')}
         </Text>
-        <Text style={type.caption} numberOfLines={1}>
-          {formatSaving(evaluation)}
-        </Text>
+        {saving && (
+          <Text style={type.caption} numberOfLines={1}>
+            {saving}
+          </Text>
+        )}
       </View>
     </Pressable>
   );

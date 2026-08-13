@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { latinRuns } from '../src/format';
+import { formatSaving, latinRuns } from '../src/format';
+import type { Evaluation } from '../src/matching';
 
 /** Shorthand: "Hebrew|LATIN|Hebrew" so the expectations stay readable. */
 const shape = (text: string) =>
@@ -57,5 +58,23 @@ describe('latinRuns', () => {
     ]) {
       expect(latinRuns(label).map((r) => r.text).join('')).toBe(label);
     }
+  });
+});
+
+describe('formatSaving', () => {
+  const evaluation = (estimatedSavingIls: number, isEstimate: boolean) =>
+    ({ estimatedSavingIls, isEstimate }) as Evaluation;
+
+  it('states a figure only when it came from a real cart', () => {
+    expect(formatSaving(evaluation(25, false))).toBe('חיסכון ₪25');
+  });
+
+  /**
+   * The reference basket exists to rank benefits, not to be read. Rendering it
+   * put the same ₪25 on every 10% benefit in the catalogue — the assumption
+   * talking, dressed as the benefit.
+   */
+  it('says nothing when the cart was assumed', () => {
+    expect(formatSaving(evaluation(25, true))).toBeNull();
   });
 });

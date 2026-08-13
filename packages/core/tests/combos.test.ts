@@ -139,6 +139,13 @@ describe('findCombos', () => {
     expect(findCombos(evaluate([thirtyPercent, elsewhere], 500), { cartAmount: 500 })).toHaveLength(0);
   });
 
+  it('flags the saving as an estimate when the cart is unknown, not when it is real', () => {
+    const [known] = findCombos(evaluate([thirtyPercent, giftCard], 500), { cartAmount: 500 });
+    expect(known!.isEstimate).toBe(false);
+    const [unknown] = findCombos(evaluate([thirtyPercent, giftCard]));
+    expect(unknown!.isEstimate).toBe(true);
+  });
+
   it('ranks a confirmed combo above a larger unconfirmed one', () => {
     const bigSilent = benefit({
       id: 'big',

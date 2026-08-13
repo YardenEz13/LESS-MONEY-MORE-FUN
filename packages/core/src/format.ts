@@ -43,9 +43,21 @@ export function formatHeadline(benefit: Benefit): string {
   }
 }
 
-export function formatSaving(evaluation: Evaluation): string {
-  const amount = `₪${Math.round(evaluation.estimatedSavingIls)}`;
-  return evaluation.isEstimate ? `חיסכון משוער ${amount}` : `חיסכון ${amount}`;
+/**
+ * The saved figure, or null when there isn't one to state.
+ *
+ * `estimatedSavingIls` falls back to a reference basket when the cart is
+ * unknown — see `estimateSaving`, which exists to rank benefits against each
+ * other, not to be read. Rendering that fallback put a number the user never
+ * spent on the same plate as the ones they did, under "חיסכון משוער": four
+ * different merchants at 10% all read ₪25, which is the assumption talking,
+ * not the benefit. A percentage the reader can apply to their own basket beats
+ * a shekel figure applied to someone else's, so an estimate returns null and
+ * the card falls back to the figure it already shows.
+ */
+export function formatSaving(evaluation: Evaluation): string | null {
+  if (evaluation.isEstimate) return null;
+  return `חיסכון ₪${Math.round(evaluation.estimatedSavingIls)}`;
 }
 
 /**

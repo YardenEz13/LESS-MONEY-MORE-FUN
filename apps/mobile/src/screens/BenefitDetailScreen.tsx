@@ -23,6 +23,7 @@ export function BenefitDetailScreen({
 }: Props) {
   const { benefit, gates, actionsRequired } = evaluation;
   const { figure, unit } = formatValue(benefit);
+  const saving = formatSaving(evaluation);
 
   return (
     <View style={styles.screen}>
@@ -41,7 +42,7 @@ export function BenefitDetailScreen({
             <Text style={styles.tillFigure}>{figure}</Text>
             <Text style={styles.tillUnit}>{unit}</Text>
           </View>
-          <Text style={styles.tillSaving}>{formatSaving(evaluation)}</Text>
+          {saving && <Text style={styles.tillSaving}>{saving}</Text>}
           <View style={styles.tillRule} />
           <Text style={styles.tillNote}>
             {actionsRequired.length === 0
