@@ -1,4 +1,4 @@
-import { I18nManager, Platform, TextStyle } from 'react-native';
+import { I18nManager, Platform, TextStyle, useWindowDimensions } from 'react-native';
 
 /**
  * Design system — "מערכת ההנחות" (Deals).
@@ -223,6 +223,31 @@ export const type = {
 
 /** 8-base grid. 4 is the only half-step. */
 export const space = { s1: 4, s2: 8, s3: 16, s4: 24, s5: 32, s6: 48, s7: 64 } as const;
+
+/**
+ * One breakpoint, and it divides phones from phones — not phones from tablets.
+ *
+ * 360dp is where the small Androids and the 1st-gen SE sit; below it the fixed
+ * costs of the layout (a 24dp gutter each side, a 104dp number plate) stop being
+ * a small fraction of the screen and start being most of it. A benefit card at
+ * 320 has 133dp left for a merchant name that runs to fifty characters, so the
+ * plate has to give some of it back.
+ *
+ * Only what is *fixed* gets a compact value. Anything that can be stated as
+ * "wrap when you run out" is written that way instead — `flexWrap` degrades at
+ * every width, while a breakpoint only fires at one, and the hero's headline
+ * and its action row never fit on one line on any phone we ship to.
+ */
+export const compactWidth = 360;
+
+/**
+ * True on a small phone. A hook rather than a module constant because the web
+ * build resizes under you and RN only reports orientation changes this way.
+ */
+export function useCompact(): boolean {
+  const { width } = useWindowDimensions();
+  return width < compactWidth;
+}
 
 /**
  * 90° everywhere. `soft` is the single sanctioned alternative and the system

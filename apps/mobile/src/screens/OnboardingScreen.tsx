@@ -104,7 +104,8 @@ function ProgramRow({
   return (
     <Pressable
       accessibilityRole="checkbox"
-      accessibilityState={{ checked: selected }}
+      /* aria-checked, not accessibilityState — see the note in components/ui. */
+      aria-checked={selected}
       accessibilityLabel={program.name}
       onPress={onPress}
       style={[styles.row, selected && styles.rowSelected]}
