@@ -2,14 +2,36 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { Gate } from '@sbr/core';
 import { Text } from './ui';
-import { border, colors, gateGlyph, gateTone, radius, space, type, type GateTone } from '../theme';
+import {
+  border,
+  colors,
+  gateGlyph,
+  gateTone,
+  gateVerdict,
+  radius,
+  space,
+  type,
+  type GateTone,
+} from '../theme';
 
-/** Amber is for errands; a caveat you can't act on gets the quiet tone. */
+/** Yellow is for errands; a caveat you can't act on gets the quiet tone. */
 function toneFor(gate: Gate): GateTone {
   if (gate.state === 'blocked') return 'blocked';
   if (gate.state === 'met') return 'met';
   return gate.actionable ? 'action' : 'note';
 }
+
+/**
+ * The verdict word sits on paper, not on the card, so it cannot use the card's
+ * own fill: `cardYellow` is a 1.7:1 text colour and no size fixes that. Each
+ * tone names the darkest member of its family that still reads as that family.
+ */
+const VERDICT_INK: Record<GateTone, string> = {
+  met: colors.surfacePrimary,
+  action: colors.cardYellowDeep,
+  note: colors.textMuted,
+  blocked: colors.cardRed,
+};
 
 /**
  * The condition strip — the one device this app is built around.
@@ -20,6 +42,11 @@ function toneFor(gate: Gate): GateTone {
  * up-to-you, or violated. "15% — 4 gates, 3 already clear, 1 on you" is
  * readable in the three seconds you have at a till, which a paragraph of
  * caveats is not.
+ *
+ * The verdicts are the referee's, which is the point of the whole kit: a
+ * booking and a sending-off are already distinct in everyone's head, and they
+ * happen to be exactly the distinction this engine computes. Yellow means the
+ * benefit is still on if you do something; red means the T&C has ruled.
  */
 export function ConditionStrip({ gates, max = 4 }: { gates: readonly Gate[]; max?: number }) {
   if (gates.length === 0) {
@@ -85,6 +112,12 @@ export function GateChip({ gate }: { gate: Gate }) {
 /**
  * The expanded form on the detail screen: one row per gate, ordered so the
  * thing standing between you and the discount is the first thing you read.
+ *
+ * The marker is a card rather than a square here — portrait, the referee's
+ * proportions — because this is the screen with room to be read rather than
+ * scanned, and a held-up card names the verdict before the words do. The glyph
+ * stays on it: colour is the fast channel, not the only one, and roughly one
+ * reader in twelve cannot separate the yellow from the red.
  */
 export function GateList({ gates }: { gates: readonly Gate[] }) {
   if (gates.length === 0) {
@@ -110,6 +143,9 @@ export function GateList({ gates }: { gates: readonly Gate[] }) {
             <View style={styles.rowText}>
               <Text style={type.bodyStrong}>{gate.label}</Text>
               <Text style={type.small}>{gate.detail}</Text>
+              {/* The ruling, in the ruling's colour. `note` is grey by design:
+                  "worth knowing" is not a verdict and should not look like one. */}
+              <Text style={[styles.verdict, { color: VERDICT_INK[key] }]}>{gateVerdict[key]}</Text>
             </View>
           </View>
         );
@@ -168,15 +204,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: border.hairline,
     borderBottomColor: colors.borderHairlineSoft,
   },
+  /* A referee's card: portrait, 3:4, 90° like everything else in the system. */
   marker: {
-    width: 22,
-    height: 22,
+    width: 20,
+    height: 27,
     borderRadius: radius.sharp,
     borderWidth: border.hairline,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
   },
+  verdict: { ...type.micro, marginTop: 3 },
   /* flex-start so a number-only label ("₪300+") aligns with a Hebrew one — see ui.tsx. */
   rowText: { flex: 1, gap: 2, alignItems: 'flex-start' },
 });

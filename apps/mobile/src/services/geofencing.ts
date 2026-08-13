@@ -82,6 +82,26 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
   await writeDwell(dwell);
 }
 
+/**
+ * Minutes since the geofence saw you enter this venue, or null if it never did.
+ *
+ * The match clock on the home screen reads from here rather than from when the
+ * user tapped a venue in the picker: "6’" has to mean six minutes standing in
+ * the mall, which is the thing the notification policy is counting too. A
+ * manually pinned venue has no entry event and so gets no minute, which is the
+ * honest answer rather than a zero.
+ */
+export async function dwellMinutes(
+  venueId: string,
+  now: number = Date.now(),
+): Promise<number | null> {
+  const dwell = await readDwell();
+  const enteredAt = dwell[venueId]?.enteredAt;
+  // `enteredAt: 0` is the exit marker written above, not the epoch.
+  if (!enteredAt) return null;
+  return Math.max(0, Math.floor((now - enteredAt) / 60_000));
+}
+
 export async function handleVenueExit(venueId: string): Promise<void> {
   const dwell = await readDwell();
   // Keep `notifiedAt` so the cooldown survives leaving and coming back;

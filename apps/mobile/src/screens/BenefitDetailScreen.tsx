@@ -2,6 +2,7 @@ import React from 'react';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { formatLastVerified, formatSaving, formatValue, type Evaluation } from '@sbr/core';
 import { GateList, gateSummary } from '../components/Gates';
+import { PitchStripes, ScarfBand } from '../components/Kit';
 import { GhostButton, PrimaryButton, ScreenHeader, Section, Text } from '../components/ui';
 import { programNames } from '../services/catalog';
 import { border, colors, radius, space, type } from '../theme';
@@ -30,26 +31,33 @@ export function BenefitDetailScreen({
         <ScreenHeader
           title={benefit.merchant_name}
           eyebrow={programNames[benefit.program_id] ?? benefit.program_id}
+          crestProgramId={benefit.program_id}
           onBack={onBack}
         />
 
         {/* The plate, full width: deliberately the loudest thing on the screen,
             because this is what you hold up at the counter. It states the
-            benefit and the one thing still standing in the way. */}
-        <View style={styles.till}>
-          <View style={styles.tillValue}>
-            <Text style={styles.tillFigure}>{figure}</Text>
-            <Text style={styles.tillUnit}>{unit}</Text>
+            benefit and the one thing still standing in the way.
+            The scoreboard, in other words — striped, closed by the scarf, with
+            the club that issued the figure named on it. */}
+        <View style={styles.tillWrap}>
+          <View style={styles.till}>
+            <PitchStripes />
+            <View style={styles.tillValue}>
+              <Text style={styles.tillFigure}>{figure}</Text>
+              <Text style={styles.tillUnit}>{unit}</Text>
+            </View>
+            <Text style={styles.tillSaving}>{formatSaving(evaluation)}</Text>
+            <View style={styles.tillRule} />
+            <Text style={styles.tillNote}>
+              {actionsRequired.length === 0
+                ? 'אין מה להכין מראש — אפשר ללכת לקופה.'
+                : actionsRequired.length === 1
+                  ? actionsRequired[0]!.detail
+                  : `להכין מראש: ${actionsRequired.map((g) => g.label).join(' · ')}`}
+            </Text>
           </View>
-          <Text style={styles.tillSaving}>{formatSaving(evaluation)}</Text>
-          <View style={styles.tillRule} />
-          <Text style={styles.tillNote}>
-            {actionsRequired.length === 0
-              ? 'אין מה להכין מראש — אפשר ללכת לקופה.'
-              : actionsRequired.length === 1
-                ? actionsRequired[0]!.detail
-                : `להכין מראש: ${actionsRequired.map((g) => g.label).join(' · ')}`}
-          </Text>
+          <ScarfBand />
         </View>
 
         <Section eyebrow={gateSummary(gates)}>
@@ -109,12 +117,13 @@ function TrustRow({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surfacePage },
   content: { paddingBottom: space.s5, gap: space.s4 },
+  tillWrap: { marginHorizontal: space.s4 },
   till: {
-    marginHorizontal: space.s4,
     backgroundColor: colors.surfacePlate,
     borderRadius: radius.sharp,
     padding: space.s4,
     gap: space.s1,
+    overflow: 'hidden',
   },
   tillValue: { flexDirection: 'row', alignItems: 'baseline', gap: space.s2 },
   tillFigure: type.figureLarge,

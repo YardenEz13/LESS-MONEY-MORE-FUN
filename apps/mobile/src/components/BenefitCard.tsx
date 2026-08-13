@@ -2,9 +2,20 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { formatSaving, formatValue, type Evaluation } from '@sbr/core';
 import { ConditionStrip } from './Gates';
+import { Crest, PitchStripes, useKit } from './Kit';
 import { Text } from './ui';
-import { programNames } from '../services/catalog';
-import { border, colors, radius, space, type, useCompact } from '../theme';
+import { programNames, programsById } from '../services/catalog';
+import {
+  border,
+  colors,
+  crestColors,
+  crestFallback,
+  kit,
+  radius,
+  space,
+  type,
+  useCompact,
+} from '../theme';
 
 interface Props {
   evaluation: Evaluation;
@@ -14,6 +25,13 @@ interface Props {
 /**
  * The card is the system's thesis in one object: the figure gets a dark plate
  * of its own, the terms get the strip, and nothing else competes.
+ *
+ * It is also a shirt. The club's colour runs along the top edge, its crest
+ * opens the identity line, and the plate is the squad number — the unit set
+ * above the figure the way a name sits above a number, which is why the two
+ * swapped order. None of that is decoration standing in for information: in a
+ * list of nine benefits from six clubs, *which club* is the fastest thing to
+ * scan for and it used to be a line of 13px grey.
  *
  * The plate takes the row's end edge from flex order alone, so it swaps sides
  * between RTL and LTR with no code change. Its hairline is a real 1px view
@@ -33,6 +51,10 @@ export function BenefitCard({ evaluation, onPress }: Props) {
   const { figure, unit } = formatValue(benefit);
   const ready = actionsRequired.length === 0;
   const compact = useCompact();
+  const intensity = useKit();
+
+  const category = programsById.get(benefit.program_id)?.category;
+  const clubColor = (category && crestColors[category]) ?? crestFallback;
 
   return (
     <Pressable
@@ -47,28 +69,42 @@ export function BenefitCard({ evaluation, onPress }: Props) {
       }`}
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
+      {/* The club's colours along the top edge. A hairline card in a list of
+          hairline cards has no way to say who it belongs to; this does it
+          without spending a single line of vertical space on text. */}
+      <View style={[styles.clubEdge, { backgroundColor: clubColor }]} />
+
       <View style={styles.top}>
         <View style={styles.identity}>
-          <Text style={type.meta} numberOfLines={1}>
-            {programNames[benefit.program_id] ?? benefit.program_id}
-          </Text>
+          <View style={styles.club}>
+            <Crest programId={benefit.program_id} size={22} />
+            <Text style={styles.clubName} numberOfLines={1}>
+              {programNames[benefit.program_id] ?? benefit.program_id}
+            </Text>
+          </View>
           <Text style={type.lead} numberOfLines={2}>
             {benefit.merchant_name}
           </Text>
         </View>
         <View style={styles.rule} />
         {/* Green is "money kept" in this system, so a benefit with nothing left
-            to do earns the green plate; one still waiting on the reader keeps
-            the neutral ink. Colour states the verdict the footer spells out. */}
+            to do earns the green plate — and, being ours, the stripes with it.
+            One still waiting on the reader keeps the neutral ink. Colour states
+            the verdict the footer spells out. */}
         <View style={[styles.plate, compact && styles.plateCompact, ready && styles.plateReady]}>
+          {ready && <PitchStripes />}
+          <Text style={[styles.plateUnit, ready && styles.plateUnitReady]}>{unit}</Text>
           <Text
-            style={[type.figure, compact && styles.figureCompact]}
+            style={[
+              type.figure,
+              { fontSize: kit.figureSize[intensity], lineHeight: kit.figureSize[intensity] },
+              compact && styles.figureCompact,
+            ]}
             numberOfLines={1}
             adjustsFontSizeToFit
           >
             {figure}
           </Text>
-          <Text style={[styles.plateUnit, ready && styles.plateUnitReady]}>{unit}</Text>
         </View>
       </View>
 
@@ -99,6 +135,9 @@ const styles = StyleSheet.create({
     marginBottom: space.s3,
   },
   cardPressed: { backgroundColor: colors.surfaceRaised },
+  clubEdge: { height: border.marker },
+  club: { flexDirection: 'row', alignItems: 'center', gap: space.s2 - 2 },
+  clubName: { ...type.meta, flexShrink: 1 },
   top: {
     flexDirection: 'row',
     alignItems: 'stretch',
@@ -124,13 +163,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: space.s2 + 4,
     paddingHorizontal: space.s2,
+    /* Clips the stripes to the plate — see PitchStripes. */
+    overflow: 'hidden',
   },
   /* `adjustsFontSizeToFit` is a native-only prop, so the web build cannot rely
      on it to rescue a figure that outgrows the plate — hence the explicit step. */
   plateCompact: { width: 84, paddingHorizontal: space.s1 + 2 },
   figureCompact: { fontSize: 34, lineHeight: 34 },
   plateReady: { backgroundColor: colors.surfacePrimary },
-  plateUnit: { ...type.micro, color: colors.textMutedInverse, marginTop: space.s1 + 2 },
+  /* Above the figure, not below it: the name goes over the number on a shirt. */
+  plateUnit: { ...type.micro, color: colors.textMutedInverse, marginBottom: space.s1 },
   /* The muted-on-green tone; textMutedInverse is tuned for ink and goes flat
      against the green. */
   plateUnitReady: { color: colors.textMutedOnPrimary },

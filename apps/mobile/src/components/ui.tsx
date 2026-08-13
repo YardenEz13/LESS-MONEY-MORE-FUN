@@ -8,7 +8,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { latinRuns } from '@sbr/core';
-import { border, colors, fonts, latinFace, radius, space, type, useCompact } from '../theme';
+import { Crest, PitchStripes, ScarfBand, useKit } from './Kit';
+import { border, colors, fonts, kit, latinFace, radius, space, type, useCompact } from '../theme';
 
 /**
  * A note that applies to every control in the app, not just the ones here:
@@ -117,6 +118,11 @@ export function Text({ style, children, ...rest }: TextProps) {
  * left the title 66dp — five lines of two characters each, and a hero eating
  * two thirds of the screen. Wrapping puts the actions on their own line at the
  * width where they stop fitting and leaves them beside the title above it.
+ *
+ * Striped and closed by the scarf, because this is the surface the app speaks
+ * from and the kit is how it signs what it says. The scarf sits outside the
+ * green rather than inside its padding: it is the edge of the block, and an
+ * edge that floats above a margin stops reading as one.
  */
 export function Hero({
   eyebrow,
@@ -130,21 +136,34 @@ export function Hero({
   children?: React.ReactNode;
 }) {
   const compact = useCompact();
+  const intensity = useKit();
   return (
-    <View style={styles.hero}>
-      <View style={styles.heroEdge} />
-      <View style={styles.heroBody}>
-        <View style={styles.heroTop}>
-          <View style={styles.heroHeadline}>
-            <Text style={styles.heroEyebrow}>{eyebrow}</Text>
-            <Text style={[styles.heroTitle, compact && styles.heroTitleCompact]}>{title}</Text>
-            <View style={[styles.heroUnderline, compact && styles.heroUnderlineCompact]} />
+    <>
+      <View style={styles.hero}>
+        <PitchStripes />
+        <View style={styles.heroEdge} />
+        <View style={styles.heroBody}>
+          <View style={styles.heroTop}>
+            <View style={styles.heroHeadline}>
+              <Text style={styles.heroEyebrow}>{eyebrow}</Text>
+              <Text
+                style={[
+                  styles.heroTitle,
+                  { fontSize: kit.heroSize[intensity], lineHeight: kit.heroSize[intensity] + 2 },
+                  compact && styles.heroTitleCompact,
+                ]}
+              >
+                {title}
+              </Text>
+              <View style={[styles.heroUnderline, compact && styles.heroUnderlineCompact]} />
+            </View>
+            {right}
           </View>
-          {right}
+          {children}
         </View>
-        {children}
       </View>
-    </View>
+      <ScarfBand />
+    </>
   );
 }
 
@@ -155,14 +174,20 @@ export function Hero({
  * merchant name — the catalog holds several past fifty characters. At 34dp on a
  * 320 screen that is seven lines before the content starts, so display drops a
  * step when the screen does.
+ *
+ * `crestProgramId` badges the eyebrow when the screen belongs to one club, so
+ * the detail screen opens with the same crest the card the reader tapped was
+ * carrying. Omit it and the eyebrow is plain text as before.
  */
 export function ScreenHeader({
   title,
   eyebrow,
+  crestProgramId,
   onBack,
 }: {
   title: string;
   eyebrow?: string;
+  crestProgramId?: string;
   onBack?: () => void;
 }) {
   const compact = useCompact();
@@ -174,11 +199,20 @@ export function ScreenHeader({
           <Text style={type.meta}>חזרה</Text>
         </Pressable>
       )}
-      {eyebrow && <Text style={styles.headerEyebrow}>{eyebrow}</Text>}
+      {eyebrow &&
+        (crestProgramId ? (
+          <View style={styles.headerCrestRow}>
+            <Crest programId={crestProgramId} size={22} />
+            <Text style={styles.headerEyebrow}>{eyebrow}</Text>
+          </View>
+        ) : (
+          <Text style={styles.headerEyebrow}>{eyebrow}</Text>
+        ))}
       <Text style={compact ? type.displaySmall : type.display}>{title}</Text>
-      {/* The same band the hero uses, at section scale: it ties the inner
-          screens to the green without giving them a second dominant surface. */}
-      <View style={styles.headerRule} />
+      {/* The same scarf the hero closes with, at section scale: it ties the
+          inner screens to the green without giving them a second dominant
+          surface. */}
+      <ScarfBand height={border.marker} style={styles.headerScarf} />
     </View>
   );
 }
@@ -217,6 +251,9 @@ export function PrimaryButton({
         disabled && styles.primaryDisabled,
       ]}
     >
+      {/* The one button that commits gets the shirt. Disabled drops it: a
+          striped button that does nothing is the worst of both. */}
+      {!disabled && <PitchStripes />}
       <Text style={[type.button, disabled && styles.primaryDisabledLabel]}>{label}</Text>
     </Pressable>
   );
@@ -307,13 +344,18 @@ export function FilterRow<T extends string>({
 }
 
 /**
- * A titled block. The heavy green band under the label is the section device —
- * the same one the design-system page uses to head 01 COLOUR, 02 TYPE.
+ * A titled block. The heavy band under the label is the section device — the
+ * same one the design-system page uses to head 01 COLOUR, 02 TYPE.
  *
- * It reads as green rather than ink now, and at `band` rather than `rule`: the
- * page turned its section heads into structural edges, and a 2px ink line under
- * a small label was reading as another hairline in a layout already full of
- * them. Green at 6px states that a new part of the screen starts here.
+ * It reads as green rather than ink, and at `band` rather than `rule`: the page
+ * turned its section heads into structural edges, and a 2px ink line under a
+ * small label was reading as another hairline in a layout already full of them.
+ * Green at 6px states that a new part of the screen starts here.
+ *
+ * Woven rather than solid now, so the device that heads a section is the same
+ * object that closes the hero. At 6px the scarf's blocks read as a texture in
+ * the band rather than as eight separate rectangles, which is the difference
+ * between a section head and a second hero.
  */
 export function Section({
   eyebrow,
@@ -326,6 +368,7 @@ export function Section({
     <View style={styles.section}>
       <View style={styles.sectionHead}>
         <Text style={styles.sectionLabel}>{eyebrow}</Text>
+        <ScarfBand height={border.band} style={styles.sectionScarf} />
       </View>
       {children}
     </View>
@@ -339,11 +382,18 @@ export function Section({
  * it is about Hebrew, where hierarchy has to come from weight and size because
  * there is no uppercase to track; this is a Latin word set in caps, which is
  * exactly the case tracking exists for.
+ *
+ * `minute` appends the match clock — `LIVE 6'` — for the one thing in this app
+ * that genuinely has a running minute: how long you have been standing in the
+ * mall. Nothing else may borrow it; a clock that is always on stops being one.
  */
-export function LivePill({ label = 'LIVE' }: { label?: string }) {
+export function LivePill({ label = 'LIVE', minute }: { label?: string; minute?: number }) {
   return (
     <View style={styles.livePill}>
-      <Text style={styles.livePillLabel}>{label}</Text>
+      <Text style={styles.livePillLabel}>
+        {label}
+        {minute == null ? '' : ` ${minute}’`}
+      </Text>
     </View>
   );
 }
@@ -369,6 +419,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'stretch',
     backgroundColor: colors.surfacePrimary,
+    /* The stripes are wider than any phone; without the clip they run on. */
+    overflow: 'hidden',
   },
   heroEdge: { width: 10, backgroundColor: colors.accentUrgent },
   heroBody: {
@@ -388,7 +440,9 @@ const styles = StyleSheet.create({
   },
   heroHeadline: { gap: space.s1, flexShrink: 1 },
   heroEyebrow: { ...type.meta, color: colors.textMutedOnPrimary },
-  heroTitle: { ...type.display, color: colors.textInverse, fontSize: 40, lineHeight: 42 },
+  /* Size and leading are set at the call site from the kit intensity — this is
+     everything about the headline that does not change between the two. */
+  heroTitle: { ...type.display, color: colors.textInverse },
   /* One step down the display ramp, so the title still clears the gutters on a
      320 screen once the actions have taken their own line. */
   heroTitleCompact: { fontSize: 34, lineHeight: 36 },
@@ -401,12 +455,8 @@ const styles = StyleSheet.create({
   /* The band is a proportion of the title, not a fixed length. */
   heroUnderlineCompact: { width: 112 },
   headerEyebrow: { ...type.meta, color: colors.surfacePrimary },
-  headerRule: {
-    height: border.marker,
-    width: 72,
-    backgroundColor: colors.surfacePrimary,
-    marginTop: space.s1,
-  },
+  headerCrestRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2 - 2 },
+  headerScarf: { width: 96, marginTop: space.s1 },
   back: { flexDirection: 'row', alignItems: 'center', gap: space.s1, marginBottom: space.s2 },
   backGlyph: { fontSize: 22, lineHeight: 24, color: colors.textDisabled },
   primary: {
@@ -415,6 +465,7 @@ const styles = StyleSheet.create({
     paddingVertical: space.s3,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   primaryDisabled: {
     backgroundColor: colors.surfaceRaised,
@@ -449,13 +500,9 @@ const styles = StyleSheet.create({
   },
   filterActive: { backgroundColor: colors.surfaceAccent, borderColor: colors.surfaceAccent },
   section: { gap: space.s3 },
-  sectionHead: {
-    marginHorizontal: space.s4,
-    borderBottomWidth: border.band,
-    borderBottomColor: colors.surfacePrimary,
-    paddingBottom: space.s2,
-  },
-  sectionLabel: { ...type.meta, color: colors.textPrimary },
+  sectionHead: { marginHorizontal: space.s4 },
+  sectionLabel: { ...type.meta, color: colors.textPrimary, paddingBottom: space.s2 },
+  sectionScarf: { alignSelf: 'stretch' },
   livePill: {
     backgroundColor: colors.accentUrgent,
     borderRadius: radius.sharp,
