@@ -100,8 +100,8 @@ export function BenefitDetailScreen({
 function TrustRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.trustRow}>
-      <Text style={type.small}>{label}</Text>
-      <Text style={type.bodyStrong}>{value}</Text>
+      <Text style={[type.small, styles.trustLabel]}>{label}</Text>
+      <Text style={[type.bodyStrong, styles.trustValue]}>{value}</Text>
     </View>
   );
 }
@@ -146,6 +146,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: border.hairline,
     borderBottomColor: colors.borderHairlineSoft,
   },
+  /**
+   * The label is two fixed words and never earns a break; the value is the
+   * variable half, so it is the one that gives. `minWidth: 0` is the part that
+   * matters on web — without it a flex item cannot go below its own content
+   * width, so an unbreakable value pushes the row past the screen instead of
+   * wrapping inside it.
+   */
+  trustLabel: { flexShrink: 0 },
+  trustValue: { flexShrink: 1, minWidth: 0 },
   trustAction: { paddingVertical: space.s3 - 4 },
   disclaimer: { ...type.caption, marginHorizontal: space.s4, lineHeight: 18 },
   footer: {
