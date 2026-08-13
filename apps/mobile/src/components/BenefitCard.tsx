@@ -4,7 +4,7 @@ import { formatSaving, formatValue, type Evaluation } from '@sbr/core';
 import { ConditionStrip } from './Gates';
 import { Text } from './ui';
 import { programNames } from '../services/catalog';
-import { border, colors, radius, space, type } from '../theme';
+import { border, colors, radius, space, type, useCompact } from '../theme';
 
 interface Props {
   evaluation: Evaluation;
@@ -21,11 +21,18 @@ interface Props {
  * to physical sides against a locale context that its stub I18nManager always
  * reports as LTR, so `start` lands on the wrong edge in the web build. A
  * sibling view is unambiguous on every platform.
+ *
+ * The plate is the card's one fixed cost, and on a small phone it is the
+ * expensive one: 104dp of a 272dp card leaves the merchant name 133dp, and the
+ * catalog holds names past fifty characters. It gives 20dp back below 360 —
+ * the figure steps down with it, since the widest the catalog produces ("3.5%",
+ * "₪233") needs 85dp at full size and would not clear the narrower plate.
  */
 export function BenefitCard({ evaluation, onPress }: Props) {
   const { benefit, gates, actionsRequired } = evaluation;
   const { figure, unit } = formatValue(benefit);
   const ready = actionsRequired.length === 0;
+  const compact = useCompact();
 
   return (
     <Pressable
@@ -53,8 +60,12 @@ export function BenefitCard({ evaluation, onPress }: Props) {
         {/* Green is "money kept" in this system, so a benefit with nothing left
             to do earns the green plate; one still waiting on the reader keeps
             the neutral ink. Colour states the verdict the footer spells out. */}
-        <View style={[styles.plate, ready && styles.plateReady]}>
-          <Text style={type.figure} numberOfLines={1} adjustsFontSizeToFit>
+        <View style={[styles.plate, compact && styles.plateCompact, ready && styles.plateReady]}>
+          <Text
+            style={[type.figure, compact && styles.figureCompact]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
             {figure}
           </Text>
           <Text style={[styles.plateUnit, ready && styles.plateUnitReady]}>{unit}</Text>
@@ -114,6 +125,10 @@ const styles = StyleSheet.create({
     paddingVertical: space.s2 + 4,
     paddingHorizontal: space.s2,
   },
+  /* `adjustsFontSizeToFit` is a native-only prop, so the web build cannot rely
+     on it to rescue a figure that outgrows the plate — hence the explicit step. */
+  plateCompact: { width: 84, paddingHorizontal: space.s1 + 2 },
+  figureCompact: { fontSize: 34, lineHeight: 34 },
   plateReady: { backgroundColor: colors.surfacePrimary },
   plateUnit: { ...type.micro, color: colors.textMutedInverse, marginTop: space.s1 + 2 },
   /* The muted-on-green tone; textMutedInverse is tuned for ink and goes flat

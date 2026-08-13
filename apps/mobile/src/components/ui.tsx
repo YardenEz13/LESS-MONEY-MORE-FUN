@@ -8,7 +8,25 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { latinRuns } from '@sbr/core';
-import { border, colors, fonts, latinFace, radius, space, type } from '../theme';
+import { border, colors, fonts, latinFace, radius, space, type, useCompact } from '../theme';
+
+/**
+ * A note that applies to every control in the app, not just the ones here:
+ * state a checkbox/tab/radio's on-ness with the `aria-*` props, never with
+ * `accessibilityState`.
+ *
+ * react-native-web 0.21 forwards `aria-checked`, `aria-selected` and friends
+ * straight to the DOM, but it has no mapping for the legacy `accessibilityState`
+ * object at all — the key is absent from its forwarded-props table, so it is
+ * dropped in silence. A row that states its state only that way renders as
+ * `role="checkbox"` with no `aria-checked` on it, and a screen reader on the web
+ * build cannot tell a ticked club from an unticked one.
+ *
+ * React Native 0.71+ reads the same `aria-*` props on View and Pressable and
+ * folds them back into `accessibilityState`, so the modern spelling is the one
+ * that works on both platforms and the legacy one is never needed alongside it.
+ * `accessibilityRole` is unaffected — it still maps to `role` on web.
+ */
 
 function splitLatin(node: React.ReactNode, face: string): React.ReactNode {
   if (Array.isArray(node)) {
@@ -63,6 +81,14 @@ export function Text({ style, children, ...rest }: TextProps) {
  * The edge is a sibling view rather than `borderStartWidth`: RN and web
  * disagree about which side "start" is under forced RTL, and flex order does
  * not.
+ *
+ * `heroTop` wraps rather than shrinking. The title is 207dp of display type and
+ * a screen's action row runs to ~200dp; against a body that is 262dp wide on a
+ * 320 phone and 332dp on a 390 one, the two have never fitted side by side on
+ * anything we ship to. Shrinking is what the layout used to do, and at 320 it
+ * left the title 66dp — five lines of two characters each, and a hero eating
+ * two thirds of the screen. Wrapping puts the actions on their own line at the
+ * width where they stop fitting and leaves them beside the title above it.
  */
 export function Hero({
   eyebrow,
@@ -75,6 +101,7 @@ export function Hero({
   right?: React.ReactNode;
   children?: React.ReactNode;
 }) {
+  const compact = useCompact();
   return (
     <View style={styles.hero}>
       <View style={styles.heroEdge} />
@@ -82,8 +109,8 @@ export function Hero({
         <View style={styles.heroTop}>
           <View style={styles.heroHeadline}>
             <Text style={styles.heroEyebrow}>{eyebrow}</Text>
-            <Text style={styles.heroTitle}>{title}</Text>
-            <View style={styles.heroUnderline} />
+            <Text style={[styles.heroTitle, compact && styles.heroTitleCompact]}>{title}</Text>
+            <View style={[styles.heroUnderline, compact && styles.heroUnderlineCompact]} />
           </View>
           {right}
         </View>
@@ -93,7 +120,14 @@ export function Hero({
   );
 }
 
-/** Back affordance + title. RTL, so "back" points right. */
+/**
+ * Back affordance + title. RTL, so "back" points right.
+ *
+ * The title is whatever the screen is about, and on the detail screen that is a
+ * merchant name — the catalog holds several past fifty characters. At 34dp on a
+ * 320 screen that is seven lines before the content starts, so display drops a
+ * step when the screen does.
+ */
 export function ScreenHeader({
   title,
   eyebrow,
@@ -103,6 +137,7 @@ export function ScreenHeader({
   eyebrow?: string;
   onBack?: () => void;
 }) {
+  const compact = useCompact();
   return (
     <View style={styles.header}>
       {onBack && (
@@ -112,7 +147,7 @@ export function ScreenHeader({
         </Pressable>
       )}
       {eyebrow && <Text style={styles.headerEyebrow}>{eyebrow}</Text>}
-      <Text style={type.display}>{title}</Text>
+      <Text style={compact ? type.displaySmall : type.display}>{title}</Text>
       {/* The same band the hero uses, at section scale: it ties the inner
           screens to the green without giving them a second dominant surface. */}
       <View style={styles.headerRule} />
@@ -123,6 +158,12 @@ export function ScreenHeader({
 /**
  * Primary action. Press is a colour step down the green ramp — the system has
  * no shadow to lift and no radius to squash, so state has to be stated in fill.
+ *
+ * `disabled` alone carries the disabled state: Pressable derives `aria-disabled`
+ * from it on web and `accessibilityState.disabled` from it on native, and on web
+ * it wins over any `aria-disabled` passed in alongside — so stating the state a
+ * second time would be dead weight. Coerced, so native gets a definite `false`
+ * rather than falling through to whatever `accessibilityState` holds.
  */
 export function PrimaryButton({
   label,
@@ -140,8 +181,7 @@ export function PrimaryButton({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: !!disabled }}
-      disabled={disabled}
+      disabled={!!disabled}
       onPress={onPress}
       style={({ pressed }) => [
         styles.primary,
@@ -188,7 +228,19 @@ export function GhostButton({
   );
 }
 
-/** Segmented filter. Selected is a solid blue chip — a choice, not a verdict. */
+/**
+ * Segmented filter. Selected is a solid blue chip — a choice, not a verdict.
+ *
+ * The row itself is the `tablist`: a `tab` outside one is an orphan, and a
+ * screen reader needs the container to announce "2 of 3" rather than reading
+ * three unrelated controls.
+ *
+ * It wraps rather than truncating. The three chips plus their counts come to
+ * 332dp — under the 320 screen's gutters, and wider still as a count goes from
+ * one digit to two. Chips do not shrink in RN, so the row used to run out
+ * through its own padding and sit visibly off-centre; a truncated "דורש פעו…"
+ * would be worse than a second line.
+ */
 export function FilterRow<T extends string>({
   options,
   value,
@@ -199,14 +251,14 @@ export function FilterRow<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <View style={styles.filterRow}>
+    <View accessibilityRole="tablist" style={styles.filterRow}>
       {options.map((option) => {
         const active = option.value === value;
         return (
           <Pressable
             key={option.value}
             accessibilityRole="tab"
-            accessibilityState={{ selected: active }}
+            aria-selected={active}
             onPress={() => onChange(option.value)}
             style={[styles.filter, active && styles.filterActive]}
           >
@@ -298,16 +350,28 @@ const styles = StyleSheet.create({
     paddingVertical: space.s3,
     gap: space.s2,
   },
-  heroTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' },
+  heroTop: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    columnGap: space.s3,
+    rowGap: space.s2,
+  },
   heroHeadline: { gap: space.s1, flexShrink: 1 },
   heroEyebrow: { ...type.meta, color: colors.textMutedOnPrimary },
   heroTitle: { ...type.display, color: colors.textInverse, fontSize: 40, lineHeight: 42 },
+  /* One step down the display ramp, so the title still clears the gutters on a
+     320 screen once the actions have taken their own line. */
+  heroTitleCompact: { fontSize: 34, lineHeight: 36 },
   heroUnderline: {
     height: border.band,
     width: 132,
     backgroundColor: colors.textInverse,
     marginTop: space.s1,
   },
+  /* The band is a proportion of the title, not a fixed length. */
+  heroUnderlineCompact: { width: 112 },
   headerEyebrow: { ...type.meta, color: colors.surfacePrimary },
   headerRule: {
     height: border.marker,
@@ -342,7 +406,9 @@ const styles = StyleSheet.create({
   },
   filterRow: {
     flexDirection: 'row',
-    gap: space.s2,
+    flexWrap: 'wrap',
+    columnGap: space.s2,
+    rowGap: space.s2,
     paddingHorizontal: space.s4,
     paddingBottom: space.s2,
   },

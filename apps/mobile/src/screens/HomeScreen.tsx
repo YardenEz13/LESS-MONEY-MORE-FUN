@@ -12,7 +12,7 @@ import { BenefitCard } from '../components/BenefitCard';
 import { FilterRow, GhostButton, Hero, LivePill, Text } from '../components/ui';
 import { benefits, benefitsAtVenue, ownedProgramIds, programNames, venues } from '../services/catalog';
 import { currentVenue } from '../services/geofencing';
-import { border, colors, radius, space, type } from '../theme';
+import { border, colors, radius, space, type, useCompact } from '../theme';
 
 type Filter = 'all' | 'ready' | 'conditional';
 
@@ -203,6 +203,7 @@ export function HomeScreen({
  */
 function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
   const [first, second] = combo.parts;
+  const compact = useCompact();
   return (
     <Pressable
       accessibilityRole="button"
@@ -222,8 +223,12 @@ function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
           </Text>
         </View>
         <View style={styles.comboRule} />
-        <View style={styles.comboPlate}>
-          <Text style={styles.comboFigure} numberOfLines={1} adjustsFontSizeToFit>
+        <View style={[styles.comboPlate, compact && styles.comboPlateCompact]}>
+          <Text
+            style={[styles.comboFigure, compact && styles.comboFigureCompact]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
             ₪{Math.round(combo.estimatedSavingIls)}
           </Text>
           <Text style={styles.comboPlateUnit}>יחד</Text>
@@ -410,7 +415,11 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surfacePage },
   headerLine: { ...type.body, color: colors.textMutedOnPrimary },
   headerFigure: { ...type.figureInline, color: colors.textInverse },
-  actions: { flexDirection: 'row', gap: space.s2, paddingTop: space.s1 },
+  /* Wraps for the same reason the hero's top row does: three labelled chips are
+     ~197dp, and once they have taken their own line they fit whole on a 320
+     screen — but a fourth action, or a longer word, should break rather than
+     push one off the edge. */
+  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s2, paddingTop: space.s1 },
   iconAction: {
     paddingHorizontal: space.s3 - 2,
     paddingVertical: space.s2,
@@ -501,7 +510,11 @@ const styles = StyleSheet.create({
     paddingVertical: space.s2 + 4,
     paddingHorizontal: space.s2,
   },
+  /* Matches the benefit card's plate step, so a combo and a card sitting in the
+     same list keep the same end column at both widths. */
+  comboPlateCompact: { width: 84, paddingHorizontal: space.s1 + 2 },
   comboFigure: { ...type.figure, fontSize: 34, lineHeight: 34 },
+  comboFigureCompact: { fontSize: 28, lineHeight: 28 },
   comboPlateUnit: { ...type.micro, color: colors.textInverse, marginTop: space.s1 + 2 },
   comboBody: {
     paddingVertical: space.s2 + 4,
