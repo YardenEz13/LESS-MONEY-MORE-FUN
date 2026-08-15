@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
@@ -38,6 +38,28 @@ const GEOFENCE_FAILURE: Record<string, string> = {
   runtime_unsupported: 'צריך development build כדי לקבל תזכורת בקניון',
 };
 
+/**
+ * Failures the OS will only let the user reverse from its own settings screen,
+ * so retrying in-app can never clear them.
+ *
+ * Both platforms refuse the grant the app asks for, and neither says so in a
+ * way the retry button can act on. Android 11+ will not show a dialog for
+ * background location at all — the request returns denied the moment it is
+ * made, and "Allow all the time" exists only in the app's settings page. iOS
+ * never grants "always" on a first ask either: it offers while-in-use, and
+ * promotes to always later or not at all. Notifications are the same shape once
+ * refused. Left alone, "הפעל מחדש" is a button that cannot work, so anything
+ * landing here gets handed the settings page instead.
+ *
+ * Native only: a browser has no app settings page to open, and
+ * react-native-web's Linking implements `openURL` and nothing else — offering
+ * the button there would hand the reader a crash instead of a permission. The
+ * web build denies location through the same `foreground_denied`, so this has
+ * to be checked here rather than inferred from the reason.
+ */
+const canOpenAppSettings = Platform.OS !== 'web';
+const SETTINGS_FIXABLE = new Set(['foreground_denied', 'background_denied']);
+
 type Screen =
   | { name: 'loading' }
   | { name: 'onboarding' }
@@ -66,6 +88,8 @@ function AppRoot() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [geofenceStatus, setGeofenceStatus] = useState('תזכורת בקניון כבויה');
   const [geofenceActive, setGeofenceActive] = useState(false);
+  /** Whether the current failure is one only the OS settings page can clear. */
+  const [geofenceFixable, setGeofenceFixable] = useState(false);
   /**
    * How loud the kit is. Lives beside the profile rather than inside it — see
    * `state/kit.ts` — and starts at `full`, so the first frame after the fonts
@@ -138,11 +162,13 @@ function AppRoot() {
     const granted = await requestNotificationPermission();
     if (!granted) {
       setGeofenceActive(false);
+      setGeofenceFixable(canOpenAppSettings);
       setGeofenceStatus('אין הרשאת התראות — אין דרך להזכיר בכניסה לקניון');
       return;
     }
     const result = await startGeofencing();
     setGeofenceActive(result.ok);
+    setGeofenceFixable(canOpenAppSettings && !result.ok && SETTINGS_FIXABLE.has(result.reason));
     setGeofenceStatus(
       result.ok
         ? `תזכורת בקניון פעילה · ${result.venueCount} מתחמים`
@@ -238,6 +264,7 @@ function AppRoot() {
           <SettingsScreen
             profile={profile}
             geofenceStatus={geofenceStatus}
+            geofenceFixable={geofenceFixable}
             kitIntensity={kitIntensity}
             onChange={persist}
             onChangeKit={(next) => void changeKit(next)}

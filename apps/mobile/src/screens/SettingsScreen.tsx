@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import type { UserProfile } from '@sbr/core';
 import { ScarfBand } from '../components/Kit';
 import { GhostButton, ScreenHeader, Section, Text } from '../components/ui';
@@ -10,6 +10,8 @@ import { border, colors, radius, space, type, type KitIntensity } from '../theme
 interface Props {
   profile: UserProfile;
   geofenceStatus: string;
+  /** The failure is one only the OS settings page can clear — see App.tsx. */
+  geofenceFixable: boolean;
   kitIntensity: KitIntensity;
   onChange: (profile: UserProfile) => void;
   onChangeKit: (intensity: KitIntensity) => void;
@@ -26,6 +28,7 @@ const KIT_OPTIONS: ReadonlyArray<{ value: KitIntensity; label: string; hint: str
 export function SettingsScreen({
   profile,
   geofenceStatus,
+  geofenceFixable,
   kitIntensity,
   onChange,
   onChangeKit,
@@ -101,7 +104,13 @@ export function SettingsScreen({
             {venues.length} מתחמים במעקב. מערכת ההפעלה מודיעה לנו רק על כניסה לאחד מהם — אנחנו לא
             עוקבים אחרי המיקום שלך, ושום דבר לא נשלח החוצה.
           </Text>
-          <GhostButton label="הפעל מחדש" onPress={onEnableGeofencing} />
+          {/* Retrying in-app cannot clear these two — the grant they need only
+              exists on the OS settings page, so that is where the button goes. */}
+          {geofenceFixable ? (
+            <GhostButton label="פתח הגדרות" onPress={() => void Linking.openSettings()} />
+          ) : (
+            <GhostButton label="הפעל מחדש" onPress={onEnableGeofencing} />
+          )}
         </View>
       </Section>
 

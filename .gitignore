@@ -6,6 +6,12 @@ dist/
 .expo/
 .DS_Store
 
+# Native projects are generated from app.json by `expo prebuild` — the config
+# is the source of truth, not the output. Editing these by hand is lost on the
+# next prebuild.
+apps/mobile/android/
+apps/mobile/ios/
+
 # Pipeline output (generated, not source of truth for the repo)
 data/generated/
 
