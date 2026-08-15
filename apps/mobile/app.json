@@ -41,7 +41,8 @@
           "isAndroidBackgroundLocationEnabled": true
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "./plugins/withGradleMemory"
     ]
   }
 }
