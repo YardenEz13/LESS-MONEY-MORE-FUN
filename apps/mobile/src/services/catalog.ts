@@ -5,6 +5,7 @@ import {
   Venue,
   expandOwnedPrograms,
   merchantsNear,
+  SHOP_FENCE_PREFIX,
   type Coordinates,
 } from '@sbr/core';
 import benefitsJson from '@sbr/data/benefits.json';
@@ -81,4 +82,21 @@ export function benefitsAtVenue(venueId: string): Benefit[] {
 
 export function benefitsForMerchant(merchantId: string): Benefit[] {
   return benefits.filter((b) => b.merchant_id === merchantId);
+}
+
+/**
+ * What a fence identifier refers to — a whole complex or a single shop.
+ *
+ * The geofence task gets a bare string back from the OS and has to answer "what
+ * is this and what is redeemable in it" without caring which kind it was. Null
+ * for an identifier that no longer resolves, which happens legitimately: a
+ * fence registered before an update can outlive the merchant it named.
+ */
+export function placeAt(fenceId: string): { name: string; benefits: Benefit[] } | null {
+  if (fenceId.startsWith(SHOP_FENCE_PREFIX)) {
+    const merchant = merchantsById.get(fenceId.slice(SHOP_FENCE_PREFIX.length));
+    return merchant ? { name: merchant.name, benefits: benefitsForMerchant(merchant.id) } : null;
+  }
+  const venue = venuesById.get(fenceId);
+  return venue ? { name: venue.name, benefits: benefitsAtVenue(venue.id) } : null;
 }

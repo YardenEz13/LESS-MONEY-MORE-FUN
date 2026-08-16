@@ -173,7 +173,7 @@ function AppRoot() {
     setGeofenceFixable(canOpenAppSettings && !result.ok && SETTINGS_FIXABLE.has(result.reason));
     setGeofenceStatus(
       result.ok
-        ? `תזכורת בקניון פעילה · ${result.venueCount} מתחמים`
+        ? `תזכורת פעילה · ${result.venueCount} מקומות בקרבתך`
         : GEOFENCE_FAILURE[result.reason],
     );
   }, []);

@@ -3,15 +3,17 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import {
   DEFAULT_NOTIFICATION_POLICY,
+  nearestFences,
   rankBenefits,
   shouldNotifyForVenue,
   toLocalMoment,
   venuesContaining,
   type Coordinates,
   type DwellState,
+  type Fence,
   type Venue,
 } from '@sbr/core';
-import { benefitsAtVenue, ownedProgramIds, venuesById, venues } from './catalog';
+import { merchants, ownedProgramIds, placeAt, venues } from './catalog';
 import { notifyVenue } from './notifications';
 import { canGeofenceInBackground } from './runtime';
 import { loadProfile } from '../state/profile';
@@ -41,8 +43,8 @@ async function writeDwell(map: DwellMap): Promise<void> {
  * driven from the debug screen without waiting to physically walk into a mall.
  */
 export async function handleVenueEnter(venueId: string, now: number = Date.now()): Promise<void> {
-  const venue = venuesById.get(venueId);
-  if (!venue) return;
+  const place = placeAt(venueId);
+  if (!place) return;
 
   const profile = await loadProfile();
   if (!profile.notifications_enabled || profile.program_ids.length === 0) return;
@@ -56,7 +58,7 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
   // Channel is deliberately left unset: standing in a mall says nothing about
   // whether the user will buy in-store or on their phone, and guessing would
   // promote an online-only benefit to "eligible".
-  const evaluations = rankBenefits(benefitsAtVenue(venueId), {
+  const evaluations = rankBenefits(place.benefits, {
     now: nowDate,
     ownedProgramIds: ownedProgramIds(profile.program_ids),
     mutedBenefitIds: profile.muted_benefit_ids,
@@ -73,7 +75,7 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
   if (decision.notify) {
     const sent = await notifyVenue({
       venueId,
-      venueName: venue.name,
+      venueName: place.name,
       evaluations: evaluations.slice(0, 5),
     });
     if (sent) state.notifiedAt = now;
@@ -171,27 +173,61 @@ export async function startGeofencing(): Promise<GeofenceStartResult> {
   // Re-registering an already-running task throws on Android.
   await stopGeofencing();
 
-  // ponytail: iOS monitors at most 20 regions and silently ignores the rest;
-  // Android's ceiling is 100. Ten venues fits both. If the venue list ever
-  // outgrows this, register only the nearest 20 to the user instead of the
-  // whole catalog — the failure mode otherwise is a fence that never fires and
-  // no error anywhere.
-  if (venues.length > 20) {
-    console.warn(`[geofence] ${venues.length} venues — iOS will only monitor 20`);
-  }
-
+  const fences = await fencesToMonitor();
   await Location.startGeofencingAsync(
     GEOFENCE_TASK,
-    venues.map((venue) => ({
-      identifier: venue.id,
-      latitude: venue.lat,
-      longitude: venue.lng,
-      radius: venue.radius_m,
+    fences.map((fence) => ({
+      identifier: fence.id,
+      latitude: fence.lat,
+      longitude: fence.lng,
+      radius: fence.radius_m,
       notifyOnEnter: true,
       notifyOnExit: true,
     })),
   );
-  return { ok: true, venueCount: venues.length };
+  return { ok: true, venueCount: fences.length };
+}
+
+/**
+ * iOS monitors at most 20 regions and silently drops the rest — no error, no
+ * callback, just fences that never fire. Android allows 100. Twenty is the
+ * number that is true on both.
+ */
+const MAX_FENCES = 20;
+
+/** A single shop is a doorway, not a complex; a mall carries its own radius. */
+const SHOP_FENCE_RADIUS_M = 150;
+
+/**
+ * Which regions to arm, from wherever the user last was.
+ *
+ * Uses the cached position rather than asking for a fresh fix: this runs during
+ * app start and must not add a GPS wait to it, and a fence set only has to be
+ * right for the neighbourhood, not the doorstep. No cached position at all —
+ * a first run before any fix — falls back to the ten malls, which is what this
+ * did for every user before branch coordinates existed.
+ */
+async function fencesToMonitor(): Promise<Fence[]> {
+  const mallsOnly = venues.map((venue) => ({
+    id: venue.id,
+    name: venue.name,
+    lat: venue.lat,
+    lng: venue.lng,
+    radius_m: venue.radius_m,
+  }));
+  try {
+    const last = await Location.getLastKnownPositionAsync();
+    if (!last) return mallsOnly;
+    return nearestFences({
+      position: { lat: last.coords.latitude, lng: last.coords.longitude },
+      venues,
+      merchants,
+      limit: MAX_FENCES,
+      shopRadiusM: SHOP_FENCE_RADIUS_M,
+    });
+  } catch {
+    return mallsOnly;
+  }
 }
 
 /**

@@ -100,9 +100,14 @@ export function SettingsScreen({
               onValueChange={(value) => onChange({ ...profile, notifications_enabled: value })}
             />
           </View>
+          {/* The privacy sentence has to keep up with the mechanism: choosing
+              the fences now reads the device's last known position, which the
+              old wording did not describe. It is still read on-device and still
+              never sent, and saying so precisely is the point of saying it. */}
           <Text style={type.small}>
-            {venues.length} מתחמים במעקב. מערכת ההפעלה מודיעה לנו רק על כניסה לאחד מהם — אנחנו לא
-            עוקבים אחרי המיקום שלך, ושום דבר לא נשלח החוצה.
+            עד 20 המקומות הקרובים אליך במעקב — קניונים והסניפים שבהם יש לך הטבה. הבחירה נעשית
+            על המכשיר לפי המיקום האחרון שלו, ומערכת ההפעלה מודיעה לנו רק על כניסה לאחד מהם.
+            אנחנו לא עוקבים אחרי המיקום שלך, ושום דבר לא נשלח החוצה.
           </Text>
           {/* Retrying in-app cannot clear these two — the grant they need only
               exists on the OS settings page, so that is where the button goes. */}
