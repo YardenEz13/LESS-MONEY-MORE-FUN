@@ -15,7 +15,7 @@ import { BenefitDetailScreen } from './src/screens/BenefitDetailScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { ShareResultScreen } from './src/screens/ShareResultScreen';
 import { StatsScreen } from './src/screens/StatsScreen';
-import { isGeofencingActive, startGeofencing } from './src/services/geofencing';
+import { resumeGeofencing, startGeofencing } from './src/services/geofencing';
 import { requestNotificationPermission } from './src/services/notifications';
 import { runtimeLimitation } from './src/services/runtime';
 import { resolveShare, subscribeToShares, type ShareResult } from './src/services/shareIntent';
@@ -122,7 +122,9 @@ function AppRoot() {
       setProfile(loaded);
       setKitIntensity(await loadKitIntensity());
       setScreen(loaded.onboarded_at ? { name: 'home' } : { name: 'onboarding' });
-      if (await isGeofencingActive()) {
+      // Re-arms a fence the OS dropped since last launch, and never prompts —
+      // see `resumeGeofencing`. Silent when nothing was granted yet.
+      if (await resumeGeofencing()) {
         setGeofenceActive(true);
         setGeofenceStatus('תזכורת בקניון פעילה');
       }

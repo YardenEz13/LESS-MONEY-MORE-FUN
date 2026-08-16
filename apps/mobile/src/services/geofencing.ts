@@ -194,6 +194,37 @@ export async function startGeofencing(): Promise<GeofenceStartResult> {
   return { ok: true, venueCount: venues.length };
 }
 
+/**
+ * How long to wait for a fresh GPS fix before falling back to the cached one.
+ *
+ * `getCurrentPositionAsync` has no timeout of its own and does not give up:
+ * indoors — which is exactly where a mall is — it can hang for minutes or never
+ * resolve at all, and the caller is sitting on a spinner the whole time. Six
+ * seconds is about as long as someone will hold a phone up waiting.
+ */
+const FIX_TIMEOUT_MS = 6_000;
+
+/**
+ * A position, or null if the device could not produce one in time.
+ *
+ * The cached fix is a real answer, not a consolation: a mall is 250m across and
+ * a fix from a few minutes ago still names it correctly. Returning nothing
+ * because the fresh fix was slow throws away a coordinate we already had.
+ */
+async function positionWithin(timeoutMs: number): Promise<Location.LocationObject | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<null>((resolve) => {
+    timer = setTimeout(() => resolve(null), timeoutMs);
+  });
+  const fresh = await Promise.race([
+    Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }).catch(() => null),
+    deadline,
+  ]);
+  clearTimeout(timer);
+  if (fresh) return fresh;
+  return Location.getLastKnownPositionAsync().catch(() => null);
+}
+
 export type WhereAmI =
   | { ok: true; venue: Venue | null; here: Coordinates }
   | { ok: false; reason: 'services_disabled' | 'foreground_denied' | 'unavailable' };
@@ -214,9 +245,8 @@ export async function currentVenue(): Promise<WhereAmI> {
     const foreground = await Location.requestForegroundPermissionsAsync();
     if (!foreground.granted) return { ok: false, reason: 'foreground_denied' };
 
-    const position = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
+    const position = await positionWithin(FIX_TIMEOUT_MS);
+    if (!position) return { ok: false, reason: 'unavailable' };
     const here = { lat: position.coords.latitude, lng: position.coords.longitude };
     // The coordinate is returned alongside the venue because being in no mall
     // is the common case — 94% of catalogued branches are on a street — and the
@@ -227,6 +257,36 @@ export async function currentVenue(): Promise<WhereAmI> {
     // location set. That is not the same as a refusal, and the caller offers a
     // manual picker either way.
     return { ok: false, reason: 'unavailable' };
+  }
+}
+
+/**
+ * Re-arm the fence on launch if the user already granted everything it needs.
+ *
+ * A registered geofence does not survive forever: a reboot, an app update or
+ * the OS reclaiming background work all drop the task, and nothing re-registers
+ * it because `startGeofencing` only ever ran from onboarding and the settings
+ * button. The user granted "always" weeks ago, sees no prompt and no error, and
+ * the reminder has simply stopped — the worst shape of broken, because it looks
+ * identical to working.
+ *
+ * Uses the `get` permission calls, never the `request` ones: this runs on every
+ * cold start, and a launch that opens a permission dialog out of nowhere is its
+ * own bug. No grant yet means do nothing and leave the asking to the button.
+ */
+export async function resumeGeofencing(): Promise<boolean> {
+  if (!canGeofenceInBackground) return false;
+  if (await isGeofencingActive()) return true;
+  try {
+    const [foreground, background] = await Promise.all([
+      Location.getForegroundPermissionsAsync(),
+      Location.getBackgroundPermissionsAsync(),
+    ]);
+    if (!foreground.granted || !background.granted) return false;
+    const result = await startGeofencing();
+    return result.ok;
+  } catch {
+    return false;
   }
 }
 
