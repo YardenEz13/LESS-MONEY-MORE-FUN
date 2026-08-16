@@ -19,6 +19,7 @@ import {
   refreshFencesIfMoved,
   resumeGeofencing,
   startGeofencing,
+  stopGeofencing,
 } from './src/services/geofencing';
 import { requestNotificationPermission } from './src/services/notifications';
 import { runtimeLimitation } from './src/services/runtime';
@@ -192,6 +193,33 @@ function AppRoot() {
     );
   }, []);
 
+  /**
+   * The settings switch, which owns the fences as well as the flag.
+   *
+   * Switching it off used to write `notifications_enabled: false` and stop
+   * there. The fences stayed armed — `handleVenueEnter` returned early, so no
+   * push arrived and it looked obeyed — while the OS went on waking the app at
+   * every doorway it had been given. For an app whose settings screen promises
+   * it is not following you around, leaving the monitoring running after being
+   * told to stop is the wrong half to get right.
+   */
+  const setNotificationsEnabled = useCallback(
+    async (next: UserProfile) => {
+      const changed = next.notifications_enabled !== profile?.notifications_enabled;
+      await persist(next);
+      if (!changed) return;
+      if (next.notifications_enabled) {
+        await enableGeofencing();
+        return;
+      }
+      await stopGeofencing();
+      setGeofenceActive(false);
+      setGeofenceFixable(false);
+      setGeofenceStatus('תזכורת כבויה — אין מעקב אחרי מיקום');
+    },
+    [enableGeofencing, persist, profile?.notifications_enabled],
+  );
+
   if (!fontsLoaded || !profile || screen.name === 'loading') {
     return (
       <SafeAreaView style={styles.centered}>
@@ -282,7 +310,7 @@ function AppRoot() {
             geofenceStatus={geofenceStatus}
             geofenceFixable={geofenceFixable}
             kitIntensity={kitIntensity}
-            onChange={persist}
+            onChange={setNotificationsEnabled}
             onChangeKit={(next) => void changeKit(next)}
             onEditPrograms={() => setScreen({ name: 'onboarding' })}
             onEnableGeofencing={enableGeofencing}
