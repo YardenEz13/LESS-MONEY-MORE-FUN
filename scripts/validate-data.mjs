@@ -112,25 +112,39 @@ for (const [file, list] of [
 // offer (see UNIVERSAL_MERCHANT_ID in @sbr/core).
 const UNIVERSAL_MERCHANT_ID = 'any_merchant';
 const merchantsWithBenefits = new Set([...benefits, ...sample].map((b) => b.merchant_id));
+
+// "Can this merchant be found by standing somewhere" — a branch coordinate or a
+// curated venue id both answer yes. Counting only `venue_ids` is what let this
+// number read 88/1057 while the sidecar held 2048 usable coordinates, and a
+// metric that measures the wrong join hides the outage it exists to report.
+const hasPlace = (m) => m.venue_ids.length > 0 || (m.branches ?? []).length > 0;
+
 const noReach = merchants.filter(
-  (m) => m.id !== UNIVERSAL_MERCHANT_ID && m.venue_ids.length === 0 && m.domains.length === 0,
+  (m) => m.id !== UNIVERSAL_MERCHANT_ID && !hasPlace(m) && m.domains.length === 0,
 );
 for (const merchant of noReach) {
   if (!merchantsWithBenefits.has(merchant.id)) {
-    fail(`merchant ${merchant.id}: no domains, no venues and no benefits — nothing can reach it`);
+    fail(`merchant ${merchant.id}: no domains, no place and no benefits — nothing can reach it`);
   }
 }
 const listOnly = noReach.filter((m) => merchantsWithBenefits.has(m.id));
 
-// Every merchant that has benefits but no venue can never fire a geofence.
+// Every merchant that has benefits but no place can never fire a geofence.
 // Worth stating separately: it is the gap between "we know about this shop" and
 // "we can remind you when you walk into it".
 const noVenue = merchants.filter(
-  (m) =>
-    m.id !== UNIVERSAL_MERCHANT_ID &&
-    m.venue_ids.length === 0 &&
-    merchantsWithBenefits.has(m.id),
+  (m) => m.id !== UNIVERSAL_MERCHANT_ID && !hasPlace(m) && merchantsWithBenefits.has(m.id),
 );
+
+// A branch outside Israel is a bad name match, not a real shop — same bounds the
+// venues are held to, applied to the 2048 coordinates that now drive matching.
+for (const merchant of merchants) {
+  for (const branch of merchant.branches ?? []) {
+    if (branch.lat < 29.4 || branch.lat > 33.4 || branch.lng < 34.2 || branch.lng > 35.9) {
+      fail(`merchant ${merchant.id}: branch ${branch.lat},${branch.lng} is outside Israel`);
+    }
+  }
+}
 
 if (errors.length > 0) {
   console.error(`data validation failed (${errors.length}):`);

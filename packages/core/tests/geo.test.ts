@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { Venue } from '../src/types';
+import { Merchant, Venue } from '../src/types';
 import {
   DEFAULT_NOTIFICATION_POLICY,
   distanceMeters,
+  merchantsNear,
   shouldNotifyForVenue,
   venuesContaining,
 } from '../src/geo';
@@ -86,5 +87,43 @@ describe('shouldNotifyForVenue', () => {
         policy: DEFAULT_NOTIFICATION_POLICY,
       }),
     ).toEqual({ notify: false, reason: 'nothing_to_show' });
+  });
+});
+
+describe('merchantsNear', () => {
+  // Dizengoff Center, and a shop ~350m up the street from it.
+  const here = { lat: 32.0757, lng: 34.7748 };
+
+  const merchant = (id: string, branches: { lat: number; lng: number }[]) =>
+    Merchant.parse({ id, name: id, branches });
+
+  const onSite = merchant('on_site', [{ lat: 32.0757, lng: 34.7748 }]);
+  const upTheStreet = merchant('up_the_street', [{ lat: 32.0789, lng: 34.7748 }]);
+  const haifa = merchant('haifa', [{ lat: 32.7866, lng: 35.0209 }]);
+
+  it('finds branches inside the radius, nearest first', () => {
+    expect(merchantsNear(here, [haifa, upTheStreet, onSite], 500).map((m) => m.id)).toEqual([
+      'on_site',
+      'up_the_street',
+    ]);
+  });
+
+  it('excludes a merchant whose only branch is out of range', () => {
+    expect(merchantsNear(here, [onSite, upTheStreet], 100).map((m) => m.id)).toEqual(['on_site']);
+  });
+
+  it('ranks a chain by its nearest branch, not its first', () => {
+    const chain = merchant('chain', [
+      { lat: 32.7866, lng: 35.0209 },
+      { lat: 32.0757, lng: 34.7748 },
+    ]);
+    expect(merchantsNear(here, [upTheStreet, chain], 500).map((m) => m.id)).toEqual([
+      'chain',
+      'up_the_street',
+    ]);
+  });
+
+  it('ignores a merchant with no branches rather than throwing', () => {
+    expect(merchantsNear(here, [merchant('nowhere', [])], 500)).toEqual([]);
   });
 });

@@ -7,6 +7,7 @@ import {
   shouldNotifyForVenue,
   toLocalMoment,
   venuesContaining,
+  type Coordinates,
   type DwellState,
   type Venue,
 } from '@sbr/core';
@@ -194,7 +195,7 @@ export async function startGeofencing(): Promise<GeofenceStartResult> {
 }
 
 export type WhereAmI =
-  | { ok: true; venue: Venue | null }
+  | { ok: true; venue: Venue | null; here: Coordinates }
   | { ok: false; reason: 'services_disabled' | 'foreground_denied' | 'unavailable' };
 
 /**
@@ -217,7 +218,10 @@ export async function currentVenue(): Promise<WhereAmI> {
       accuracy: Location.Accuracy.Balanced,
     });
     const here = { lat: position.coords.latitude, lng: position.coords.longitude };
-    return { ok: true, venue: venuesContaining(here, venues)[0] ?? null };
+    // The coordinate is returned alongside the venue because being in no mall
+    // is the common case — 94% of catalogued branches are on a street — and the
+    // caller can still answer "what is near me" from the point itself.
+    return { ok: true, venue: venuesContaining(here, venues)[0] ?? null, here };
   } catch {
     // A GPS fix can simply fail — indoors, airplane mode, emulator with no
     // location set. That is not the same as a refusal, and the caller offers a

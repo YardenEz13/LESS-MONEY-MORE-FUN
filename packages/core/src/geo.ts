@@ -1,4 +1,4 @@
-import type { Venue } from './types';
+import type { Merchant, Venue } from './types';
 
 export interface Coordinates {
   lat: number;
@@ -28,6 +28,35 @@ export function venuesContaining(position: Coordinates, venues: readonly Venue[]
   return venues
     .filter((venue) => isInsideVenue(position, venue))
     .sort((a, b) => distanceMeters(position, a) - distanceMeters(position, b));
+}
+
+/**
+ * Merchants with a branch within `radiusM` of a point, nearest branch first.
+ *
+ * This replaces the `venue_ids` join everywhere it mattered. That join asked
+ * "did a human type this mall's id onto this merchant", which for 92% of the
+ * catalog was no, so standing inside a correctly-firing geofence produced an
+ * empty list. This asks where the shop actually is.
+ *
+ * ponytail: linear scan over every branch. ~4k coordinates, called on a
+ * location fix, not per frame — a spatial index earns its keep somewhere north
+ * of 100k.
+ */
+export function merchantsNear(
+  position: Coordinates,
+  merchants: readonly Merchant[],
+  radiusM: number,
+): Merchant[] {
+  const hits: { merchant: Merchant; distance: number }[] = [];
+  for (const merchant of merchants) {
+    let nearest = Infinity;
+    for (const branch of merchant.branches) {
+      const d = distanceMeters(position, branch);
+      if (d < nearest) nearest = d;
+    }
+    if (nearest <= radiusM) hits.push({ merchant, distance: nearest });
+  }
+  return hits.sort((a, b) => a.distance - b.distance).map((h) => h.merchant);
 }
 
 export interface DwellState {
