@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, AppState, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
@@ -15,7 +15,11 @@ import { BenefitDetailScreen } from './src/screens/BenefitDetailScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { ShareResultScreen } from './src/screens/ShareResultScreen';
 import { StatsScreen } from './src/screens/StatsScreen';
-import { resumeGeofencing, startGeofencing } from './src/services/geofencing';
+import {
+  refreshFencesIfMoved,
+  resumeGeofencing,
+  startGeofencing,
+} from './src/services/geofencing';
 import { requestNotificationPermission } from './src/services/notifications';
 import { runtimeLimitation } from './src/services/runtime';
 import { resolveShare, subscribeToShares, type ShareResult } from './src/services/shareIntent';
@@ -129,6 +133,16 @@ function AppRoot() {
         setGeofenceStatus('תזכורת בקניון פעילה');
       }
     })();
+  }, []);
+
+  // The fence set is chosen around where the user was. Coming back to the app
+  // is the cheapest honest moment to notice they have moved — see
+  // `refreshFencesIfMoved`, which reads the cached position and never prompts.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void refreshFencesIfMoved();
+    });
+    return () => subscription.remove();
   }, []);
 
   // A share can arrive while the app is cold or already open; both land here.

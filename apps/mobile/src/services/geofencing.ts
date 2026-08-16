@@ -3,6 +3,7 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import {
   DEFAULT_NOTIFICATION_POLICY,
+  distanceMeters,
   nearestFences,
   rankBenefits,
   shouldNotifyForVenue,
@@ -37,7 +38,12 @@ async function writeDwell(map: DwellMap): Promise<void> {
 }
 
 /**
- * Decide whether entering a venue is worth a push, and send it if so.
+ * Decide whether entering a fenced place is worth a push, and send it if so.
+ *
+ * `venueId` is any fence identifier — a mall id, or `shop:<merchantId>` since
+ * the fence set stopped being malls-only. The name is kept because the dwell
+ * records, the notification payload and the KPI events all key on `venueId`,
+ * and renaming the parameter alone would leave the code half-telling the truth.
  *
  * Exported separately from the task registration so the decision path can be
  * driven from the debug screen without waiting to physically walk into a mall.
@@ -217,9 +223,16 @@ async function fencesToMonitor(): Promise<Fence[]> {
   }));
   try {
     const last = await Location.getLastKnownPositionAsync();
-    if (!last) return mallsOnly;
+    if (!last) {
+      await AsyncStorage.removeItem(FENCE_ORIGIN_KEY);
+      return mallsOnly;
+    }
+    const position = { lat: last.coords.latitude, lng: last.coords.longitude };
+    // Remembered so `refreshFencesIfMoved` can tell whether this set still
+    // describes where the user is.
+    await AsyncStorage.setItem(FENCE_ORIGIN_KEY, JSON.stringify(position));
     return nearestFences({
-      position: { lat: last.coords.latitude, lng: last.coords.longitude },
+      position,
       venues,
       merchants,
       limit: MAX_FENCES,
@@ -227,6 +240,49 @@ async function fencesToMonitor(): Promise<Fence[]> {
     });
   } catch {
     return mallsOnly;
+  }
+}
+
+const FENCE_ORIGIN_KEY = 'sbr.fenceOrigin.v1';
+
+/**
+ * Far enough from where the fences were chosen that they describe someone
+ * else's neighbourhood. The twenty nearest shops in Tel Aviv all sit inside a
+ * kilometre, so five is comfortably past "the set is now wrong" without
+ * re-registering every time someone crosses town for lunch.
+ */
+const FENCE_REFRESH_DISTANCE_M = 5_000;
+
+/**
+ * Re-pick the fences if the user has moved away from where they were chosen.
+ *
+ * The fence set is position-relative, and nothing else recomputes it while the
+ * app is alive — a phone can sit backgrounded for weeks. Without this, someone
+ * who moves city keeps twenty fences around their old one and the reminder goes
+ * quiet with every permission still granted, which is the exact failure
+ * `resumeGeofencing` exists to prevent, one level up.
+ *
+ * Reads only the cached position, so this is free to call on every foreground
+ * and can never raise a dialog or spin up the GPS.
+ */
+export async function refreshFencesIfMoved(): Promise<boolean> {
+  if (!canGeofenceInBackground) return false;
+  if (!(await isGeofencingActive())) return false;
+  try {
+    const [raw, last] = await Promise.all([
+      AsyncStorage.getItem(FENCE_ORIGIN_KEY),
+      Location.getLastKnownPositionAsync(),
+    ]);
+    if (!last) return false;
+    const here = { lat: last.coords.latitude, lng: last.coords.longitude };
+    // No stored origin means the fences are the mall fallback, registered
+    // before any fix existed. A position now is strictly better than that.
+    const origin = raw ? (JSON.parse(raw) as Coordinates) : null;
+    if (origin && distanceMeters(origin, here) < FENCE_REFRESH_DISTANCE_M) return false;
+    const result = await startGeofencing();
+    return result.ok;
+  } catch {
+    return false;
   }
 }
 

@@ -98,9 +98,12 @@ them even if they somehow appear in the catalog.
 past 45 it stops being surfaced. Committed JSON ages whether or not you re-run
 the pipeline.
 
-**Malls, not shops.** Ten geofenced complexes, plus a 3-minute dwell threshold,
-a 12-hour per-venue cooldown, and quiet hours — because a geofence enter event
-on its own is mostly GPS drift.
+**Wherever you are, not ten malls.** Places are matched by branch coordinate,
+so a shop on a high street counts the same as one inside a complex. The OS will
+only monitor 20 regions at once, so the app arms the nearest 20 to where you
+were and re-picks them when you have moved — plus a 3-minute dwell threshold, a
+12-hour per-place cooldown, and quiet hours, because a geofence enter event on
+its own is mostly GPS drift.
 
 ## The look
 
@@ -128,5 +131,7 @@ Phases 1–3 of the PRD are built. Phase 4 is the 30-day personal validation run
 the stats screen exists to make its KPIs readable without a backend.
 
 Known gaps — iOS Share Extension needs a native target (Android works today,
-`docs/SHARE_EXTENSION.md`), the bundled catalog is synthetic, and the venue
-coordinates are unverified. Details in `docs/ARCHITECTURE.md`.
+`docs/SHARE_EXTENSION.md`), and the ten mall coordinates are still hand-entered
+and unverified. Branch coordinates come from the collector and cover 1038 of
+1057 merchants; the 19 without one can be listed but never fenced. Details in
+`docs/ARCHITECTURE.md`.
