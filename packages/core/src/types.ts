@@ -124,6 +124,15 @@ export const Merchant = z
     domains: z.array(z.string()).default([]),
     /** Venue ids where this merchant has a branch (MVP: mall-level only). */
     venue_ids: z.array(z.string()).default([]),
+    /**
+     * Where this merchant's branches physically are.
+     *
+     * The reason place-matching does not depend on `venue_ids` any more: that
+     * list is hand-maintained, was filled for 88 of 1057 merchants, and could
+     * only ever describe the ten malls someone thought to type. A coordinate
+     * matches a high street too, and comes from the source rather than a human.
+     */
+    branches: z.array(z.object({ lat: z.number(), lng: z.number() }).strict()).default([]),
     /** A merchant can be more than one — a supermarket that sells fuel. */
     categories: z.array(MerchantCategory).default([]),
   })

@@ -1,4 +1,4 @@
-import type { Venue } from './types';
+import type { Merchant, Venue } from './types';
 
 export interface Coordinates {
   lat: number;
@@ -28,6 +28,111 @@ export function venuesContaining(position: Coordinates, venues: readonly Venue[]
   return venues
     .filter((venue) => isInsideVenue(position, venue))
     .sort((a, b) => distanceMeters(position, a) - distanceMeters(position, b));
+}
+
+/**
+ * Merchants with a branch within `radiusM` of a point, nearest branch first.
+ *
+ * This replaces the `venue_ids` join everywhere it mattered. That join asked
+ * "did a human type this mall's id onto this merchant", which for 92% of the
+ * catalog was no, so standing inside a correctly-firing geofence produced an
+ * empty list. This asks where the shop actually is.
+ *
+ * ponytail: linear scan over every branch. ~4k coordinates, called on a
+ * location fix, not per frame — a spatial index earns its keep somewhere north
+ * of 100k.
+ */
+export function merchantsNear(
+  position: Coordinates,
+  merchants: readonly Merchant[],
+  radiusM: number,
+): Merchant[] {
+  const hits: { merchant: Merchant; distance: number }[] = [];
+  for (const merchant of merchants) {
+    let nearest = Infinity;
+    for (const branch of merchant.branches) {
+      const d = distanceMeters(position, branch);
+      if (d < nearest) nearest = d;
+    }
+    if (nearest <= radiusM) hits.push({ merchant, distance: nearest });
+  }
+  return hits.sort((a, b) => a.distance - b.distance).map((h) => h.merchant);
+}
+
+/** Prefix marking a fence around a single shop rather than a whole complex. */
+export const SHOP_FENCE_PREFIX = 'shop:';
+
+/** A region to hand the OS. `id` is a venue id, or `shop:<merchantId>`. */
+export interface Fence {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  radius_m: number;
+}
+
+/**
+ * The regions worth monitoring from where the user is standing, nearest first.
+ *
+ * Both platforms cap how many regions an app may monitor — iOS at 20, and it
+ * silently ignores the rest rather than failing, which is the worst way to
+ * learn about a limit. So the set has to be chosen rather than dumped: the ten
+ * malls alone contain 6% of catalogued branches, and monitoring only those is
+ * why walking into a shop on a high street never reminded anyone of anything.
+ *
+ * One fence per merchant, at its nearest branch. A second branch of the same
+ * chain further away would spend a slot on a place the user is demonstrably not
+ * at, and the whole point of the cap is that slots are scarce.
+ *
+ * Position-relative, so this has to be recomputed when the user has moved — see
+ * the caller. A merchant with no branch coordinates simply cannot be fenced.
+ */
+export function nearestFences(input: {
+  position: Coordinates;
+  venues: readonly Venue[];
+  merchants: readonly Merchant[];
+  limit: number;
+  /** Radius for a single shop. A mall carries its own. */
+  shopRadiusM: number;
+}): Fence[] {
+  const candidates: { fence: Fence; distance: number }[] = [];
+
+  for (const venue of input.venues) {
+    candidates.push({
+      fence: {
+        id: venue.id,
+        name: venue.name,
+        lat: venue.lat,
+        lng: venue.lng,
+        radius_m: venue.radius_m,
+      },
+      distance: distanceMeters(input.position, venue),
+    });
+  }
+
+  for (const merchant of input.merchants) {
+    let nearest: { branch: Coordinates; distance: number } | null = null;
+    for (const branch of merchant.branches) {
+      const distance = distanceMeters(input.position, branch);
+      if (!nearest || distance < nearest.distance) nearest = { branch, distance };
+    }
+    if (!nearest) continue;
+    candidates.push({
+      fence: {
+        id: `${SHOP_FENCE_PREFIX}${merchant.id}`,
+        name: merchant.name,
+        lat: nearest.branch.lat,
+        lng: nearest.branch.lng,
+        radius_m: input.shopRadiusM,
+      },
+      distance: nearest.distance,
+    });
+  }
+
+  return candidates
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, input.limit)
+    .map((c) => c.fence);
 }
 
 export interface DwellState {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, AppState, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
@@ -15,7 +15,12 @@ import { BenefitDetailScreen } from './src/screens/BenefitDetailScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { ShareResultScreen } from './src/screens/ShareResultScreen';
 import { StatsScreen } from './src/screens/StatsScreen';
-import { isGeofencingActive, startGeofencing } from './src/services/geofencing';
+import {
+  refreshFencesIfMoved,
+  resumeGeofencing,
+  startGeofencing,
+  stopGeofencing,
+} from './src/services/geofencing';
 import { requestNotificationPermission } from './src/services/notifications';
 import { runtimeLimitation } from './src/services/runtime';
 import { resolveShare, subscribeToShares, type ShareResult } from './src/services/shareIntent';
@@ -122,11 +127,23 @@ function AppRoot() {
       setProfile(loaded);
       setKitIntensity(await loadKitIntensity());
       setScreen(loaded.onboarded_at ? { name: 'home' } : { name: 'onboarding' });
-      if (await isGeofencingActive()) {
+      // Re-arms a fence the OS dropped since last launch, and never prompts —
+      // see `resumeGeofencing`. Silent when nothing was granted yet.
+      if (await resumeGeofencing()) {
         setGeofenceActive(true);
         setGeofenceStatus('תזכורת בקניון פעילה');
       }
     })();
+  }, []);
+
+  // The fence set is chosen around where the user was. Coming back to the app
+  // is the cheapest honest moment to notice they have moved — see
+  // `refreshFencesIfMoved`, which reads the cached position and never prompts.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void refreshFencesIfMoved();
+    });
+    return () => subscription.remove();
   }, []);
 
   // A share can arrive while the app is cold or already open; both land here.
@@ -171,10 +188,37 @@ function AppRoot() {
     setGeofenceFixable(canOpenAppSettings && !result.ok && SETTINGS_FIXABLE.has(result.reason));
     setGeofenceStatus(
       result.ok
-        ? `תזכורת בקניון פעילה · ${result.venueCount} מתחמים`
+        ? `תזכורת פעילה · ${result.venueCount} מקומות בקרבתך`
         : GEOFENCE_FAILURE[result.reason],
     );
   }, []);
+
+  /**
+   * The settings switch, which owns the fences as well as the flag.
+   *
+   * Switching it off used to write `notifications_enabled: false` and stop
+   * there. The fences stayed armed — `handleVenueEnter` returned early, so no
+   * push arrived and it looked obeyed — while the OS went on waking the app at
+   * every doorway it had been given. For an app whose settings screen promises
+   * it is not following you around, leaving the monitoring running after being
+   * told to stop is the wrong half to get right.
+   */
+  const setNotificationsEnabled = useCallback(
+    async (next: UserProfile) => {
+      const changed = next.notifications_enabled !== profile?.notifications_enabled;
+      await persist(next);
+      if (!changed) return;
+      if (next.notifications_enabled) {
+        await enableGeofencing();
+        return;
+      }
+      await stopGeofencing();
+      setGeofenceActive(false);
+      setGeofenceFixable(false);
+      setGeofenceStatus('תזכורת כבויה — אין מעקב אחרי מיקום');
+    },
+    [enableGeofencing, persist, profile?.notifications_enabled],
+  );
 
   if (!fontsLoaded || !profile || screen.name === 'loading') {
     return (
@@ -266,7 +310,7 @@ function AppRoot() {
             geofenceStatus={geofenceStatus}
             geofenceFixable={geofenceFixable}
             kitIntensity={kitIntensity}
-            onChange={persist}
+            onChange={setNotificationsEnabled}
             onChangeKit={(next) => void changeKit(next)}
             onEditPrograms={() => setScreen({ name: 'onboarding' })}
             onEnableGeofencing={enableGeofencing}

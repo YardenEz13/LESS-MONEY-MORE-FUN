@@ -4,6 +4,7 @@ import {
   findCombos,
   rankBenefits,
   type Combo,
+  type Coordinates,
   type Evaluation,
   type UserProfile,
   type Venue,
@@ -11,11 +12,28 @@ import {
 import { BenefitCard } from '../components/BenefitCard';
 import { Crest, PitchStripes, ScarfBand } from '../components/Kit';
 import { FilterRow, GhostButton, Hero, LivePill, Text } from '../components/ui';
-import { benefits, benefitsAtVenue, ownedProgramIds, programNames, venues } from '../services/catalog';
+import {
+  benefits,
+  benefitsAtVenue,
+  benefitsNear,
+  ownedProgramIds,
+  programNames,
+  venues,
+} from '../services/catalog';
 import { currentVenue, dwellMinutes } from '../services/geofencing';
 import { border, colors, radius, space, type, useCompact } from '../theme';
 
 type Filter = 'all' | 'ready' | 'conditional';
+
+/**
+ * How far "here" reaches when the fix lands outside every mall.
+ *
+ * ponytail: one fixed radius. 500m is roughly a five-minute walk and keeps a
+ * Tel Aviv high street from returning half the city — 2258 of the 3925
+ * catalogued branches are in Tel Aviv alone. Make it a setting when someone
+ * driving complains, not before.
+ */
+const WALKING_RADIUS_M = 500;
 
 interface Props {
   profile: UserProfile;
@@ -40,6 +58,8 @@ export function HomeScreen({
 
   /** Where the user is. Null means "everywhere" — the default, not an error. */
   const [venue, setVenue] = useState<Venue | null>(null);
+  /** A fix that landed outside every mall: still a place, just not a named one. */
+  const [here, setHere] = useState<Coordinates | null>(null);
   const [picking, setPicking] = useState(false);
   const [locating, setLocating] = useState(false);
 
@@ -67,10 +87,16 @@ export function HomeScreen({
     setLocating(true);
     const where = await currentVenue();
     setLocating(false);
-    // Not in any tracked mall, or no fix: fall through to the manual list
-    // rather than leaving the user with a spinner that resolved to nothing.
-    if (where.ok && where.venue) setVenue(where.venue);
-    else setPicking(true);
+    if (!where.ok) {
+      setPicking(true);
+      return;
+    }
+    // Standing in no tracked mall is the normal case, not a failure: the ten
+    // venues cover 6% of catalogued branches. Pin the point instead and let the
+    // list answer from branch distance. The manual sheet is now only for "no
+    // fix at all".
+    setVenue(where.venue);
+    setHere(where.venue ? null : where.here);
   }, []);
 
   // Channel is left unset here: the user isn't at a till or in a checkout yet,
@@ -99,11 +125,16 @@ export function HomeScreen({
   // A chosen venue narrows whatever the filter already selected, rather than
   // replacing it — "ready, here" is the question someone standing in a mall
   // is actually asking.
-  const hereIds = useMemo(
-    () => (venue ? new Set(benefitsAtVenue(venue.id).map((b) => b.id)) : null),
-    [venue],
-  );
+  const hereIds = useMemo(() => {
+    if (venue) return new Set(benefitsAtVenue(venue.id).map((b) => b.id));
+    if (here) return new Set(benefitsNear(here, WALKING_RADIUS_M).map((b) => b.id));
+    return null;
+  }, [venue, here]);
   const shown = hereIds ? byFilter.filter((e) => hereIds.has(e.benefit.id)) : byFilter;
+
+  // Counted off `evaluations`, not `shown`: the plate reports what this place is
+  // worth to the user, and must not drop when they tick a filter above it.
+  const hereCount = hereIds ? evaluations.filter((e) => hereIds.has(e.benefit.id)).length : 0;
 
   /**
    * How many benefits a venue is worth *to this user*.
@@ -144,12 +175,16 @@ export function HomeScreen({
 
         <WhereAmI
           venue={venue}
-          count={venue ? countAt(venue.id) : 0}
+          nearby={here != null}
+          count={hereCount}
           minute={minute}
           locating={locating}
           onLocate={locate}
           onPick={() => setPicking(true)}
-          onClear={() => setVenue(null)}
+          onClear={() => {
+            setVenue(null);
+            setHere(null);
+          }}
         />
       </Hero>
 
@@ -158,6 +193,7 @@ export function HomeScreen({
           countAt={countAt}
           onChoose={(chosen) => {
             setVenue(chosen);
+            setHere(null);
             setPicking(false);
           }}
           onClose={() => setPicking(false)}
@@ -303,6 +339,7 @@ function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
  */
 function WhereAmI({
   venue,
+  nearby,
   count,
   minute,
   locating,
@@ -311,6 +348,8 @@ function WhereAmI({
   onClear,
 }: {
   venue: Venue | null;
+  /** A fix outside every mall — a place with no name, but still a place. */
+  nearby: boolean;
   count: number;
   minute: number | null;
   locating: boolean;
@@ -318,7 +357,7 @@ function WhereAmI({
   onPick: () => void;
   onClear: () => void;
 }) {
-  if (venue) {
+  if (venue || nearby) {
     return (
       <View style={styles.whereRow}>
         <View style={styles.whereActive}>
@@ -326,7 +365,7 @@ function WhereAmI({
               clock. No entry event, no minute — see `dwellMinutes`. */}
           {minute != null && <LivePill minute={minute} />}
           <Text style={styles.whereActiveText} numberOfLines={1}>
-            {venue.name} · {count} הטבות כאן
+            {venue ? venue.name : 'קרוב אליך'} · {count} הטבות כאן
           </Text>
         </View>
         <Pressable

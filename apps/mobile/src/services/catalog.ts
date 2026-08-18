@@ -1,4 +1,13 @@
-import { Benefit, Merchant, Program, Venue, expandOwnedPrograms } from '@sbr/core';
+import {
+  Benefit,
+  Merchant,
+  Program,
+  Venue,
+  expandOwnedPrograms,
+  merchantsNear,
+  SHOP_FENCE_PREFIX,
+  type Coordinates,
+} from '@sbr/core';
 import benefitsJson from '@sbr/data/benefits.json';
 import merchantsJson from '@sbr/data/merchants.json';
 import programsJson from '@sbr/data/programs.json';
@@ -45,14 +54,49 @@ export function ownedProgramIds(profileProgramIds: readonly string[]): string[] 
   return expandOwnedPrograms(profileProgramIds, programs);
 }
 
-/** Benefits redeemable at merchants that have a branch in the given venue. */
+/** Benefits redeemable at any merchant with a branch within `radiusM` of a point. */
+export function benefitsNear(position: Coordinates, radiusM: number): Benefit[] {
+  const merchantIds = new Set(merchantsNear(position, merchants, radiusM).map((m) => m.id));
+  return benefits.filter((b) => merchantIds.has(b.merchant_id));
+}
+
+/**
+ * Benefits redeemable at merchants inside the given venue.
+ *
+ * Geography first, `venue_ids` second. The id list was hand-typed and reached
+ * 88 of 1057 merchants, so this used to return 156 of 2763 benefits and a mall
+ * with real offers in it looked empty. Branch coordinates answer the same
+ * question without anyone maintaining a list — the ids are kept as a union
+ * because a merchant can sit inside a mall the sidecar never geocoded.
+ */
 export function benefitsAtVenue(venueId: string): Benefit[] {
+  const venue = venuesById.get(venueId);
   const merchantIds = new Set(
     merchants.filter((m) => m.venue_ids.includes(venueId)).map((m) => m.id),
   );
+  if (venue) {
+    for (const m of merchantsNear(venue, merchants, venue.radius_m)) merchantIds.add(m.id);
+  }
   return benefits.filter((b) => merchantIds.has(b.merchant_id));
 }
 
 export function benefitsForMerchant(merchantId: string): Benefit[] {
   return benefits.filter((b) => b.merchant_id === merchantId);
+}
+
+/**
+ * What a fence identifier refers to — a whole complex or a single shop.
+ *
+ * The geofence task gets a bare string back from the OS and has to answer "what
+ * is this and what is redeemable in it" without caring which kind it was. Null
+ * for an identifier that no longer resolves, which happens legitimately: a
+ * fence registered before an update can outlive the merchant it named.
+ */
+export function placeAt(fenceId: string): { name: string; benefits: Benefit[] } | null {
+  if (fenceId.startsWith(SHOP_FENCE_PREFIX)) {
+    const merchant = merchantsById.get(fenceId.slice(SHOP_FENCE_PREFIX.length));
+    return merchant ? { name: merchant.name, benefits: benefitsForMerchant(merchant.id) } : null;
+  }
+  const venue = venuesById.get(fenceId);
+  return venue ? { name: venue.name, benefits: benefitsAtVenue(venue.id) } : null;
 }

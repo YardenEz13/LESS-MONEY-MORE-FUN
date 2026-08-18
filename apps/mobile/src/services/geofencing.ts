@@ -3,14 +3,18 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 import {
   DEFAULT_NOTIFICATION_POLICY,
+  distanceMeters,
+  nearestFences,
   rankBenefits,
   shouldNotifyForVenue,
   toLocalMoment,
   venuesContaining,
+  type Coordinates,
   type DwellState,
+  type Fence,
   type Venue,
 } from '@sbr/core';
-import { benefitsAtVenue, ownedProgramIds, venuesById, venues } from './catalog';
+import { merchants, ownedProgramIds, placeAt, venues } from './catalog';
 import { notifyVenue } from './notifications';
 import { canGeofenceInBackground } from './runtime';
 import { loadProfile } from '../state/profile';
@@ -34,14 +38,19 @@ async function writeDwell(map: DwellMap): Promise<void> {
 }
 
 /**
- * Decide whether entering a venue is worth a push, and send it if so.
+ * Decide whether entering a fenced place is worth a push, and send it if so.
+ *
+ * `venueId` is any fence identifier — a mall id, or `shop:<merchantId>` since
+ * the fence set stopped being malls-only. The name is kept because the dwell
+ * records, the notification payload and the KPI events all key on `venueId`,
+ * and renaming the parameter alone would leave the code half-telling the truth.
  *
  * Exported separately from the task registration so the decision path can be
  * driven from the debug screen without waiting to physically walk into a mall.
  */
 export async function handleVenueEnter(venueId: string, now: number = Date.now()): Promise<void> {
-  const venue = venuesById.get(venueId);
-  if (!venue) return;
+  const place = placeAt(venueId);
+  if (!place) return;
 
   const profile = await loadProfile();
   if (!profile.notifications_enabled || profile.program_ids.length === 0) return;
@@ -55,7 +64,7 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
   // Channel is deliberately left unset: standing in a mall says nothing about
   // whether the user will buy in-store or on their phone, and guessing would
   // promote an online-only benefit to "eligible".
-  const evaluations = rankBenefits(benefitsAtVenue(venueId), {
+  const evaluations = rankBenefits(place.benefits, {
     now: nowDate,
     ownedProgramIds: ownedProgramIds(profile.program_ids),
     mutedBenefitIds: profile.muted_benefit_ids,
@@ -72,7 +81,7 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
   if (decision.notify) {
     const sent = await notifyVenue({
       venueId,
-      venueName: venue.name,
+      venueName: place.name,
       evaluations: evaluations.slice(0, 5),
     });
     if (sent) state.notifiedAt = now;
@@ -170,31 +179,146 @@ export async function startGeofencing(): Promise<GeofenceStartResult> {
   // Re-registering an already-running task throws on Android.
   await stopGeofencing();
 
-  // ponytail: iOS monitors at most 20 regions and silently ignores the rest;
-  // Android's ceiling is 100. Ten venues fits both. If the venue list ever
-  // outgrows this, register only the nearest 20 to the user instead of the
-  // whole catalog — the failure mode otherwise is a fence that never fires and
-  // no error anywhere.
-  if (venues.length > 20) {
-    console.warn(`[geofence] ${venues.length} venues — iOS will only monitor 20`);
-  }
-
+  const fences = await fencesToMonitor();
   await Location.startGeofencingAsync(
     GEOFENCE_TASK,
-    venues.map((venue) => ({
-      identifier: venue.id,
-      latitude: venue.lat,
-      longitude: venue.lng,
-      radius: venue.radius_m,
+    fences.map((fence) => ({
+      identifier: fence.id,
+      latitude: fence.lat,
+      longitude: fence.lng,
+      radius: fence.radius_m,
       notifyOnEnter: true,
       notifyOnExit: true,
     })),
   );
-  return { ok: true, venueCount: venues.length };
+  return { ok: true, venueCount: fences.length };
+}
+
+/**
+ * iOS monitors at most 20 regions and silently drops the rest — no error, no
+ * callback, just fences that never fire. Android allows 100. Twenty is the
+ * number that is true on both.
+ */
+const MAX_FENCES = 20;
+
+/** A single shop is a doorway, not a complex; a mall carries its own radius. */
+const SHOP_FENCE_RADIUS_M = 150;
+
+/**
+ * Which regions to arm, from wherever the user last was.
+ *
+ * Uses the cached position rather than asking for a fresh fix: this runs during
+ * app start and must not add a GPS wait to it, and a fence set only has to be
+ * right for the neighbourhood, not the doorstep. No cached position at all —
+ * a first run before any fix — falls back to the ten malls, which is what this
+ * did for every user before branch coordinates existed.
+ */
+async function fencesToMonitor(): Promise<Fence[]> {
+  const mallsOnly = venues.map((venue) => ({
+    id: venue.id,
+    name: venue.name,
+    lat: venue.lat,
+    lng: venue.lng,
+    radius_m: venue.radius_m,
+  }));
+  try {
+    const last = await Location.getLastKnownPositionAsync();
+    if (!last) {
+      await AsyncStorage.removeItem(FENCE_ORIGIN_KEY);
+      return mallsOnly;
+    }
+    const position = { lat: last.coords.latitude, lng: last.coords.longitude };
+    // Remembered so `refreshFencesIfMoved` can tell whether this set still
+    // describes where the user is.
+    await AsyncStorage.setItem(FENCE_ORIGIN_KEY, JSON.stringify(position));
+    return nearestFences({
+      position,
+      venues,
+      merchants,
+      limit: MAX_FENCES,
+      shopRadiusM: SHOP_FENCE_RADIUS_M,
+    });
+  } catch {
+    return mallsOnly;
+  }
+}
+
+const FENCE_ORIGIN_KEY = 'sbr.fenceOrigin.v1';
+
+/**
+ * Far enough from where the fences were chosen that they describe someone
+ * else's neighbourhood. The twenty nearest shops in Tel Aviv all sit inside a
+ * kilometre, so five is comfortably past "the set is now wrong" without
+ * re-registering every time someone crosses town for lunch.
+ */
+const FENCE_REFRESH_DISTANCE_M = 5_000;
+
+/**
+ * Re-pick the fences if the user has moved away from where they were chosen.
+ *
+ * The fence set is position-relative, and nothing else recomputes it while the
+ * app is alive — a phone can sit backgrounded for weeks. Without this, someone
+ * who moves city keeps twenty fences around their old one and the reminder goes
+ * quiet with every permission still granted, which is the exact failure
+ * `resumeGeofencing` exists to prevent, one level up.
+ *
+ * Reads only the cached position, so this is free to call on every foreground
+ * and can never raise a dialog or spin up the GPS.
+ */
+export async function refreshFencesIfMoved(): Promise<boolean> {
+  if (!canGeofenceInBackground) return false;
+  if (!(await isGeofencingActive())) return false;
+  try {
+    const [raw, last] = await Promise.all([
+      AsyncStorage.getItem(FENCE_ORIGIN_KEY),
+      Location.getLastKnownPositionAsync(),
+    ]);
+    if (!last) return false;
+    const here = { lat: last.coords.latitude, lng: last.coords.longitude };
+    // No stored origin means the fences are the mall fallback, registered
+    // before any fix existed. A position now is strictly better than that.
+    const origin = raw ? (JSON.parse(raw) as Coordinates) : null;
+    if (origin && distanceMeters(origin, here) < FENCE_REFRESH_DISTANCE_M) return false;
+    const result = await startGeofencing();
+    return result.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * How long to wait for a fresh GPS fix before falling back to the cached one.
+ *
+ * `getCurrentPositionAsync` has no timeout of its own and does not give up:
+ * indoors — which is exactly where a mall is — it can hang for minutes or never
+ * resolve at all, and the caller is sitting on a spinner the whole time. Six
+ * seconds is about as long as someone will hold a phone up waiting.
+ */
+const FIX_TIMEOUT_MS = 6_000;
+
+/**
+ * A position, or null if the device could not produce one in time.
+ *
+ * The cached fix is a real answer, not a consolation: a mall is 250m across and
+ * a fix from a few minutes ago still names it correctly. Returning nothing
+ * because the fresh fix was slow throws away a coordinate we already had.
+ */
+async function positionWithin(timeoutMs: number): Promise<Location.LocationObject | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<null>((resolve) => {
+    timer = setTimeout(() => resolve(null), timeoutMs);
+  });
+  const fresh = await Promise.race([
+    Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }).catch(() => null),
+    deadline,
+  ]);
+  clearTimeout(timer);
+  if (fresh) return fresh;
+  return Location.getLastKnownPositionAsync().catch(() => null);
 }
 
 export type WhereAmI =
-  | { ok: true; venue: Venue | null }
+  | { ok: true; venue: Venue | null; here: Coordinates }
   | { ok: false; reason: 'services_disabled' | 'foreground_denied' | 'unavailable' };
 
 /**
@@ -213,16 +337,48 @@ export async function currentVenue(): Promise<WhereAmI> {
     const foreground = await Location.requestForegroundPermissionsAsync();
     if (!foreground.granted) return { ok: false, reason: 'foreground_denied' };
 
-    const position = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
+    const position = await positionWithin(FIX_TIMEOUT_MS);
+    if (!position) return { ok: false, reason: 'unavailable' };
     const here = { lat: position.coords.latitude, lng: position.coords.longitude };
-    return { ok: true, venue: venuesContaining(here, venues)[0] ?? null };
+    // The coordinate is returned alongside the venue because being in no mall
+    // is the common case — 94% of catalogued branches are on a street — and the
+    // caller can still answer "what is near me" from the point itself.
+    return { ok: true, venue: venuesContaining(here, venues)[0] ?? null, here };
   } catch {
     // A GPS fix can simply fail — indoors, airplane mode, emulator with no
     // location set. That is not the same as a refusal, and the caller offers a
     // manual picker either way.
     return { ok: false, reason: 'unavailable' };
+  }
+}
+
+/**
+ * Re-arm the fence on launch if the user already granted everything it needs.
+ *
+ * A registered geofence does not survive forever: a reboot, an app update or
+ * the OS reclaiming background work all drop the task, and nothing re-registers
+ * it because `startGeofencing` only ever ran from onboarding and the settings
+ * button. The user granted "always" weeks ago, sees no prompt and no error, and
+ * the reminder has simply stopped — the worst shape of broken, because it looks
+ * identical to working.
+ *
+ * Uses the `get` permission calls, never the `request` ones: this runs on every
+ * cold start, and a launch that opens a permission dialog out of nowhere is its
+ * own bug. No grant yet means do nothing and leave the asking to the button.
+ */
+export async function resumeGeofencing(): Promise<boolean> {
+  if (!canGeofenceInBackground) return false;
+  if (await isGeofencingActive()) return true;
+  try {
+    const [foreground, background] = await Promise.all([
+      Location.getForegroundPermissionsAsync(),
+      Location.getBackgroundPermissionsAsync(),
+    ]);
+    if (!foreground.granted || !background.granted) return false;
+    const result = await startGeofencing();
+    return result.ok;
+  } catch {
+    return false;
   }
 }
 
