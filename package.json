@@ -15,7 +15,7 @@
     "status": "node scripts/status.mjs",
     "validate:easy": "node scripts/validate-easy.mjs",
     "mine:merchants": "node scripts/mine-merchants.mjs",
-    "test:scripts": "node scripts/scrape-easy.test.mjs && node scripts/scrape-keeps-verification.test.mjs && node scripts/validate-easy.test.mjs && node scripts/extract-easy.test.mjs && node scripts/publish-catalog.test.mjs",
+    "test:scripts": "node scripts/scrape-easy.test.mjs && node scripts/scrape-keeps-verification.test.mjs && node scripts/scrape-geo-sweep.test.mjs && node scripts/validate-easy.test.mjs && node scripts/extract-easy.test.mjs && node scripts/publish-catalog.test.mjs",
     "publish:catalog": "node scripts/publish-catalog.mjs",
     "ship:catalog": "npm run validate:data && cd apps/mobile && npx eas update --branch production",
     "validate:data": "node scripts/validate-data.mjs",
