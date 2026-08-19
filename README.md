@@ -71,6 +71,36 @@ fresh clone builds without ever running the pipeline. Promotion is a separate
 step on purpose: it is the last point a human sees what is about to appear at a
 till, and it refuses to publish anything still in the review queue.
 
+Then push it to phones already in the field:
+
+```bash
+npm run ship:catalog     # validate:data, then eas update --branch production
+```
+
+**Why this is not optional.** Every benefit carries `last_verified_at`, and past
+45 days `evaluateBenefit` blocks it. The catalog ships inside the JS bundle, so
+a build that stops receiving updates crosses that line all at once — 206
+relevant benefits become 0, on every phone, about six weeks after the last
+publish. `eas update` replaces the bundle, and the catalog rides along with it;
+without it, refreshing data costs a full store release.
+
+Two things follow from that. `runtimeVersion` is `appVersion`, so bumping
+`version` in `app.json` deliberately cuts existing installs off from further
+updates — bump it for native changes only, never for a catalog refresh. And the
+home screen names the failure rather than showing a blank list, so a phone that
+did fall behind says so instead of looking empty (`catalogIsStale`).
+
+First run on a machine needs an Expo account once, to create the project and
+write `updates.url` into `app.json`:
+
+```bash
+cd apps/mobile && npx eas update:configure
+```
+
+`npm run ship:catalog` is deliberately not wired into `weekly-refresh.ps1`: that
+script refreshes collected data and stops, because pushing to phones costs money
+and judgement and stays a decision made at a keyboard.
+
 ### Run the app
 
 ```bash
