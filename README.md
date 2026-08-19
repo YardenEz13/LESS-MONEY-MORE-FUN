@@ -59,6 +59,28 @@ Offers are keyed by the collector's `content_hash`, so a re-crawl only pays the
 model for pages whose text actually changed. `--limit` defaults to 25 because a
 first run against an 800-offer catalog should be a choice, not a typo.
 
+### Collecting outside Gush Dan
+
+easy.co.il geo-ranks its results, so a plain `npm run scrape:easy` returns the
+region its own default location sits in — which is why the catalog was 84% Gush
+Dan, with 16 branches in Haifa and 10 in Be'er Sheva. Anchor the crawl somewhere
+else to add that region:
+
+```bash
+node scripts/scrape-easy.mjs --lat 32.7940 --lng 34.9896 --rad 15   # חיפה
+node scripts/scrape-easy.mjs --lat 31.7683 --lng 35.2137 --rad 15   # ירושלים
+node scripts/scrape-easy.mjs --lat 31.2530 --lng 34.7915 --rad 15   # באר שבע
+node scripts/scrape-easy.mjs --lat 31.8014 --lng 34.6435 --rad 15   # אשדוד
+node scripts/scrape-easy.mjs --lat 32.3215 --lng 34.8532 --rad 15   # נתניה
+```
+
+Roughly 20 minutes per city across all ~90 lists. A run with coordinates
+**merges** into what is already collected, so cities accumulate and the order
+you run them in does not matter. A run **without** coordinates still replaces,
+because that is the only way a business that closed ever leaves the file — so
+run the unscoped crawl first and the regional sweeps after it, never the other
+way around.
+
 ### Getting a benefit onto a phone
 
 ```bash
