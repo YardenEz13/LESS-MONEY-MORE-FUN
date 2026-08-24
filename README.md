@@ -34,13 +34,44 @@ npm run validate:data
 # Dry run against local fixtures — no network, no model call
 npm run extract -- --offline --scrape-only
 
-# Real run (needs ANTHROPIC_API_KEY, or an `ant auth login` profile)
+# Real run (needs GEMINI_API_KEY; GEMINI_MODEL overrides the default flash model)
 npm run extract
 npm run -w @sbr/extraction review    # work the low-confidence queue
 ```
 
 Output lands in `data/generated/` (git-ignored): `benefits.json` for anything
 that cleared the confidence gate, `review-queue.json` for anything that didn't.
+
+### Crawl the country, not one city
+
+easy.co.il ranks a list by distance from wherever you ask, and caps a query at
+100 businesses however wide the radius. One query per list is therefore one
+*city's* worth of that list — which is why the first crawl came back with 2258
+Tel Aviv businesses, 18 in Jerusalem and 16 in Haifa. Nothing was wrong with it;
+it was run from one point.
+
+```bash
+npm run scrape:easy -- --cities                     # all 42 points, ~9h
+npm run scrape:easy -- --cities חיפה,ירושלים         # a sitting at a time, ~14min per city
+npm run backfill:merchants -- --write               # branches, cities, categories, labels
+```
+
+easy blocks the JSON endpoint per IP once a crawl gets greedy, and a blocked
+crawl stops itself after three consecutive list failures rather than grinding
+through the rest. The block is on the address, so any different egress clears
+it — set `EASY_PROXY` to a VPN, a phone hotspot or a paid pool:
+
+```bash
+EASY_PROXY=http://user:pass@host:port npm run scrape:easy -- --cities חיפה
+```
+
+Offers union with what is already collected, so chunked runs accumulate instead
+of overwriting each other. Retraction is `verify:catalog`'s job, plus the
+freshness policy: an offer that stops being re-found keeps its old
+`last_verified_at` and ages out on its own.
+
+One list crawled from four extra points took Jerusalem from 18 businesses to
+102, Haifa 16 to 93, Beer Sheva 10 to 94. There are 74 lists.
 
 ### Collect with a browser, extract separately
 
@@ -133,5 +164,10 @@ the stats screen exists to make its KPIs readable without a backend.
 Known gaps — iOS Share Extension needs a native target (Android works today,
 `docs/SHARE_EXTENSION.md`), and the ten mall coordinates are still hand-entered
 and unverified. Branch coordinates come from the collector and cover 1038 of
-1057 merchants; the 19 without one can be listed but never fenced. Details in
-`docs/ARCHITECTURE.md`.
+1057 merchants; the 19 without one can be listed but never fenced.
+
+The catalog is still a Gush Dan catalog until a `--cities` crawl has been run —
+the app now says so on an empty list rather than implying there are no deals
+today. 472 of 1057 merchants have no `categories` and so answer no category
+question, though all but 19 now carry the source's own `label` for what they
+are. Details in `docs/ARCHITECTURE.md`.
