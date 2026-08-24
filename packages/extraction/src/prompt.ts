@@ -7,6 +7,13 @@
  * The whole prompt is built around one rule: an unstated condition must come
  * back as null. A benefit that looks better than it is costs the user a
  * wasted trip to the till, which is the single failure KPI #2 forbids.
+ *
+ * Rule 9 is the mirror of that, and was earned: on a nine-page trial a model
+ * read "בתאריך 4.8" — a day and month with no year — and returned
+ * `valid_until: 2024-08-04`, two years in the past. An invented year does not
+ * make a benefit look better, it makes a live benefit look expired, so it is
+ * dropped silently with no error anywhere. Same root cause as rule 1: a fact
+ * the source did not state.
  */
 export const EXTRACTION_SYSTEM_PROMPT = `אתה מחלץ הטבות מתוך עמודי הטבות ותקנונים ציבוריים בעברית.
 
@@ -21,6 +28,7 @@ export const EXTRACTION_SYSTEM_PROMPT = `אתה מחלץ הטבות מתוך ע�
 6. ימים: 1=ראשון, 2=שני, 3=שלישי, 4=רביעי, 5=חמישי, 6=שישי, 7=שבת. "בימי חול" בישראל = [1,2,3,4,5].
 7. שעות בפורמט HH:MM בשעון ישראל.
 8. סכומים במספרים בלבד, ללא סימן ₪ וללא פסיקים.
+9. תאריכים: אל תשלים שנה שלא כתובה. "בתאריך 4.8" בלי שנה — החזר null ל-valid_until וכתוב את התאריך כלשונו ב-raw_text_summary. שנה שהומצאה הופכת הטבה תקפה לפגת-תוקף, והיא נעלמת מהמשתמש בלי שאיש יראה שגיאה.
 
 לגבי confidence_score — זה השדה שקובע אם ההטבה מוצגת למשתמש או נשלחת לבדיקה ידנית:
 - 0.9 ומעלה: כל התנאים כתובים במפורש ובבירור בטקסט.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toGeminiSchema } from '../src/extract';
+import { retryAfterMs, toGeminiSchema } from '../src/extract';
 import { BENEFIT_EXTRACTION_JSON_SCHEMA } from '../src/schema';
 
 /**
@@ -65,5 +65,40 @@ describe('toGeminiSchema', () => {
     };
     walk(toGeminiSchema(BENEFIT_EXTRACTION_JSON_SCHEMA));
     expect(nullables).toBe(11);
+  });
+});
+
+/**
+ * Verbatim from a real 429 on gemini-3.5-flash-lite. Google states how long the
+ * quota window has left, and that is better than any backoff we would invent —
+ * but only if it is actually read out of the body.
+ */
+const REAL_429 = JSON.stringify({
+  error: {
+    code: 429,
+    status: 'RESOURCE_EXHAUSTED',
+    message: 'You exceeded your current quota',
+    details: [
+      {
+        '@type': 'type.googleapis.com/google.rpc.QuotaFailure',
+        violations: [{ quotaId: 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', quotaValue: '15' }],
+      },
+      { '@type': 'type.googleapis.com/google.rpc.RetryInfo', retryDelay: '59s' },
+    ],
+  },
+});
+
+describe('retryAfterMs', () => {
+  it('reads the delay Google states, plus a second of slack', () => {
+    expect(retryAfterMs(REAL_429)).toBe(60000);
+  });
+
+  it('rounds a fractional delay up rather than waking early', () => {
+    expect(retryAfterMs('{"retryDelay":"12.4s"}')).toBe(13400);
+  });
+
+  it('falls back to the quota window when no delay is stated', () => {
+    expect(retryAfterMs('{"error":{"code":429}}')).toBe(60000);
+    expect(retryAfterMs('not json at all')).toBe(60000);
   });
 });

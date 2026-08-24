@@ -59,6 +59,33 @@ export function toGeminiSchema(node: unknown): unknown {
 
 const RESPONSE_SCHEMA = toGeminiSchema(BENEFIT_EXTRACTION_JSON_SCHEMA);
 
+/**
+ * How many times a page waits out a rate limit before giving up.
+ *
+ * The free tier is 15 requests per minute per model, so a run of any size hits
+ * it — a 25-page run extracted 9 and lost 16 to 429s that were nothing but
+ * "ask again in a minute". Failing the page there wastes the scrape and the
+ * cache lookup for a condition the API itself says is temporary, and tells you
+ * to retry in 59 seconds.
+ */
+const RATE_LIMIT_RETRIES = 4;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Seconds Google asks us to wait, from its own `RetryInfo` detail.
+ *
+ * Preferred over a backoff schedule of our own because it is the authority on
+ * when the window resets, and it is usually shorter than anything we would
+ * guess. Falls back to a minute — the length of the quota window — when the
+ * detail is missing or unparseable.
+ */
+export function retryAfterMs(body: string): number {
+  const stated = /"retryDelay"\s*:\s*"(\d+(?:\.\d+)?)s"/.exec(body)?.[1];
+  const seconds = stated ? Number(stated) : NaN;
+  return Number.isFinite(seconds) ? Math.ceil(seconds * 1000) + 1000 : 60000;
+}
+
 /** Finish reasons that mean the model declined rather than answered. */
 const REFUSALS = new Set(['SAFETY', 'RECITATION', 'PROHIBITED_CONTENT', 'BLOCKLIST', 'SPII']);
 
@@ -74,7 +101,7 @@ export async function extractBenefits(input: ExtractInput): Promise<ExtractOutpu
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
-  const response = await fetch(`${ENDPOINT}/${EXTRACTION_MODEL}:generateContent`, {
+  const request = {
     method: 'POST',
     // The key goes in a header, never the query string — a URL lands in logs
     // and proxies in a way a header does not.
@@ -92,7 +119,15 @@ export async function extractBenefits(input: ExtractInput): Promise<ExtractOutpu
         temperature: 0,
       },
     }),
-  });
+  };
+
+  let response = await fetch(`${ENDPOINT}/${EXTRACTION_MODEL}:generateContent`, request);
+  for (let attempt = 0; response.status === 429 && attempt < RATE_LIMIT_RETRIES; attempt += 1) {
+    const wait = retryAfterMs(await response.clone().text());
+    console.warn(`  rate limited — waiting ${Math.round(wait / 1000)}s (${input.sourceUrl})`);
+    await sleep(wait);
+    response = await fetch(`${ENDPOINT}/${EXTRACTION_MODEL}:generateContent`, request);
+  }
 
   if (!response.ok) {
     throw new Error(
