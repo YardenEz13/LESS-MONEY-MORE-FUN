@@ -10,7 +10,6 @@
     "review": "tsx src/review.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.115.0",
     "@sbr/core": "*",
     "zod": "^3.23.8"
   },

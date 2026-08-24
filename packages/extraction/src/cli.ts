@@ -57,6 +57,19 @@ async function main(): Promise<void> {
     return;
   }
 
+  // Checked before any branch that reaches the model, not just the sources
+  // pipeline: `--collected` used to run right past this and fail once per page,
+  // after the whole file had been read and cache-checked. `--import` is exempt
+  // because it loads benefits a browser agent already extracted, and
+  // `--offline`/`--scrape-only` never call out at all.
+  const needsModel =
+    args.import === undefined && args.offline === undefined && args['scrape-only'] === undefined;
+  if (needsModel && !process.env.GEMINI_API_KEY) {
+    console.error('GEMINI_API_KEY is not set');
+    process.exitCode = 1;
+    return;
+  }
+
   const outDir = resolve(repoRoot, typeof args.out === 'string' ? args.out : 'data/generated');
 
   if (typeof args.import === 'string') {
@@ -120,11 +133,6 @@ async function main(): Promise<void> {
   }
 
   const scrapeOnly = args['scrape-only'] === true;
-  if (!scrapeOnly && !args.offline && !process.env.ANTHROPIC_API_KEY) {
-    // Not fatal: the SDK also accepts ANTHROPIC_AUTH_TOKEN or an `ant auth
-    // login` profile, so warn rather than refuse.
-    console.warn('! ANTHROPIC_API_KEY is not set — relying on another credential source');
-  }
 
   const report = await runPipeline({
     rootDir: repoRoot,
