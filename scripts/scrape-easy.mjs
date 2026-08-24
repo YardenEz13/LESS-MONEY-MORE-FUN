@@ -11,8 +11,15 @@
  * Output: collected/easy/<slug>.jsonl, one CollectedRecord per line, ready for
  *   npm run extract -- --collected collected/easy/MAX.jsonl --program max
  *
- * ponytail: results are geo-ranked around easy's default location (no lat/lng
- * sent). Pass --lat/--lng/--rad if coverage outside Gush Dan matters.
+ * Results are geo-ranked around whatever point you query from, and the API
+ * returns at most 100 businesses per query however wide the radius. One query
+ * per list is therefore one *city's* worth of that list — which is why the
+ * first 3925 businesses collected were 2258 Tel Aviv ones, 18 Jerusalem and 16
+ * Haifa: nothing was wrong with the crawl, it was simply run from one point.
+ *
+ * `--cities` re-runs every list from each point in CITIES, which is how the
+ * catalog stops being a Tel Aviv catalog. Pass --lat/--lng/--rad for a single
+ * point of your own.
  */
 import { writeFile, readFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -100,6 +107,72 @@ const PROGRAMS = {
   'Discount-For-Senior-Citizens': 'discount_for_senior_citizens',
 };
 
+/**
+ * Where to crawl from.
+ *
+ * easy caps a list query at 100 businesses ranked by distance from the point
+ * you ask from, so coverage is bounded by how many points you ask from, not by
+ * radius. These are population centres rather than a uniform grid because
+ * that is where the shops are — a grid spends half its queries on farmland and
+ * still misses Nazareth.
+ *
+ * ponytail: hand-typed, roughly city-hall coordinates, deliberately unweighted
+ * — every point gets the same 100-result budget whether it is Tel Aviv or Arad.
+ * Split the dense ones into several points if a city's results all come back
+ * from one neighbourhood.
+ */
+const CITIES = [
+  ['ירושלים', 31.7683, 35.2137],
+  ['תל אביב יפו', 32.0853, 34.7818],
+  ['חיפה', 32.794, 34.9896],
+  ['ראשון לציון', 31.973, 34.7925],
+  ['פתח תקווה', 32.084, 34.8878],
+  ['אשדוד', 31.8014, 34.6435],
+  ['נתניה', 32.3215, 34.8532],
+  ['באר שבע', 31.253, 34.7915],
+  ['בני ברק', 32.0807, 34.8338],
+  ['חולון', 32.0117, 34.7725],
+  ['רמת גן', 32.07, 34.8241],
+  ['אשקלון', 31.6688, 34.5742],
+  ['רחובות', 31.8928, 34.8113],
+  ['בת ים', 32.0171, 34.7457],
+  ['בית שמש', 31.7497, 34.9887],
+  ['כפר סבא', 32.175, 34.907],
+  ['הרצליה', 32.1624, 34.8447],
+  ['חדרה', 32.434, 34.9196],
+  ['מודיעין', 31.8928, 35.0104],
+  ['נצרת', 32.7021, 35.2978],
+  ['לוד', 31.9515, 34.8951],
+  ['רמלה', 31.9288, 34.8667],
+  ['רעננה', 32.1848, 34.8713],
+  ['ראש העין', 32.0956, 34.9568],
+  ['אילת', 29.5577, 34.9519],
+  ['טבריה', 32.7959, 35.5308],
+  ['עכו', 32.9281, 35.0818],
+  ['נהריה', 33.0058, 35.0948],
+  ['כרמיאל', 32.9186, 35.2951],
+  ['עפולה', 32.6078, 35.2897],
+  ['קרית גת', 31.61, 34.7642],
+  ['דימונה', 31.0686, 35.0325],
+  ['אריאל', 32.1056, 35.1872],
+  ['צפת', 32.9646, 35.496],
+  ['קרית שמונה', 33.2072, 35.5695],
+  ['יבנה', 31.8783, 34.7395],
+  ['אום אל פחם', 32.5197, 35.1522],
+  ['רהט', 31.3925, 34.7544],
+  ['בית שאן', 32.4967, 35.4996],
+  ['נתיבות', 31.4222, 34.5889],
+  ['יקנעם', 32.6597, 35.1103],
+  ['זכרון יעקב', 32.5736, 34.9536],
+];
+
+/**
+ * Wide enough to reach a city's retail edge, narrow enough that a dense city
+ * does not spend its 100 results on the next town. The cap, not this, is what
+ * actually bounds a query — see CITIES.
+ */
+const CITY_RADIUS_M = 15000;
+
 /** The hub every discount list hangs off. */
 const HUB = '/list/Discounts';
 
@@ -108,23 +181,55 @@ const UA =
 const BASE = 'https://easy.co.il';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Backoff schedule. Was 15s then 30s, which is the right shape for the odd
+ * dropped request and useless against a rate limit: a 42-city run is 40x the
+ * requests the original crawl made, easy starts 403ing the JSON endpoint (the
+ * HTML pages keep serving), and 45 seconds of patience never outlasts it.
+ */
+const RETRY_WAITS_MS = [60000, 180000, 420000];
+
+/**
+ * Consecutive list failures before the run gives up.
+ *
+ * The first 42-city run failed at list 2 of 90 and then kept going for four
+ * hours, failing every remaining list against a limiter it had already tripped
+ * — 268 failed requests that could not have succeeded, and a log that looked
+ * like a working crawl. Once easy is saying no, the only useful move is to
+ * stop asking.
+ */
+const GIVE_UP_AFTER = 3;
+
 // node's TLS fingerprint trips Cloudflare; curl's does not. So: curl.
 // Cloudflare also throws intermittent 403/503 at a steady crawl — back off and retry.
 async function get(url, referer, attempt = 0) {
   try {
     return await getOnce(url, referer);
   } catch (err) {
-    if (attempt >= 2) throw err;
-    const wait = 15000 * (attempt + 1);
+    if (attempt >= RETRY_WAITS_MS.length) throw err;
+    const wait = RETRY_WAITS_MS[attempt];
     console.warn(`  ${err.message.trim()} — retrying in ${wait / 1000}s`);
     await sleep(wait);
     return get(url, referer, attempt + 1);
   }
 }
 
+/**
+ * Route every request through a proxy when `EASY_PROXY` is set.
+ *
+ * easy blocks the JSON endpoint per IP — the HTML pages keep serving 200, so a
+ * blocked crawl looks alive right up until every list fails. The block is on
+ * the address, not the account or the client, so any different egress clears
+ * it: a VPN, a phone hotspot, or a paid pool like Bright Data. Deliberately a
+ * plain curl proxy string rather than a vendor integration, because that is the
+ * whole of what the vendors need and it costs one line.
+ *
+ *   EASY_PROXY=http://user:pass@host:port npm run scrape:easy -- --cities חיפה
+ */
 async function getOnce(url, referer) {
   const args = ['-s', '-w', '\n%{http_code}', '-A', UA];
   if (referer) args.push('-H', `Referer: ${referer}`);
+  if (process.env.EASY_PROXY) args.push('--proxy', process.env.EASY_PROXY);
   args.push(url);
   const { stdout } = await execFileP('curl', args, { maxBuffer: 20 * 1024 * 1024 });
   const nl = stdout.lastIndexOf('\n');
@@ -179,6 +284,19 @@ function toRecord(slug, biz) {
  * 100%. Keyed on `content_hash` as well as url: if the deal text changed the
  * record is genuinely new and has to earn its proof again.
  */
+/** Records already on disk, as [offer_url, record] pairs. Empty on first run. */
+async function previousRecords(path) {
+  try {
+    return (await readFile(path, 'utf8'))
+      .split(String.fromCharCode(10))
+      .filter((line) => line.trim())
+      .map((line) => JSON.parse(line))
+      .map((record) => [record.offer_url, record]);
+  } catch {
+    return [];
+  }
+}
+
 async function keepVerification(path, records) {
   let previous;
   try {
@@ -297,26 +415,72 @@ async function main() {
     return i !== -1 ? args[i + 1] : undefined;
   };
   const only = opt('list');
-  const geo = new URLSearchParams();
-  for (const k of ['lat', 'lng', 'rad']) if (opt(k)) geo.set(k, opt(k));
+
+  /**
+   * The points to crawl each list from. One unnamed point by default, which is
+   * whatever easy ranks around when sent no coordinates — historically Tel
+   * Aviv. `--cities` walks CITIES; `--cities חיפה,אילת` walks a named subset,
+   * which is how a 42-point run gets done in sittings rather than in one
+   * sleepless night.
+   */
+  let points = [{ name: null, params: '' }];
+  if (args.includes('--cities')) {
+    const value = opt('cities');
+    const names = value && !value.startsWith('--') ? value.split(',').map((n) => n.trim()) : null;
+    const missing = names?.filter((n) => !CITIES.some((c) => c[0] === n)) ?? [];
+    if (missing.length > 0) {
+      console.error(`unknown city: ${missing.join(', ')}`);
+      console.error(`known: ${CITIES.map((c) => c[0]).join(', ')}`);
+      process.exit(1);
+    }
+    points = CITIES.filter(([name]) => !names || names.includes(name)).map(([name, lat, lng]) => ({
+      name,
+      params: `lat=${lat}&lng=${lng}&rad=${CITY_RADIUS_M}`,
+    }));
+  } else if (opt('lat')) {
+    const geo = new URLSearchParams();
+    for (const k of ['lat', 'lng', 'rad']) if (opt(k)) geo.set(k, opt(k));
+    points = [{ name: 'custom point', params: geo.toString() }];
+  }
 
   await mkdir('collected/easy', { recursive: true });
 
   const slugs = only ? [only] : await discoverLists();
-  console.log(`${slugs.length} discount lists to crawl\n`);
+  console.log(`${slugs.length} discount lists x ${points.length} point(s) to crawl\n`);
 
-  const candidates = [];
   let done = 0;
+  let consecutiveFailures = 0;
   for (const slug of slugs) {
     const program = PROGRAMS[slug];
     done += 1;
-    process.stdout.write(`[${done}/${slugs.length}] `);
     try {
-      const { records, merchants, complete } = await scrapeList(slug, geo.toString());
-      // Kept even from an incomplete crawl: merchant identity is additive, so a
-      // short list under-reports rather than falsely retracting anything.
-      candidates.push(...merchants);
+      // Every point's results for one list, unioned with what is already on
+      // disk and keyed by offer_url, so the same shop found from two cities is
+      // one record.
+      //
+      // Unioning rather than replacing is what makes `--cities` chunkable: a
+      // 42-point crawl is hours, so it gets run a few cities at a time, and a
+      // replacing write would mean each sitting deleted the last one's cities.
+      // Retraction is not lost, it just does not happen here — `verify:catalog`
+      // removes an offer whose page 404s, and an offer that simply stops being
+      // re-found keeps its old `last_verified_at`, so the freshness policy
+      // flags it at 14 days and stops surfacing it at 45.
       const path = `collected/easy/${slug}.jsonl`;
+      const byUrl = new Map(await previousRecords(path));
+      const candidates = [];
+      let complete = true;
+      for (const point of points) {
+        process.stdout.write(`[${done}/${slugs.length}] ${point.name ? point.name + ' ' : ''}`);
+        const pass = await scrapeList(slug, point.params);
+        // Kept even from an incomplete crawl: merchant identity is additive, so
+        // a short list under-reports rather than falsely retracting anything.
+        candidates.push(...pass.merchants);
+        for (const record of pass.records) byUrl.set(record.offer_url, record);
+        if (!pass.complete) complete = false;
+        if (points.length > 1) await sleep(8000);
+      }
+
+      const records = [...byUrl.values()];
       // A crawl cut short mid-way is not a smaller catalog — overwriting here
       // would read downstream as "these deals were removed" and delete real rows.
       if (complete) {
@@ -324,7 +488,7 @@ async function main() {
           const merged = await keepVerification(path, records);
           await writeFile(path, merged.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
           console.log(
-            `  wrote ${path}${program ? ` -> --program ${program}` : '  (no program mapped yet)'}`,
+            `  wrote ${path} (${records.length} offers)${program ? ` -> --program ${program}` : '  (no program mapped yet)'}`,
           );
         } else {
           console.log('  no deals in this list, nothing written');
@@ -333,13 +497,28 @@ async function main() {
         console.error(`  ${path} NOT written: crawl incomplete, keeping the previous file`);
         process.exitCode = 1;
       }
+      // Merged per list, not once at the end: a 42-city run is hours long, and
+      // losing every merchant found so far to one Cloudflare block at list 60
+      // is the difference between resuming and starting over.
+      if (candidates.length > 0) await mergeMerchants(candidates);
+      consecutiveFailures = 0;
     } catch (err) {
       console.error(`${slug}: FAILED — ${err.message}`);
       process.exitCode = 1;
+      consecutiveFailures += 1;
+      if (consecutiveFailures >= GIVE_UP_AFTER) {
+        console.error(
+          `\n${consecutiveFailures} lists failed in a row — easy is refusing us. Stopping.`,
+        );
+        console.error(
+          'Everything written so far is kept, and offers union on the next run, so re-running',
+        );
+        console.error('resumes rather than restarts. Try one city at a time: --cities <name>');
+        break;
+      }
     }
     await sleep(3000);
   }
-  if (candidates.length > 0) await mergeMerchants(candidates);
 }
 
 main();
