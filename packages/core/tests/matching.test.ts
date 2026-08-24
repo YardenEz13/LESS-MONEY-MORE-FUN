@@ -254,6 +254,66 @@ describe('rankBenefits', () => {
     expect(ranked.map((r) => r.benefit.id)).toEqual(['eligible-small', 'conditional-big']);
   });
 
+  it('ranks by rate of spend kept, not by the invented reference basket', () => {
+    // The bug this replaces: a ₪233 cinematheque membership topped every list.
+    // A fixed amount is absolute, while 2751 of 2763 catalogued benefits are a
+    // percentage of a basket nobody stated — so the membership won on units,
+    // not on being a better deal.
+    const benefits = [
+      makeBenefit({
+        id: 'annual-membership',
+        type: 'fixed',
+        value: 233,
+        conditions: { raw_text_summary: 'מנוי שנתי', stacks_with_club: true },
+      }),
+      makeBenefit({
+        id: 'fuel-6pct',
+        type: 'percent',
+        value: 6,
+        conditions: { raw_text_summary: '6% בתדלוק', stacks_with_club: true },
+      }),
+    ];
+    // ₪233 against an unstated spend states no rate at all, so it sorts below
+    // a stated 6% rather than above it.
+    expect(rankBenefits(benefits, baseCtx).map((r) => r.benefit.id)).toEqual([
+      'fuel-6pct',
+      'annual-membership',
+    ]);
+  });
+
+  it('derives a rate for a fixed amount when the terms state the spend', () => {
+    // A min_spend is an unresolved gate, so both of these are conditional and
+    // compete inside that tier — which is where the derived rate has to work.
+    const benefits = [
+      makeBenefit({
+        id: 'gift-150-of-300',
+        type: 'gift_card',
+        value: 150,
+        conditions: {
+          raw_text_summary: 'שובר ₪150 בקנייה מעל ₪300',
+          min_spend: 300,
+          stacks_with_club: true,
+        },
+      }),
+      makeBenefit({
+        id: 'gift-100-of-1000',
+        type: 'gift_card',
+        value: 100,
+        conditions: {
+          raw_text_summary: 'שובר ₪100 בקנייה מעל ₪1000',
+          min_spend: 1000,
+          stacks_with_club: true,
+        },
+      }),
+    ];
+    // ₪150 off ₪300 is 50%; ₪100 off ₪1000 is 10%. The old sort had these the
+    // other way round, on ₪150 vs ₪100 alone.
+    expect(rankBenefits(benefits, baseCtx).map((r) => r.benefit.id)).toEqual([
+      'gift-150-of-300',
+      'gift-100-of-1000',
+    ]);
+  });
+
   it('honours the limit', () => {
     const benefits = [makeBenefit({ id: 'a' }), makeBenefit({ id: 'b' })];
     expect(rankBenefits(benefits, baseCtx, { limit: 1 })).toHaveLength(1);

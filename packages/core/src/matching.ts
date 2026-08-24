@@ -424,6 +424,47 @@ export interface RankOptions {
 }
 
 /**
+ * How much of the spend a benefit keeps, as a percentage — or null when the
+ * catalog does not state enough to say.
+ *
+ * This, not `estimatedSavingIls`, is what ranks a browse list. The ILS figure
+ * is right for display and wrong for sorting: 2751 of 2763 catalogued benefits
+ * are a percentage scaled off an invented reference basket, and the dozen that
+ * are not inject absolute shekels into the same column. A cinematheque annual
+ * membership at ₪233 then outranks 6% off fuel — not because it is a better
+ * deal, but because the purchase behind it is bigger.
+ *
+ * A fixed amount only becomes a rate when the terms say what spend unlocks it:
+ * ₪150 off ₪300 at Castro is 50%, ₪100 off ₪1000 at Ivory is 10%. With no
+ * `min_spend` stated there is no rate to compute, and null sorts last rather
+ * than first — the same rule the gates follow, that an unknown is never
+ * resolved in the benefit's favour. Ranking one above every stated percentage
+ * in the catalog is exactly that, done silently.
+ *
+ * `max_discount` is deliberately ignored: a cap only bites above a basket size
+ * we do not know here, and it already reaches the reader as a condition chip.
+ */
+function savingRate(benefit: Benefit): number | null {
+  switch (benefit.type) {
+    case 'percent':
+    case 'cashback':
+      return benefit.value;
+    case 'fixed':
+    case 'gift_card': {
+      const spend = benefit.conditions.min_spend;
+      return spend != null && spend > 0 ? (benefit.value / spend) * 100 : null;
+    }
+    case 'bogo':
+      // The cheaper of two free, which is half only when the two cost the same.
+      // Same assumption `estimateSaving` already makes for bogo, kept in step
+      // with it rather than invented here.
+      return 50;
+    default:
+      return null;
+  }
+}
+
+/**
  * Rank benefits for display. Fully eligible beats conditional at equal value,
  * so a "you definitely have this" card never sits below a "maybe" card.
  */
@@ -443,6 +484,12 @@ export function rankBenefits(
         e.status === 'blocked' ? 2 : e.actionsRequired.length > 0 ? 1 : 0;
       const byRank = rank(a) - rank(b);
       if (byRank !== 0) return byRank;
+      // -1 for "no stated rate", so an unrankable benefit sorts below every
+      // benefit that does state one instead of above all of them.
+      const byRate = (savingRate(b.benefit) ?? -1) - (savingRate(a.benefit) ?? -1);
+      if (byRate !== 0) return byRate;
+      // Same rate: the bigger basket-relative figure wins, which is what
+      // separates a 5% with a ₪200 cap from a 5% without one.
       const byValue = b.estimatedSavingIls - a.estimatedSavingIls;
       if (byValue !== 0) return byValue;
       // Tie-break on freshness so the better-verified row wins deterministically.
