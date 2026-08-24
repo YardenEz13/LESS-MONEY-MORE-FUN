@@ -16,6 +16,7 @@ import {
   benefits,
   benefitsAtVenue,
   benefitsNear,
+  nearestCatalogPlace,
   ownedProgramIds,
   programNames,
   venues,
@@ -235,6 +236,7 @@ export function HomeScreen({
           <EmptyState
             filter={filter}
             hasPrograms={profile.program_ids.length > 0}
+            here={hereIds && !venue ? here : null}
             onEditPrograms={onOpenSettings}
           />
         ) : (
@@ -455,17 +457,32 @@ function IconAction({ label, onPress }: { label: string; onPress: () => void }) 
 function EmptyState({
   filter,
   hasPrograms,
+  here,
   onEditPrograms,
 }: {
   filter: Filter;
   hasPrograms: boolean;
+  /** A pinned point that returned nothing — the coverage case, not the no-deals case. */
+  here: Coordinates | null;
   onEditPrograms: () => void;
 }) {
+  // Nothing within walking distance has two very different causes, and telling
+  // them apart is the whole job of this branch. "every benefit is blocked right
+  // now" is a statement about the day; "the catalog does not reach this city"
+  // is a statement about the catalog, and showing the first when the second is
+  // true is how an app reads as broken to everyone outside Gush Dan.
+  const nearest = here ? nearestCatalogPlace(here) : null;
+
   const copy = !hasPrograms
     ? {
         title: 'עוד לא סימנת מועדונים',
         body: 'פתח הגדרות וסמן את הכרטיסים והמועדונים שברשותך. זה לוקח פחות מדקה.',
       }
+    : nearest
+      ? {
+          title: 'הקטלוג לא מגיע לכאן',
+          body: `אין בקטלוג בית עסק בטווח הליכה מכאן. הקרוב ביותר נמצא ב${nearest.city}, כ-${Math.round(nearest.km)} ק״מ מכאן. הכיסוי כרגע מרוכז בגוש דן.`,
+        }
     : filter === 'ready'
       ? {
           title: 'אין הטבה שמוכנה כרגע',

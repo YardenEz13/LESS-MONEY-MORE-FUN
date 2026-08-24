@@ -132,9 +132,36 @@ export const Merchant = z
      * only ever describe the ten malls someone thought to type. A coordinate
      * matches a high street too, and comes from the source rather than a human.
      */
-    branches: z.array(z.object({ lat: z.number(), lng: z.number() }).strict()).default([]),
+    branches: z
+      .array(
+        z
+          .object({
+            lat: z.number(),
+            lng: z.number(),
+            /**
+             * Nullish because the source sometimes omits it, and an absent city
+             * has to read as "we don't know" rather than as a blank line under
+             * a shop name. It is what a list with no location fix can still say
+             * about where a benefit is, and what tells someone in Haifa that
+             * the catalog does not reach them yet instead of showing them an
+             * empty screen that looks broken.
+             */
+            city: z.string().min(1).nullish(),
+          })
+          .strict(),
+      )
+      .default([]),
     /** A merchant can be more than one — a supermarket that sells fuel. */
     categories: z.array(MerchantCategory).default([]),
+    /**
+     * The source's own words for what this shop is — "רשת חנויות ספרים",
+     * "מינימרקט", "מוסך". Free text on purpose, and not a substitute for
+     * `categories`: the closed enum is what the advisor filters on, this is
+     * what a human reads. 574 distinct values, most of which no ten-member
+     * enum could hold, and which is the difference between a list of 1057
+     * unfamiliar business names and a list you can actually scan.
+     */
+    label: z.string().min(1).nullish(),
   })
   .strict();
 export type Merchant = z.infer<typeof Merchant>;

@@ -3,6 +3,7 @@ import {
   Merchant,
   Program,
   Venue,
+  distanceMeters,
   expandOwnedPrograms,
   merchantsNear,
   SHOP_FENCE_PREFIX,
@@ -99,4 +100,51 @@ export function placeAt(fenceId: string): { name: string; benefits: Benefit[] } 
   }
   const venue = venuesById.get(fenceId);
   return venue ? { name: venue.name, benefits: benefitsAtVenue(venue.id) } : null;
+}
+
+/**
+ * The one line under a merchant's name: what it is, and where.
+ *
+ * A catalog of 1057 businesses is mostly businesses nobody has heard of, and a
+ * bare "מינימרקט קרן" gives a reader nothing to decide with. The source's own
+ * words for the trade do, and they cost nothing — they were collected with the
+ * coordinates and simply never read out until `backfill:merchants`.
+ *
+ * City only when there is exactly one, because that is the only case where a
+ * single city name is true. A chain gets its branch count instead: naming one
+ * of six cities would read as "this shop is in Givatayim", which for five of
+ * the six branches is wrong.
+ */
+export function merchantLine(merchantId: string): string | null {
+  const merchant = merchantsById.get(merchantId);
+  if (!merchant) return null;
+  const cities = [...new Set(merchant.branches.map((b) => b.city).filter(Boolean))];
+  const where =
+    cities.length === 1
+      ? cities[0]!
+      : merchant.branches.length > 1
+        ? `${merchant.branches.length} סניפים`
+        : null;
+  return [merchant.label, where].filter(Boolean).join(' · ') || null;
+}
+
+/**
+ * The nearest place the catalog actually covers, for a point it does not.
+ *
+ * Collection ran geo-ranked around easy.co.il's default location, which is Tel
+ * Aviv, so 2258 of 3925 businesses are in one city and Jerusalem has 18. Someone
+ * standing in Haifa is not looking at a bug and not looking at "no benefits
+ * today" — they are outside the catalog, and the screen has to say which, or
+ * every empty list reads as a broken app.
+ */
+export function nearestCatalogPlace(position: Coordinates): { city: string; km: number } | null {
+  let best: { city: string; km: number } | null = null;
+  for (const merchant of merchants) {
+    for (const branch of merchant.branches) {
+      if (!branch.city) continue;
+      const km = distanceMeters(position, branch) / 1000;
+      if (!best || km < best.km) best = { city: branch.city, km };
+    }
+  }
+  return best;
 }

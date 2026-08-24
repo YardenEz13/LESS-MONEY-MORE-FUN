@@ -1,10 +1,16 @@
 import React from 'react';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
-import { formatLastVerified, formatSaving, formatValue, type Evaluation } from '@sbr/core';
+import {
+  extractHostname,
+  formatLastVerified,
+  formatSaving,
+  formatValue,
+  type Evaluation,
+} from '@sbr/core';
 import { GateList, gateSummary } from '../components/Gates';
 import { PitchStripes, ScarfBand } from '../components/Kit';
 import { GhostButton, PrimaryButton, ScreenHeader, Section, Text } from '../components/ui';
-import { programNames } from '../services/catalog';
+import { programNames, programsById } from '../services/catalog';
 import { border, colors, radius, space, type } from '../theme';
 
 interface Props {
@@ -24,6 +30,16 @@ export function BenefitDetailScreen({
 }: Props) {
   const { benefit, gates, actionsRequired } = evaluation;
   const { figure, unit } = formatValue(benefit);
+
+  // Where this came from, in two parts, because they are two different claims.
+  // `source_url` is the page we actually read — for 2731 of 2763 benefits that
+  // is easy.co.il, a directory, not the club's own terms. The club's catalog is
+  // where the binding version lives. Naming the listing host rather than just
+  // offering a button matters: "we read this on a directory" and "we read this
+  // on max.co.il" deserve different amounts of trust, and only one of them is
+  // the issuer.
+  const listing = extractHostname(benefit.source_url) ?? benefit.source_url;
+  const club = programsById.get(benefit.program_id);
 
   return (
     <View style={styles.screen}>
@@ -80,15 +96,23 @@ export function BenefitDetailScreen({
                 benefit.reviewed_by_human ? ' · אושר ידנית' : ''
               }`}
             />
+            <TrustRow label="נקרא מתוך" value={listing} />
             <View style={styles.trustAction}>
               <GhostButton
-                label="פתח את עמוד המקור"
+                label={`פתח את הדף ב${listing}`}
                 onPress={() => void Linking.openURL(benefit.source_url)}
               />
+              {club?.catalog_url && (
+                <GhostButton
+                  label={`התקנון אצל ${club.name}`}
+                  onPress={() => void Linking.openURL(club.catalog_url!)}
+                />
+              )}
             </View>
           </View>
           <Text style={styles.disclaimer}>
             אנחנו לא מנחשים תנאים. מה שלא כתוב בתקנון מסומן כ״לא צוין״ ולא כ״אין הגבלה״.
+            הדף שנקרא הוא מה שראינו; התקנון המחייב הוא של המועדון.
           </Text>
         </Section>
       </ScrollView>
@@ -164,7 +188,7 @@ const styles = StyleSheet.create({
    */
   trustLabel: { flexShrink: 0 },
   trustValue: { flexShrink: 1, minWidth: 0 },
-  trustAction: { paddingVertical: space.s3 - 4 },
+  trustAction: { paddingVertical: space.s3 - 4, gap: space.s2 },
   disclaimer: { ...type.caption, marginHorizontal: space.s4, lineHeight: 18 },
   footer: {
     flexDirection: 'row',

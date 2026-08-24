@@ -85,10 +85,17 @@ export class AdvisorError extends Error {}
  */
 function describe(evaluation: Evaluation) {
   const { benefit, gates } = evaluation;
+  const merchant = merchantsById.get(benefit.merchant_id);
   return {
     id: benefit.id,
     merchant: benefit.merchant_name,
-    categories: merchantsById.get(benefit.merchant_id)?.categories ?? [],
+    categories: merchant?.categories ?? [],
+    // The source's own Hebrew for the trade, alongside the enum. 574 distinct
+    // values against ten enum members: "מוסך" and "מכבסה" have no enum home and
+    // never will, but a model reading Hebrew can match them to "where do I get
+    // the car serviced" perfectly well. The enum stays because it is what the
+    // engine filters on; this is what makes the long tail answerable at all.
+    trade: merchant?.label ?? null,
     club: programNames[benefit.program_id] ?? benefit.program_id,
     offer: `${benefit.value}${benefit.type === 'percent' || benefit.type === 'cashback' ? '%' : ' ₪'}`,
     estimated_saving_ils: Math.round(evaluation.estimatedSavingIls),

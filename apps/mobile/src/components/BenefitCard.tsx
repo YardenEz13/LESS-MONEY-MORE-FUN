@@ -4,7 +4,7 @@ import { formatSaving, formatValue, type Evaluation } from '@sbr/core';
 import { ConditionStrip } from './Gates';
 import { Crest, PitchStripes, useKit } from './Kit';
 import { Text } from './ui';
-import { programNames, programsById } from '../services/catalog';
+import { merchantLine, programNames, programsById } from '../services/catalog';
 import {
   border,
   colors,
@@ -55,6 +55,9 @@ export function BenefitCard({ evaluation, onPress }: Props) {
 
   const category = programsById.get(benefit.program_id)?.category;
   const clubColor = (category && crestColors[category]) ?? crestFallback;
+  // "מכולת · גבעתיים". Absent for the handful of merchants the source never
+  // described, and then the name simply stands alone as it always did.
+  const place = merchantLine(benefit.merchant_id);
 
   return (
     <Pressable
@@ -85,6 +88,11 @@ export function BenefitCard({ evaluation, onPress }: Props) {
           <Text style={type.lead} numberOfLines={2}>
             {benefit.merchant_name}
           </Text>
+          {place && (
+            <Text style={styles.place} numberOfLines={1}>
+              {place}
+            </Text>
+          )}
         </View>
         <View style={styles.rule} />
         {/* Green is "money kept" in this system, so a benefit with nothing left
@@ -138,6 +146,9 @@ const styles = StyleSheet.create({
   clubEdge: { height: border.marker },
   club: { flexDirection: 'row', alignItems: 'center', gap: space.s2 - 2 },
   clubName: { ...type.meta, flexShrink: 1 },
+  /* `caption`, not `meta`: the trade is context for the name above it, and a
+     second medium-weight line would compete with the club it sits under. */
+  place: { ...type.caption, flexShrink: 1 },
   top: {
     flexDirection: 'row',
     alignItems: 'stretch',

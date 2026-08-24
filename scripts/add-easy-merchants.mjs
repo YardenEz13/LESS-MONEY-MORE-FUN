@@ -29,6 +29,7 @@
  * Run: node scripts/add-easy-merchants.mjs [--write]
  */
 import { readFile, writeFile } from 'node:fs/promises';
+import { categoriesFor } from './easy-category.mjs';
 
 /** Byte-for-byte the app's rule (packages/extraction/src/store.ts). */
 const normalizeMerchantName = (name) => name.trim().toLowerCase().replace(/[\s'"׳״־-]+/g, '');
@@ -42,33 +43,6 @@ function distance(a, b) {
     Math.sin(dLat / 2) ** 2 + Math.sin(dLng / 2) ** 2 * Math.cos(rad(a.lat)) * Math.cos(rad(b.lat));
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
 }
-
-/**
- * easy's Hebrew category -> the app's errand vocabulary.
- *
- * Only entries confident enough to answer "where do I buy X". Anything absent
- * yields `[]`: a merchant with no category still lists and still geofences, it
- * just never surfaces for a category question. Guessing here would answer
- * "where do I get petrol" with a bookshop.
- */
-const CATEGORY = [
-  [/דלק|תדלוק|תחנת דלק/, 'fuel'],
-  [/סופרמרקט|מכולת|רשת מזון|ירקות|פירות|מאפי|קצבי/, 'grocery'],
-  [/בית מרקחת|פארם/, 'pharmacy'],
-  [/אופנה|בגדים|נעליים|תיקים|הלבשה/, 'fashion'],
-  [/חשמל|מחשבים|סלולר|אלקטרוניקה|ציוד היקפי/, 'electronics'],
-  [/מסעד|קפה|פיצרי|המבורגר|סושי|בר |פאב|קייטרינג|מקום לאכול|גריל|שווארמה|פלאפל/, 'dining'],
-  [/רהיט|עיצוב הבית|כלי בית|עשה זאת בעצמך|מטבח/, 'home'],
-  [/קולנוע|תיאטרון|מופע|בילוי|ספורט|כושר|מלון|נופש|פארק/, 'leisure'],
-  [/ספרים|ספרי/, 'books'],
-  [/קוסמטיק|איפור|יופי|ספר |מספר|טיפוח|ציפורניים/, 'beauty'],
-];
-
-const categoriesFor = (easyCategory) => {
-  if (!easyCategory) return [];
-  const hit = CATEGORY.find(([re]) => re.test(easyCategory));
-  return hit ? [hit[1]] : [];
-};
 
 const [published, raw, merchants, venues] = await Promise.all(
   [
@@ -115,7 +89,14 @@ for (const name of wanted) {
   const venue_ids = venues.filter((v) => distance(source, v) <= v.radius_m).map((v) => v.id);
   if (venue_ids.length) inVenue += 1;
 
-  added.push({ id, name, domains: [], venue_ids, categories: categoriesFor(source.easy_category) });
+  added.push({
+    id,
+    name,
+    domains: [],
+    venue_ids,
+    categories: categoriesFor(source.easy_category),
+    ...(source.easy_category ? { label: source.easy_category } : {}),
+  });
   usedIds.add(id);
   known.add(key);
 }
