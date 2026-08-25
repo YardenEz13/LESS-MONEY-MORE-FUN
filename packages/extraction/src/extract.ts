@@ -22,13 +22,20 @@ const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models';
  * catalog — worth a fixed model if the gate is load-bearing for you.
  */
 const DEFAULT_MODELS = [
+  // The lite tier carries the run: 500 requests a day each against 20 for the
+  // rest. Ordered first so the scarce models are overflow rather than the
+  // models a run opens with.
+  'gemini-3.5-flash-lite',
+  'gemini-flash-lite-latest',
+  'gemini-3.1-flash-lite',
+  // 20 a day each. Worth holding anyway — they disagree with the lite tier on
+  // confidence, and that disagreement is what keeps the publish gate meaning
+  // something (see the note above).
   'gemini-3.7-flash',
   'gemini-3.6-flash',
   'gemini-3.5-flash',
-  // 3 Flash is only published as a preview id.
   'gemini-3-flash-preview',
-  'gemini-3.1-flash-lite',
-];
+]
 
 export const EXTRACTION_MODELS = (process.env.GEMINI_MODEL ?? DEFAULT_MODELS.join(','))
   .split(',')
@@ -40,6 +47,20 @@ export const EXTRACTION_MODELS = (process.env.GEMINI_MODEL ?? DEFAULT_MODELS.joi
  * begin on different models instead of all hammering the first one.
  */
 let rotation = 0;
+
+/**
+ * Models whose *daily* quota is gone, which no amount of waiting fixes today.
+ *
+ * Google reports the two limits with different quota ids, and they need
+ * opposite handling: a per-minute 429 reopens in a minute, a per-day one does
+ * not reopen until midnight Pacific. Without this the four 20-a-day models are
+ * re-tried on every remaining page — a run of 1400 pages would spend 5600
+ * round-trips learning the same thing over and over.
+ */
+const dailyExhausted = new Set<string>();
+
+/** True when the 429 body blames the daily quota rather than the per-minute one. */
+const isDailyQuota = (body: string) => /GenerateRequestsPerDayPerProjectPerModel/.test(body);
 
 export interface ExtractInput {
   programName: string;
@@ -148,17 +169,35 @@ async function fetchRotating(request: RequestInit, sourceUrl: string): Promise<R
 
   for (let round = 0; round <= RATE_LIMIT_RETRIES; round += 1) {
     let shortestWait = 60000;
+    let triedAny = false;
     for (let i = 0; i < EXTRACTION_MODELS.length; i += 1) {
       const model = EXTRACTION_MODELS[(start + i) % EXTRACTION_MODELS.length]!;
+      if (dailyExhausted.has(model)) continue;
+      triedAny = true;
       const response = await fetch(`${ENDPOINT}/${model}:generateContent`, request);
       if (!TRY_ANOTHER_MODEL.has(response.status)) return response;
       // A 5xx carries no RetryInfo, so it falls back to the quota window. That
       // is the right order of magnitude for an overloaded model too, and it
       // only applies once every model in the pool is refusing.
-      shortestWait = Math.min(shortestWait, retryAfterMs(await response.text()));
+      const body = await response.text();
+      if (response.status === 429 && isDailyQuota(body)) {
+        dailyExhausted.add(model);
+        console.warn(`  ${model} is out of daily quota — dropping it for this run`);
+        continue;
+      }
+      shortestWait = Math.min(shortestWait, retryAfterMs(body));
     }
+    // Every model is done for the day. Waiting cannot help, and the run should
+    // say so once rather than fail every remaining page four minutes at a time.
+    if (!triedAny) {
+      throw new Error(
+        `every model is out of daily quota (${EXTRACTION_MODELS.join(', ')}) — resets at midnight Pacific. ` +
+          'Cached pages are kept, so re-running resumes rather than restarts.',
+      );
+    }
+    const live = EXTRACTION_MODELS.length - dailyExhausted.size;
     console.warn(
-      `  all ${EXTRACTION_MODELS.length} models busy — waiting ${Math.round(shortestWait / 1000)}s (${sourceUrl})`,
+      `  all ${live} available model(s) busy — waiting ${Math.round(shortestWait / 1000)}s (${sourceUrl})`,
     );
     await sleep(shortestWait);
   }
