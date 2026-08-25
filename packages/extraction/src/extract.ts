@@ -4,12 +4,42 @@ import { EXTRACTION_SYSTEM_PROMPT, buildExtractionUserMessage } from './prompt';
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 /**
- * Overridable because the flash/pro trade-off is a real one here and it is not
- * ours to make: extraction reads Hebrew T&C text and scores its own confidence,
- * which is the kind of work a bigger model does better, but every page costs.
- * The default matches the model the app's advisor already uses.
+ * The models a run spreads itself across, in rotation.
+ *
+ * The free-tier quota is `GenerateRequestsPerMinutePerProjectPerModel` — 15 a
+ * minute, counted per model — so five models is five buckets and roughly 75
+ * requests a minute rather than 15. That is the difference between the 1580-page
+ * backlog taking two hours and taking most of a day.
+ *
+ * `GEMINI_MODEL` overrides it and takes a comma-separated list, so a single
+ * value still behaves exactly as it did.
+ *
+ * Caveat worth carrying: `confidence_score` is not calibrated the same way
+ * across models. A 25-page trial on gemini-3.5-flash-lite returned 0.95 for
+ * every page including two it got wrong, where the previous model spread its
+ * scores and queued 23 benefits for review. Rotating models therefore makes the
+ * publish gate mean slightly different things for different rows of the same
+ * catalog — worth a fixed model if the gate is load-bearing for you.
  */
-export const EXTRACTION_MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash';
+const DEFAULT_MODELS = [
+  'gemini-3.7-flash',
+  'gemini-3.6-flash',
+  'gemini-3.5-flash',
+  // 3 Flash is only published as a preview id.
+  'gemini-3-flash-preview',
+  'gemini-3.1-flash-lite',
+];
+
+export const EXTRACTION_MODELS = (process.env.GEMINI_MODEL ?? DEFAULT_MODELS.join(','))
+  .split(',')
+  .map((name) => name.trim())
+  .filter(Boolean);
+
+/**
+ * Where the next page starts its rotation. Module-level so concurrent pages
+ * begin on different models instead of all hammering the first one.
+ */
+let rotation = 0;
 
 export interface ExtractInput {
   programName: string;
@@ -90,6 +120,55 @@ export function retryAfterMs(body: string): number {
 const REFUSALS = new Set(['SAFETY', 'RECITATION', 'PROHIBITED_CONTENT', 'BLOCKLIST', 'SPII']);
 
 /**
+ * Statuses that mean "this model cannot serve you right now", as opposed to
+ * "this request is wrong".
+ *
+ * 429 is the quota window being full. The 5xx entries are the model being
+ * overloaded or briefly down — gemini-3.7-flash answered 503 "currently
+ * experiencing high traffic" on the first probe of the pool, which under a
+ * 429-only rule would have failed one page in five outright while four healthy
+ * models sat idle. Both cases have the same right answer: ask a different
+ * model. A 400 stays fatal, because a malformed schema will be malformed for
+ * every model in the pool and rotating would just multiply the same error.
+ */
+const TRY_ANOTHER_MODEL = new Set([429, 500, 502, 503, 504]);
+
+/**
+ * One page's request, rotated across the model pool until one of them answers.
+ *
+ * A busy model means "not here, not now", not "this page failed", so the next
+ * model is tried immediately rather than sleeping — that is the whole point of
+ * holding more than one. Only when every model in the pool has refused does the
+ * page wait, and then for the shortest window any of them reported, since that
+ * is the first one to reopen.
+ */
+async function fetchRotating(request: RequestInit, sourceUrl: string): Promise<Response> {
+  const start = rotation;
+  rotation += 1;
+
+  for (let round = 0; round <= RATE_LIMIT_RETRIES; round += 1) {
+    let shortestWait = 60000;
+    for (let i = 0; i < EXTRACTION_MODELS.length; i += 1) {
+      const model = EXTRACTION_MODELS[(start + i) % EXTRACTION_MODELS.length]!;
+      const response = await fetch(`${ENDPOINT}/${model}:generateContent`, request);
+      if (!TRY_ANOTHER_MODEL.has(response.status)) return response;
+      // A 5xx carries no RetryInfo, so it falls back to the quota window. That
+      // is the right order of magnitude for an overloaded model too, and it
+      // only applies once every model in the pool is refusing.
+      shortestWait = Math.min(shortestWait, retryAfterMs(await response.text()));
+    }
+    console.warn(
+      `  all ${EXTRACTION_MODELS.length} models busy — waiting ${Math.round(shortestWait / 1000)}s (${sourceUrl})`,
+    );
+    await sleep(shortestWait);
+  }
+
+  // Every model, every round. Hand back a real response so the caller reports
+  // the API's own words rather than a message invented here.
+  return fetch(`${ENDPOINT}/${EXTRACTION_MODELS[start % EXTRACTION_MODELS.length]!}:generateContent`, request);
+}
+
+/**
  * Run one page through the model.
  *
  * `responseSchema` constrains the response to the strict schema, so the shape
@@ -121,13 +200,7 @@ export async function extractBenefits(input: ExtractInput): Promise<ExtractOutpu
     }),
   };
 
-  let response = await fetch(`${ENDPOINT}/${EXTRACTION_MODEL}:generateContent`, request);
-  for (let attempt = 0; response.status === 429 && attempt < RATE_LIMIT_RETRIES; attempt += 1) {
-    const wait = retryAfterMs(await response.clone().text());
-    console.warn(`  rate limited — waiting ${Math.round(wait / 1000)}s (${input.sourceUrl})`);
-    await sleep(wait);
-    response = await fetch(`${ENDPOINT}/${EXTRACTION_MODEL}:generateContent`, request);
-  }
+  const response = await fetchRotating(request, input.sourceUrl);
 
   if (!response.ok) {
     throw new Error(
