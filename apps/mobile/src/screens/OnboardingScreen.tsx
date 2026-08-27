@@ -7,7 +7,12 @@ import { benefits, programs } from '../services/catalog';
 import { toggleProgram } from '../state/profile';
 import { border, colors, radius, space, type } from '../theme';
 
-const SECTION_TITLES: Record<Program['category'], string> = {
+/**
+ * `public` is deliberately absent. It is granted to everyone rather than
+ * chosen, and the `order` below is what decides which sections render — a
+ * category with no title here simply cannot appear on this screen.
+ */
+const SECTION_TITLES: Partial<Record<Program['category'], string>> = {
   credit_card: 'כרטיסי אשראי',
   employer_club: 'מועדוני מעסיק וארגון',
   retail_club: 'מועדוני קמעונאות',
@@ -67,7 +72,7 @@ export function OnboardingScreen({ profile, onChange, onDone }: Props) {
         </View>
 
         {sections.map((section) => (
-          <Section key={section.category} eyebrow={SECTION_TITLES[section.category]}>
+          <Section key={section.category} eyebrow={SECTION_TITLES[section.category] ?? ''}>
             <View style={styles.group}>
               {section.items.map((program) => (
                 <ProgramRow

@@ -525,5 +525,12 @@
     "category": "employer_club",
     "catalog_url": "https://easy.co.il/list/Discount-For-Senior-Citizens",
     "hint": "הטבות הטבת גמלאי — כפי שמופיעות באיזי"
+  },
+  {
+    "id": "public",
+    "name": "הטבות פתוחות לכולם",
+    "category": "public",
+    "catalog_url": null,
+    "hint": "מבצעים שלא דורשים מועדון או כרטיס — שעה עליזה, מבצעי סוף יום, מבצעי קניונים"
   }
 ]

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { Benefit } from '../src/types';
-import { estimateSaving, evaluateBenefit, rankBenefits, type EvalContext } from '../src/matching';
+import { Benefit, Program } from '../src/types';
+import {
+  estimateSaving,
+  evaluateBenefit,
+  expandOwnedPrograms,
+  rankBenefits,
+  type EvalContext,
+} from '../src/matching';
 
 /** 2026-08-02 is a Sunday; 13:00 Asia/Jerusalem == 10:00Z (IDT, UTC+3). */
 const SUNDAY_NOON = new Date('2026-08-02T10:00:00Z');
@@ -317,5 +323,61 @@ describe('rankBenefits', () => {
   it('honours the limit', () => {
     const benefits = [makeBenefit({ id: 'a' }), makeBenefit({ id: 'b' })];
     expect(rankBenefits(benefits, baseCtx, { limit: 1 })).toHaveLength(1);
+  });
+});
+
+describe('expandOwnedPrograms', () => {
+  const programs = [
+    Program.parse({ id: 'cal', name: 'כאל', category: 'credit_card' }),
+    Program.parse({ id: 'cal_cash_pro', name: 'Cash כאל Pro', category: 'credit_card', parent_id: 'cal' }),
+    Program.parse({ id: 'public', name: 'הטבות פתוחות לכולם', category: 'public' }),
+  ];
+
+  it('grants public offers to a profile that has ticked nothing', () => {
+    // Nobody opts in to being a member of the public, and an offer needing no
+    // card should not wait behind a checkbox.
+    expect(expandOwnedPrograms([], programs)).toEqual(['public']);
+  });
+
+  it('still walks parents, and adds public alongside', () => {
+    expect(expandOwnedPrograms(['cal_cash_pro'], programs).sort()).toEqual(
+      ['cal', 'cal_cash_pro', 'public'].sort(),
+    );
+  });
+
+  it('does not duplicate public when it is somehow already owned', () => {
+    expect(expandOwnedPrograms(['public'], programs)).toEqual(['public']);
+  });
+});
+
+describe('freshness for public offers', () => {
+  const daysAgo = (n: number) => new Date(SUNDAY_NOON.getTime() - n * 86400000).toISOString();
+
+  it('stops surfacing a public offer at 21 days, where a club one still shows', () => {
+    const ctx: EvalContext = { now: SUNDAY_NOON, ownedProgramIds: ['hever', 'public'] };
+    const stale = { last_verified_at: daysAgo(30), conditions: { raw_text_summary: 'מבצע' } };
+    // A mall sale unverified for a month is very likely over; a club's standing
+    // 3% almost certainly is not.
+    expect(evaluateBenefit(makeBenefit({ ...stale, program_id: 'public' }), ctx).status).toBe('blocked');
+    expect(evaluateBenefit(makeBenefit({ ...stale, program_id: 'hever' }), ctx).status).not.toBe('blocked');
+  });
+
+  it('warns on a public offer at 10 days, before the club threshold of 14', () => {
+    const ctx: EvalContext = { now: SUNDAY_NOON, ownedProgramIds: ['hever', 'public'] };
+    const aging = { last_verified_at: daysAgo(10), conditions: { raw_text_summary: 'מבצע' } };
+    const pub = evaluateBenefit(makeBenefit({ ...aging, program_id: 'public' }), ctx);
+    const club = evaluateBenefit(makeBenefit({ ...aging, program_id: 'hever' }), ctx);
+    expect(pub.gates.find((g) => g.code === 'freshness')?.state).toBe('pending');
+    expect(club.gates.find((g) => g.code === 'freshness')?.state).toBe('met');
+  });
+
+  it('still lets an explicit policy from the caller win', () => {
+    const ctx: EvalContext = {
+      now: SUNDAY_NOON,
+      ownedProgramIds: ['public'],
+      freshness: { agingDays: 90, staleDays: 180 },
+    };
+    const old = makeBenefit({ program_id: 'public', last_verified_at: daysAgo(30) });
+    expect(evaluateBenefit(old, ctx).status).not.toBe('blocked');
   });
 });

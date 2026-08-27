@@ -12,6 +12,38 @@ export interface FreshnessPolicy {
 
 export const DEFAULT_FRESHNESS: FreshnessPolicy = { agingDays: 14, staleDays: 45 };
 
+/** The program carrying offers open to anyone — see `Program.category`. */
+export const PUBLIC_PROGRAM_ID = 'public';
+
+/**
+ * Public offers go stale faster, because they are a different kind of offer.
+ *
+ * A club discount is a standing arrangement — 3% at the pharmacy, for as long
+ * as the card exists — so 45 days of silence rarely means it has ended. A
+ * public offer is a mall sale, a happy hour, an end-of-day deal: short by
+ * nature, and stopping without announcement is the normal way it ends.
+ *
+ * The blast radius differs too. A club benefit is only seen by people holding
+ * that card; a public one is granted to every profile, so a stale row is shown
+ * to everybody.
+ *
+ * 7 and 21 rather than something tighter because the crawl is weekly
+ * (`scripts/weekly-refresh.ps1`). A window shorter than the refresh interval
+ * would mark every row unverified permanently, and a warning that is always on
+ * is a warning nobody reads. This is one missed refresh to a caveat, three to
+ * silence.
+ *
+ * Note this is the backstop, not the main guard: 28 of the first 33 public
+ * offers state their own `valid_until`, which is checked separately and
+ * exactly. This covers the rest, where nothing says when the sale ends.
+ */
+export const PUBLIC_FRESHNESS: FreshnessPolicy = { agingDays: 7, staleDays: 21 };
+
+/** The freshness policy a benefit is judged by when the caller states none. */
+export function freshnessFor(benefit: Pick<Benefit, 'program_id'>): FreshnessPolicy {
+  return benefit.program_id === PUBLIC_PROGRAM_ID ? PUBLIC_FRESHNESS : DEFAULT_FRESHNESS;
+}
+
 /**
  * Minimum confidence for a benefit to be surfaced without human review.
  * Anything below goes to the review queue in the extraction pipeline; if it
@@ -41,6 +73,12 @@ export function expandOwnedPrograms(
 ): string[] {
   const parentOf = new Map(programs.map((p) => [p.id, p.parent_id ?? null]));
   const owned = new Set<string>();
+  // Everyone is a member of the public. These offers need no card and no
+  // membership, so withholding them until someone ticks a box would hide a
+  // discount they could already have used.
+  for (const program of programs) {
+    if (program.category === 'public') owned.add(program.id);
+  }
   for (const id of ownedProgramIds) {
     let current: string | null | undefined = id;
     while (current && !owned.has(current)) {
@@ -252,7 +290,7 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
     actionable = false,
   ) => gates.push({ code, state, label, detail, actionable });
   const timeZone = ctx.timeZone ?? DEFAULT_TIME_ZONE;
-  const freshness = ctx.freshness ?? DEFAULT_FRESHNESS;
+  const freshness = ctx.freshness ?? freshnessFor(benefit);
   const minConfidence = ctx.minConfidence ?? DEFAULT_MIN_CONFIDENCE;
   const { conditions } = benefit;
 

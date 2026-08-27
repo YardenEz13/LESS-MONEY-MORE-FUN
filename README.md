@@ -127,7 +127,10 @@ them even if they somehow appear in the catalog.
 
 **Staleness is a condition.** Past 14 days a benefit is flagged as unverified;
 past 45 it stops being surfaced. Committed JSON ages whether or not you re-run
-the pipeline.
+the pipeline. Offers in the `public` program — mall sales, happy hours, deals
+open to anyone — age on a shorter clock, 7 and 21, because they are short by
+nature, they stop without announcing it, and being granted to every profile
+means a stale one is shown to everybody rather than to one club's members.
 
 **Wherever you are, not ten malls.** Places are matched by branch coordinate,
 so a shop on a high street counts the same as one inside a complex. The OS will

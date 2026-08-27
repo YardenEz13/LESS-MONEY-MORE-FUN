@@ -70,7 +70,14 @@ export const Program = z
   .object({
     id: z.string().min(1),
     name: z.string().min(1),
-    category: z.enum(['credit_card', 'employer_club', 'retail_club']),
+    /**
+     * `public` is not a club and nobody holds it: it carries offers open to
+     * anyone — a mall sale, a restaurant happy hour, an end-of-day deal. It is
+     * granted to every profile automatically (see `expandOwnedPrograms`) and
+     * never appears in onboarding, because a checkbox for it would be asking
+     * whether you are a member of the public.
+     */
+    category: z.enum(['credit_card', 'employer_club', 'retail_club', 'public']),
     /** Public catalog entry point, used by the scraper. */
     catalog_url: z.string().url().nullish(),
     /** Shown during onboarding so the user recognises what they hold. */

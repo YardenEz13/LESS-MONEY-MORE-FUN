@@ -105,6 +105,25 @@ const PROGRAMS = {
   'Security-Forces-Benefit': 'security_forces_benefit',
   'Student-Discounts': 'student_discounts',
   'Discount-For-Senior-Citizens': 'discount_for_senior_citizens',
+  // Open to anyone: a mall sale, a happy hour, an end-of-day deal. easy files
+  // these as lists like any club, but nobody holds them, so they all map to the
+  // one `public` program and reach every user without a box being ticked.
+  //
+  // Checked rather than assumed: across these nine lists, not one of 298 offers
+  // mentions a club, a card or residency. Metzer looks similar and is not here —
+  // 72 of its 85 offers name a club card. Ramat-Gan-buy-Local and the Menashe
+  // council list are also absent: both are addressed to residents of a place,
+  // which is an eligibility, and a benefit shown to someone who does not have it
+  // is the same broken promise as a club they do not hold.
+  'All-you-can-eat': 'public',
+  Brunch: 'public',
+  'Business-Menu': 'public',
+  'End-Of-Day-Deals': 'public',
+  'Happy-Gift': 'public',
+  'Happy-Hour': 'public',
+  'Late-Night-Deal': 'public',
+  'Special-Offers': 'public',
+  'Wishing-Well': 'public',
 };
 
 /**
