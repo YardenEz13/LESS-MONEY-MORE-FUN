@@ -101,9 +101,49 @@ export function toBenefit(
   });
 }
 
+/** Money amounts in a Hebrew summary: "200₪", "144 ש״ח". */
+const AMOUNTS = /(\d+(?:\.\d+)?)\s*(?:₪|ש[\"״']ח)/g;
+
+/**
+ * Catch a price reported as a saving, which the model cannot be trusted to do.
+ *
+ * `value` on a fixed/gift_card benefit means money saved, but Israeli voucher
+ * offers overwhelmingly state a price instead — "תו קנייה בשווי 200₪ החל
+ * מ-144₪" is ₪200 of credit costing ₪144, so the saving is ₪56. 72 of 89
+ * fixed/gift_card rows in a real run were written that way.
+ *
+ * A prompt rule was tried first and is kept, because when it works it produces
+ * the right number rather than a queue entry. But it only worked about half the
+ * time on real pages: 29 right against 38 wrong, where the isolated string
+ * passed every time. Messier context is enough to lose it, and an instruction
+ * a model follows on a coin flip is not a gate.
+ *
+ * This is: when the summary states two amounts and `value` is simply one of
+ * them, the model has copied a figure rather than computed a saving. That is
+ * decidable from the text, so code decides it. The benefit is not rewritten —
+ * guessing which amount was meant is how this went wrong in the first place —
+ * it goes to a human.
+ */
+export function statesAPriceNotASaving(benefit: Benefit): boolean {
+  if (benefit.type !== 'fixed' && benefit.type !== 'gift_card') return false;
+  const amounts = [...(benefit.conditions.raw_text_summary ?? '').matchAll(AMOUNTS)].map((m) =>
+    Number(m[1]),
+  );
+  if (amounts.length < 2) return false;
+  const distinct = [...new Set(amounts)];
+  if (distinct.length < 2) return false;
+  // The saving is the gap between the two figures. If `value` is one of the
+  // figures themselves, it is a price or a face value, not what anyone saves.
+  return distinct.includes(benefit.value);
+}
+
 /**
  * The confidence gate. Anything the model was unsure about goes to a human
  * instead of to a device — see KPI #2 in the PRD.
+ *
+ * Confidence is necessary and not sufficient: every one of the mis-valued rows
+ * above arrived at 0.85 to 0.95, because the model was genuinely certain about
+ * what it had read and wrong only about which number to report.
  */
 export function partitionByConfidence(
   candidates: Array<{ benefit: Benefit; reason: string }>,
@@ -112,6 +152,13 @@ export function partitionByConfidence(
   const publish: Benefit[] = [];
   const review: Array<{ benefit: Benefit; reason: string }> = [];
   for (const candidate of candidates) {
+    if (statesAPriceNotASaving(candidate.benefit)) {
+      review.push({
+        ...candidate,
+        reason: `הסכום שהוחזר הוא אחד המחירים בטקסט ולא החיסכון — ${candidate.reason}`,
+      });
+      continue;
+    }
     if (candidate.benefit.confidence_score >= threshold) publish.push(candidate.benefit);
     else review.push(candidate);
   }
