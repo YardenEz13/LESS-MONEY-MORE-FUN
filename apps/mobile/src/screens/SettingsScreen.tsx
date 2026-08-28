@@ -110,6 +110,7 @@ export function SettingsScreen({
             <Pressable
               key={venue.id}
               accessibilityRole="button"
+              accessibilityLabel={`הרצת בדיקה: ${venue.name}, ${venue.city}`}
               onPress={async () => {
                 await handleVenueEnter(venue.id);
                 setSimulated(venue.name);

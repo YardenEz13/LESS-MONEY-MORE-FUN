@@ -457,7 +457,12 @@ function VenueSheet({
     <View style={styles.sheet}>
       <View style={styles.sheetHead}>
         <Text style={type.bodyStrong}>איפה אתה עכשיו?</Text>
-        <Pressable accessibilityRole="button" onPress={onClose} hitSlop={12}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="סגור"
+          onPress={onClose}
+          hitSlop={12}
+        >
           <Text style={type.meta}>סגור</Text>
         </Pressable>
       </View>
@@ -466,6 +471,9 @@ function VenueSheet({
           <Pressable
             key={v.id}
             accessibilityRole="button"
+            // The city as well as the name: "קניון עזריאלי" alone is three
+            // different malls in this list.
+            accessibilityLabel={`${v.name}, ${v.city}`}
             onPress={() => onChoose(v)}
             style={({ pressed }) => [
               styles.sheetRow,
@@ -483,7 +491,12 @@ function VenueSheet({
 
 function IconAction({ label, onPress }: { label: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={styles.iconAction}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={styles.iconAction}
+    >
       <Text style={styles.iconActionLabel}>{label}</Text>
     </Pressable>
   );

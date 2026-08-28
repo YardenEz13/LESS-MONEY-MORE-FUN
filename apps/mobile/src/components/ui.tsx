@@ -194,7 +194,13 @@ export function ScreenHeader({
   return (
     <View style={styles.header}>
       {onBack && (
-        <Pressable onPress={onBack} accessibilityRole="button" hitSlop={12} style={styles.back}>
+        <Pressable
+          onPress={onBack}
+          accessibilityRole="button"
+          accessibilityLabel="חזרה"
+          hitSlop={12}
+          style={styles.back}
+        >
           <Text style={styles.backGlyph}>›</Text>
           <Text style={type.meta}>חזרה</Text>
         </Pressable>
@@ -243,6 +249,10 @@ export function PrimaryButton({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={label}
+      // Announced as well as painted: a greyed button that still reports itself
+      // as available is a tap a screen-reader user makes and gets nothing from.
+      accessibilityState={{ disabled: !!disabled }}
       disabled={!!disabled}
       onPress={onPress}
       style={({ pressed }) => [
@@ -272,6 +282,7 @@ export function GhostButton({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={label}
       onPress={onPress}
       style={({ pressed }) => [
         styles.ghost,
@@ -384,6 +395,13 @@ export function FilterRow<T extends string>({
           <Pressable
             key={option.value}
             accessibilityRole="tab"
+            // The count is part of the name on purpose: "מוכן לקופה" and
+            // "מוכן לקופה, 238" are different amounts of information, and the
+            // number is the reason someone picks the tab.
+            accessibilityLabel={
+              option.count != null ? `${option.label}, ${option.count}` : option.label
+            }
+            accessibilityState={{ selected: active }}
             aria-selected={active}
             onPress={() => onChange(option.value)}
             style={[styles.filter, active && styles.filterActive]}
