@@ -19,6 +19,7 @@
     "backfill:merchants": "node scripts/backfill-merchants.mjs",
     "test:scripts": "node scripts/easy-category.test.mjs && node scripts/scrape-easy.test.mjs && node scripts/scrape-keeps-verification.test.mjs && node scripts/validate-easy.test.mjs && node scripts/extract-easy.test.mjs && node scripts/publish-catalog.test.mjs",
     "publish:catalog": "node scripts/publish-catalog.mjs",
+    "unpublish": "node scripts/unpublish.mjs",
     "validate:data": "node scripts/validate-data.mjs",
     "verify:catalog": "node scripts/verify-catalog.mjs",
     "extract:easy": "node scripts/extract-easy.mjs",

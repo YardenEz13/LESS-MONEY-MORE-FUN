@@ -196,6 +196,17 @@ export const UserProfile = z
     program_ids: z.array(z.string()),
     /** Merchants/benefits the user muted. */
     muted_benefit_ids: z.array(z.string()).default([]),
+    /**
+     * Benefits the user reported as wrong — the discount was not there, or not
+     * on these terms.
+     *
+     * Kept apart from `muted_benefit_ids` because the two say different things
+     * and only one of them is a bug report. A mute is "not for me" and stays on
+     * this device forever; a rejection is evidence the catalog is wrong, and is
+     * meant to leave the device and reach the review queue (`npm run unpublish`).
+     * Collapsing them would lose the distinction the moment it matters.
+     */
+    rejected_benefit_ids: z.array(z.string()).default([]),
     notifications_enabled: z.boolean().default(true),
     onboarded_at: z.string().datetime().nullish(),
   })

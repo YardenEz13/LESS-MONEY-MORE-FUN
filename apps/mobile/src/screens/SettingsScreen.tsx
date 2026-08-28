@@ -14,6 +14,7 @@ interface Props {
   onChange: (profile: UserProfile) => void;
   onEditPrograms: () => void;
   onEnableGeofencing: () => void;
+  onClearRejections: () => void;
   onBack: () => void;
 }
 
@@ -25,6 +26,7 @@ export function SettingsScreen({
   onChange,
   onEditPrograms,
   onEnableGeofencing,
+  onClearRejections,
   onBack,
 }: Props) {
   const [simulated, setSimulated] = useState<string | null>(null);
@@ -43,6 +45,26 @@ export function SettingsScreen({
           <GhostButton label="ערוך רשימה" onPress={onEditPrograms} />
         </View>
       </Section>
+
+      {/* The report loop's other half. A tap in the app cannot reach the
+          catalog on its own — there is no backend — so the ids have to be
+          readable here and handed to `npm run unpublish`, which is what moves
+          them out of the shipped catalog and back into the review queue.
+          Without this the button would only be a mute wearing a bug report's
+          name. Hidden entirely until something has been reported. */}
+      {profile.rejected_benefit_ids.length > 0 && (
+        <Section eyebrow="הטבות שדיווחת עליהן">
+          <View style={styles.card}>
+            <Text style={type.body}>
+              {`${profile.rejected_benefit_ids.length} הטבות סומנו כשגויות והוסתרו. כדי להוציא אותן מהקטלוג, הריצו:`}
+            </Text>
+            <Text selectable style={styles.command}>
+              {`npm run unpublish -- ${profile.rejected_benefit_ids.join(' ')}`}
+            </Text>
+            <GhostButton label="נקה את הרשימה" onPress={onClearRejections} />
+          </View>
+        </Section>
+      )}
 
       <Section eyebrow="תזכורת בקניון">
         <View style={styles.card}>
@@ -132,6 +154,15 @@ export function SettingsScreen({
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surfacePage },
   content: { paddingBottom: space.s6, gap: space.s4 },
+  /* Monospace and selectable: this exists to be copied out of the app, and a
+     benefit id in the body face is a line nobody can transcribe correctly. */
+  command: {
+    ...type.small,
+    fontFamily: 'monospace',
+    backgroundColor: colors.surfaceInset,
+    padding: space.s2,
+    borderRadius: radius.sharp,
+  },
   card: {
     marginHorizontal: space.s4,
     borderRadius: radius.sharp,

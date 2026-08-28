@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   findCombos,
+  hiddenBenefitIds,
   matchesQuery,
   rankBenefits,
   type Combo,
@@ -110,7 +111,7 @@ export function HomeScreen({
       rankBenefits(benefits, {
         now: new Date(),
         ownedProgramIds: ownedProgramIds(profile.program_ids),
-        mutedBenefitIds: profile.muted_benefit_ids,
+        mutedBenefitIds: hiddenBenefitIds(profile),
       }),
     [profile.program_ids, profile.muted_benefit_ids],
   );

@@ -23,7 +23,7 @@ import {
 import { requestNotificationPermission } from './src/services/notifications';
 import { runtimeLimitation } from './src/services/runtime';
 import { resolveShare, subscribeToShares, type ShareResult } from './src/services/shareIntent';
-import { loadProfile, saveProfile, toggleMuted } from './src/state/profile';
+import { clearRejections, loadProfile, rejectBenefit, saveProfile, toggleMuted } from './src/state/profile';
 import { logEvent } from './src/state/events';
 import { colors, enforceRtl } from './src/theme';
 
@@ -262,6 +262,7 @@ function AppRoot() {
           <BenefitDetailScreen
             evaluation={screen.evaluation}
             isMuted={profile.muted_benefit_ids.includes(screen.evaluation.benefit.id)}
+            isRejected={profile.rejected_benefit_ids.includes(screen.evaluation.benefit.id)}
             onBack={() => setScreen({ name: 'home' })}
             onRedeemed={async () => {
               await logEvent({
@@ -272,6 +273,10 @@ function AppRoot() {
             }}
             onToggleMute={async () => {
               await persist(toggleMuted(profile, screen.evaluation.benefit.id));
+              setScreen({ name: 'home' });
+            }}
+            onReport={async () => {
+              await persist(rejectBenefit(profile, screen.evaluation.benefit.id));
               setScreen({ name: 'home' });
             }}
           />
@@ -293,6 +298,7 @@ function AppRoot() {
             profile={profile}
             geofenceStatus={geofenceStatus}
             geofenceFixable={geofenceFixable}
+            onClearRejections={() => void persist(clearRejections(profile))}
             onChange={setNotificationsEnabled}
             onEditPrograms={() => setScreen({ name: 'onboarding' })}
             onEnableGeofencing={enableGeofencing}

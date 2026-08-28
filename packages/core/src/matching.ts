@@ -89,6 +89,21 @@ export function expandOwnedPrograms(
   return [...owned];
 }
 
+/**
+ * Everything the engine should not surface for this profile.
+ *
+ * Muted and rejected benefits are hidden by the same mechanism and for
+ * different reasons, and every call site that builds an EvalContext needs both.
+ * Having one function say so is what stops a screen being added later that
+ * remembers the mutes and forgets the reports.
+ */
+export function hiddenBenefitIds(profile: {
+  muted_benefit_ids: readonly string[];
+  rejected_benefit_ids?: readonly string[];
+}): string[] {
+  return [...profile.muted_benefit_ids, ...(profile.rejected_benefit_ids ?? [])];
+}
+
 export interface EvalContext {
   now: Date;
   ownedProgramIds: readonly string[];

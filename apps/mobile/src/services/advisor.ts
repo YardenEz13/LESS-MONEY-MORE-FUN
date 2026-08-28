@@ -1,4 +1,9 @@
-import { rankBenefits, type Evaluation, type UserProfile } from '@sbr/core';
+import {
+  hiddenBenefitIds,
+  rankBenefits,
+  type Evaluation,
+  type UserProfile,
+} from '@sbr/core';
 import { benefits, merchantsById, ownedProgramIds, programNames } from './catalog';
 
 /**
@@ -124,7 +129,7 @@ export async function askAdvisor(
   const ranked = rankBenefits(benefits, {
     now: new Date(),
     ownedProgramIds: ownedProgramIds(profile.program_ids),
-    mutedBenefitIds: profile.muted_benefit_ids,
+    mutedBenefitIds: hiddenBenefitIds(profile),
   });
   if (ranked.length === 0) {
     return { answer: 'אין כרגע הטבות פעילות במועדונים שסימנת.' };

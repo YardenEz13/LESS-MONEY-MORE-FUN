@@ -16,6 +16,8 @@ import { border, colors, radius, space, type } from '../theme';
 interface Props {
   evaluation: Evaluation;
   isMuted: boolean;
+  isRejected: boolean;
+  onReport: () => void;
   onBack: () => void;
   onRedeemed: () => void;
   onToggleMute: () => void;
@@ -24,6 +26,8 @@ interface Props {
 export function BenefitDetailScreen({
   evaluation,
   isMuted,
+  isRejected,
+  onReport,
   onBack,
   onRedeemed,
   onToggleMute,
@@ -114,6 +118,19 @@ export function BenefitDetailScreen({
             אנחנו לא מנחשים תנאים. מה שלא כתוב בתקנון מסומן כ״לא צוין״ ולא כ״אין הגבלה״.
             הדף שנקרא הוא מה שראינו; התקנון המחייב הוא של המועדון.
           </Text>
+
+          {/* Placed with the source links rather than beside "I redeemed this":
+              reporting is a claim that the catalog disagrees with the page above,
+              so the two belong next to each other. */}
+          <View style={styles.report}>
+            {isRejected ? (
+              <Text style={styles.reportDone}>
+                דווח כשגוי. ההטבה הוסתרה ותוחזר לבדיקה בעדכון הקטלוג הבא.
+              </Text>
+            ) : (
+              <GhostButton label="ההטבה לא נכונה" onPress={onReport} />
+            )}
+          </View>
         </Section>
       </ScrollView>
 
@@ -189,6 +206,8 @@ const styles = StyleSheet.create({
   trustLabel: { flexShrink: 0 },
   trustValue: { flexShrink: 1, minWidth: 0 },
   trustAction: { paddingVertical: space.s3 - 4, gap: space.s2 },
+  report: { paddingTop: space.s3, borderTopWidth: border.hairline, borderTopColor: colors.borderHairlineSoft },
+  reportDone: { ...type.small, color: colors.textMuted },
   disclaimer: { ...type.caption, marginHorizontal: space.s4, lineHeight: 18 },
   footer: {
     flexDirection: 'row',

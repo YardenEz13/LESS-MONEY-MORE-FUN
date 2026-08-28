@@ -6,6 +6,7 @@ const STORAGE_KEY = 'sbr.profile.v1';
 export const emptyProfile: UserProfile = {
   program_ids: [],
   muted_benefit_ids: [],
+  rejected_benefit_ids: [],
   notifications_enabled: true,
   onboarded_at: null,
 };
@@ -59,4 +60,19 @@ export function toggleMuted(profile: UserProfile, benefitId: string): UserProfil
       ? profile.muted_benefit_ids.filter((id) => id !== benefitId)
       : [...profile.muted_benefit_ids, benefitId],
   };
+}
+
+/**
+ * Mark a benefit as wrong. One way only: un-rejecting from the app would let
+ * someone quietly withdraw a report they no longer remember making, and the
+ * catalog fix belongs in the review queue rather than on the device. Clearing
+ * happens in settings, after the ids have been handed to `npm run unpublish`.
+ */
+export function rejectBenefit(profile: UserProfile, benefitId: string): UserProfile {
+  if (profile.rejected_benefit_ids.includes(benefitId)) return profile;
+  return { ...profile, rejected_benefit_ids: [...profile.rejected_benefit_ids, benefitId] };
+}
+
+export function clearRejections(profile: UserProfile): UserProfile {
+  return { ...profile, rejected_benefit_ids: [] };
 }
