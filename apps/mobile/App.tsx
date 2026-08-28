@@ -7,7 +7,6 @@ import { useFonts } from 'expo-font';
 import { Karantina_700Bold } from '@expo-google-fonts/karantina';
 import { NotoSansHebrew_400Regular } from '@expo-google-fonts/noto-sans-hebrew';
 import type { Evaluation, UserProfile } from '@sbr/core';
-import { KitProvider } from './src/components/Kit';
 import { AdvisorScreen } from './src/screens/AdvisorScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
@@ -25,9 +24,8 @@ import { requestNotificationPermission } from './src/services/notifications';
 import { runtimeLimitation } from './src/services/runtime';
 import { resolveShare, subscribeToShares, type ShareResult } from './src/services/shareIntent';
 import { loadProfile, saveProfile, toggleMuted } from './src/state/profile';
-import { loadKitIntensity, saveKitIntensity } from './src/state/kit';
 import { logEvent } from './src/state/events';
-import { colors, enforceRtl, type KitIntensity } from './src/theme';
+import { colors, enforceRtl } from './src/theme';
 
 enforceRtl();
 
@@ -95,18 +93,6 @@ function AppRoot() {
   const [geofenceActive, setGeofenceActive] = useState(false);
   /** Whether the current failure is one only the OS settings page can clear. */
   const [geofenceFixable, setGeofenceFixable] = useState(false);
-  /**
-   * How loud the kit is. Lives beside the profile rather than inside it — see
-   * `state/kit.ts` — and starts at `full`, so the first frame after the fonts
-   * land is already striped rather than dressing itself a tick later.
-   */
-  const [kitIntensity, setKitIntensity] = useState<KitIntensity>('full');
-
-  const changeKit = useCallback(async (next: KitIntensity) => {
-    setKitIntensity(next);
-    await saveKitIntensity(next);
-  }, []);
-
   // The EFT pair carries the Hebrew; the two Google faces carry Latin runs
   // inside it — see the `latinFace` note in theme.ts.
   const [fontsLoaded] = useFonts({
@@ -125,7 +111,6 @@ function AppRoot() {
     void (async () => {
       const loaded = await loadProfile();
       setProfile(loaded);
-      setKitIntensity(await loadKitIntensity());
       setScreen(loaded.onboarded_at ? { name: 'home' } : { name: 'onboarding' });
       // Re-arms a fence the OS dropped since last launch, and never prompts —
       // see `resumeGeofencing`. Silent when nothing was granted yet.
@@ -229,7 +214,6 @@ function AppRoot() {
   }
 
   return (
-    <KitProvider intensity={kitIntensity}>
     <SafeAreaView style={styles.root}>
       <StatusBar style="dark" />
       <View style={styles.body}>
@@ -309,9 +293,7 @@ function AppRoot() {
             profile={profile}
             geofenceStatus={geofenceStatus}
             geofenceFixable={geofenceFixable}
-            kitIntensity={kitIntensity}
             onChange={setNotificationsEnabled}
-            onChangeKit={(next) => void changeKit(next)}
             onEditPrograms={() => setScreen({ name: 'onboarding' })}
             onEnableGeofencing={enableGeofencing}
             onBack={() => setScreen({ name: 'home' })}
@@ -321,7 +303,6 @@ function AppRoot() {
         {screen.name === 'stats' && <StatsScreen onBack={() => setScreen({ name: 'home' })} />}
       </View>
     </SafeAreaView>
-    </KitProvider>
   );
 }
 

@@ -9,7 +9,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { latinRuns } from '@sbr/core';
-import { Crest, PitchStripes, ScarfBand, useKit } from './Kit';
+import { Crest, PitchStripes, ScarfBand } from './Kit';
 import { border, colors, fonts, kit, latinFace, radius, space, type, useCompact } from '../theme';
 
 /**
@@ -137,7 +137,6 @@ export function Hero({
   children?: React.ReactNode;
 }) {
   const compact = useCompact();
-  const intensity = useKit();
   return (
     <>
       <View style={styles.hero}>
@@ -150,7 +149,7 @@ export function Hero({
               <Text
                 style={[
                   styles.heroTitle,
-                  { fontSize: kit.heroSize[intensity], lineHeight: kit.heroSize[intensity] + 2 },
+                  { fontSize: kit.heroSize, lineHeight: kit.heroSize + 2 },
                   compact && styles.heroTitleCompact,
                 ]}
               >
@@ -502,7 +501,7 @@ const styles = StyleSheet.create({
   },
   heroHeadline: { gap: space.s1, flexShrink: 1 },
   heroEyebrow: { ...type.meta, color: colors.textMutedOnPrimary },
-  /* Size and leading are set at the call site from the kit intensity — this is
+  /* Size and leading are set at the call site — this is
      everything about the headline that does not change between the two. */
   heroTitle: { ...type.display, color: colors.textInverse },
   /* One step down the display ramp, so the title still clears the gutters on a

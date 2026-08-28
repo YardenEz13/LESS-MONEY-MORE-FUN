@@ -372,12 +372,11 @@ export const gateVerdict: Record<GateTone, string> = {
  * The kit — the football half of the system, and the only part of this file
  * that draws texture rather than states a value.
  *
- * Two intensities, both real. `full` is the shirt: stripes at full strength,
- * the scarf at full depth, display type at scoreboard size. `quiet` keeps every
- * token and every layout and simply turns the volume down — a quarter-strength
- * stripe, a thin scarf, smaller display. Nothing moves between them, so a
- * screen laid out in one is laid out in the other, and the reader who does not
- * want to be a supporter still gets a system rather than a fan site.
+ * One intensity. There used to be two — a `quiet` mode at a quarter strength,
+ * chosen from settings — and it was removed along with its control: a second
+ * set of values nobody could pick is a fork in every kit call site paying for
+ * itself with nothing. Stripes at full strength, the scarf at full depth,
+ * display type at scoreboard size.
  *
  * A stripe is drawn as a row of fixed-width views, not as a gradient: React
  * Native has no repeating background, and a row of flat fills is what the
@@ -389,12 +388,10 @@ export const kit = {
   stripeGap: 26,
   /** Enough stripes to cross a tablet in landscape; the parent clips the rest. */
   stripeCount: 40,
-  stripeAlpha: { full: 0.17, quiet: 0.05 },
+  stripeAlpha: 0.17,
   /** The scarf: the band that closes a green surface. */
-  scarfHeight: { full: 16, quiet: 7 },
-  /** Display type is the scoreboard, so it is the first thing intensity moves. */
-  heroSize: { full: 46, quiet: 36 },
-  figureSize: { full: 48, quiet: 40 },
+  scarfHeight: 16,
+  /** Display type is the scoreboard. */
+  heroSize: 46,
+  figureSize: 48,
 } as const;
-
-export type KitIntensity = keyof typeof kit.stripeAlpha;

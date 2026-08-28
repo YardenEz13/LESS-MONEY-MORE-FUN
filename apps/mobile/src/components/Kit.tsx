@@ -1,14 +1,7 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text as RNText, View, type ViewStyle } from 'react-native';
 import { programsById } from '../services/catalog';
-import {
-  colors,
-  crestColors,
-  crestFallback,
-  fonts,
-  kit,
-  type KitIntensity,
-} from '../theme';
+import { colors, crestColors, crestFallback, fonts, kit } from '../theme';
 
 /**
  * The kit: pitch stripes, the scarf, and the club crest.
@@ -25,26 +18,6 @@ import {
  * Metro long before anyone saw a stripe.
  */
 
-const KitContext = createContext<KitIntensity>('full');
-
-/**
- * Wrap the app once. Defaults to `full` — the shirt is the product's face, and
- * a reader who wants it quieter says so in settings rather than by default.
- */
-export function KitProvider({
-  intensity,
-  children,
-}: {
-  intensity: KitIntensity;
-  children: React.ReactNode;
-}) {
-  return <KitContext.Provider value={intensity}>{children}</KitContext.Provider>;
-}
-
-export function useKit(): KitIntensity {
-  return useContext(KitContext);
-}
-
 /**
  * Vertical shirt stripes across whatever they are dropped into.
  *
@@ -53,12 +26,10 @@ export function useKit(): KitIntensity {
  * without the clip the stripes run past the block's edge.
  *
  * `tone` picks which way the stripe leans: `light` on a green or ink surface,
- * `dark` on a bright one like the yellow card. Both are drawn at the alpha the
- * current intensity allows, which is the single knob the quiet kit turns.
+ * `dark` on a bright one like the yellow card.
  */
 export function PitchStripes({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
-  const intensity = useKit();
-  const alpha = kit.stripeAlpha[intensity];
+  const alpha = kit.stripeAlpha;
   const backgroundColor =
     tone === 'light' ? `rgba(245, 243, 238, ${alpha})` : `rgba(17, 19, 16, ${alpha})`;
 
@@ -109,9 +80,8 @@ const SCARF_FILL = {
 } as const;
 
 export function ScarfBand({ height, style }: { height?: number; style?: ViewStyle }) {
-  const intensity = useKit();
   return (
-    <View style={[styles.scarf, { height: height ?? kit.scarfHeight[intensity] }, style]}>
+    <View style={[styles.scarf, { height: height ?? kit.scarfHeight }, style]}>
       {SCARF.map(([weight, role], i) => (
         <View key={i} style={{ flex: weight, backgroundColor: SCARF_FILL[role] }} />
       ))}

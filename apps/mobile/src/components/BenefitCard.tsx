@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { formatSaving, formatValue, type Evaluation } from '@sbr/core';
 import { ConditionStrip } from './Gates';
-import { Crest, PitchStripes, useKit } from './Kit';
+import { Crest, PitchStripes } from './Kit';
 import { Text } from './ui';
 import { merchantLine, programNames, programsById } from '../services/catalog';
 import {
@@ -51,7 +51,6 @@ export function BenefitCard({ evaluation, onPress }: Props) {
   const { figure, unit } = formatValue(benefit);
   const ready = actionsRequired.length === 0;
   const compact = useCompact();
-  const intensity = useKit();
 
   const category = programsById.get(benefit.program_id)?.category;
   const clubColor = (category && crestColors[category]) ?? crestFallback;
@@ -105,7 +104,7 @@ export function BenefitCard({ evaluation, onPress }: Props) {
           <Text
             style={[
               type.figure,
-              { fontSize: kit.figureSize[intensity], lineHeight: kit.figureSize[intensity] },
+              { fontSize: kit.figureSize, lineHeight: kit.figureSize },
               compact && styles.figureCompact,
             ]}
             numberOfLines={1}
