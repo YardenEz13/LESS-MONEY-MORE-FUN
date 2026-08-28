@@ -3,6 +3,7 @@ import {
   Pressable,
   StyleSheet,
   Text as RNText,
+  TextInput,
   View,
   type TextProps,
   type ViewStyle,
@@ -306,6 +307,67 @@ export function GhostButton({
  * through its own padding and sit visibly off-centre; a truncated "דורש פעו…"
  * would be worse than a second line.
  */
+/**
+ * The search box. One component for both lists that got too long to scan: 61
+ * clubs at onboarding and 1199 merchants after it.
+ *
+ * `textAlign: 'right'` rather than leaving it to the platform. The catalog is
+ * Hebrew with Latin brand names all through it ("Fox Home", "KSP"), and an
+ * input left to auto-align jumps its alignment the moment the first Latin
+ * character is typed — the field visibly moves while someone is using it. It is
+ * a Hebrew field that sometimes holds Latin text, so it is pinned that way.
+ *
+ * The clear button is a real control rather than relying on the keyboard's,
+ * because on a filtered list "how do I get everything back" is the second
+ * thing anyone needs and the platform's own clear affordance is inconsistent.
+ */
+export function SearchField({
+  value,
+  onChange,
+  placeholder,
+  resultCount,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  /** Shown once something has been typed, so a short list reads as filtered rather than empty. */
+  resultCount?: number;
+}) {
+  return (
+    <View style={styles.searchWrap}>
+      <View style={styles.search}>
+        <TextInput
+          value={value}
+          onChangeText={onChange}
+          placeholder={placeholder}
+          placeholderTextColor={colors.textMuted}
+          style={styles.searchInput}
+          accessibilityLabel={placeholder}
+          autoCorrect={false}
+          autoCapitalize="none"
+          returnKeyType="search"
+          clearButtonMode="never"
+        />
+        {value.length > 0 && (
+          <Pressable
+            onPress={() => onChange('')}
+            accessibilityRole="button"
+            accessibilityLabel="נקה חיפוש"
+            style={styles.searchClear}
+          >
+            <Text style={styles.searchClearMark}>×</Text>
+          </Pressable>
+        )}
+      </View>
+      {value.trim().length > 0 && resultCount != null && (
+        <Text style={styles.searchCount}>
+          {resultCount === 0 ? 'אין תוצאות' : `${resultCount} תוצאות`}
+        </Text>
+      )}
+    </View>
+  );
+}
+
 export function FilterRow<T extends string>({
   options,
   value,
@@ -483,6 +545,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  searchWrap: { paddingHorizontal: space.s4, paddingBottom: space.s2, gap: space.s1 },
+  /* Flat fill, 90 degrees, one hairline — the same three rules as every other
+     surface in the system. No focus glow: the caret already says where you are. */
+  search: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceRaised,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
+    borderRadius: radius.sharp,
+    paddingHorizontal: space.s3,
+  },
+  searchInput: {
+    flex: 1,
+    ...type.body,
+    paddingVertical: space.s2 + 2,
+    textAlign: 'right',
+  },
+  searchClear: { paddingHorizontal: space.s2, paddingVertical: space.s1 },
+  searchClearMark: { ...type.body, color: colors.textMuted, fontSize: 20, lineHeight: 22 },
+  searchCount: { ...type.caption, paddingHorizontal: space.s1 },
   filterRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
