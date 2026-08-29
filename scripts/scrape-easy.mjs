@@ -295,6 +295,39 @@ function toRecord(slug, biz) {
 }
 
 /**
+ * Fold a regional sweep into the file an unscoped crawl owns.
+ *
+ * easy geo-ranks its results, so a crawl anchored on Haifa returns Haifa's
+ * businesses and not Tel Aviv's. Writing that straight out would replace 84% of
+ * the catalog with 16 shops — the flags to run one existed for months and were
+ * never safe to use for exactly this reason.
+ *
+ * Only for `--lat/--lng` runs. An unscoped crawl stays authoritative and keeps
+ * replacing, because that is the only way a deal that genuinely disappeared
+ * ever leaves the file; a union can add but can never retract.
+ *
+ * Fresh rows win on collision, existing order is preserved and new rows are
+ * appended, so a second city shows up in the diff as additions rather than as a
+ * rewrite of the whole file.
+ */
+async function unionWithExisting(path, records) {
+  let previous;
+  try {
+    previous = (await readFile(path, 'utf8'))
+      .split('\n')
+      .filter((l) => l.trim())
+      .map((l) => JSON.parse(l));
+  } catch {
+    return records; // no previous file: the sweep is the whole file
+  }
+  const incoming = new Map(records.map((r) => [r.offer_url, r]));
+  const merged = previous.map((r) => incoming.get(r.offer_url) ?? r);
+  const seen = new Set(previous.map((r) => r.offer_url));
+  for (const r of records) if (!seen.has(r.offer_url)) merged.push(r);
+  return merged;
+}
+
+/**
  * Carry `verified_at` across a re-crawl for records that did not change.
  *
  * Without this every weekly crawl silently resets the proof on every list it
@@ -504,7 +537,11 @@ async function main() {
       // would read downstream as "these deals were removed" and delete real rows.
       if (complete) {
         if (records.length > 0) {
-          const merged = await keepVerification(path, records);
+          const stamped = await keepVerification(path, records);
+          // A geo-anchored run is a supplementary sweep, not a replacement. With
+          // --cities every point is geo-anchored, so without this each city
+          // would overwrite the one before it.
+          const merged = point.params ? await unionWithExisting(path, stamped) : stamped;
           await writeFile(path, merged.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
           console.log(
             `  wrote ${path} (${records.length} offers)${program ? ` -> --program ${program}` : '  (no program mapped yet)'}`,

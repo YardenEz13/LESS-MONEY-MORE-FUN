@@ -45,6 +45,28 @@ export function freshnessFor(benefit: Pick<Benefit, 'program_id'>): FreshnessPol
 }
 
 /**
+ * Has the whole catalog aged out — is the list empty because of the clock
+ * rather than because of anything the user chose?
+ *
+ * The catalog ships inside the app and every benefit carries the date it was
+ * verified, so a build that stops receiving updates crosses `staleDays` all at
+ * once and `evaluateBenefit` blocks every single row. The screen that results
+ * is indistinguishable from "you hold no clubs with offers right now", and the
+ * user cannot act on it because the fix is a new catalog, not a new choice.
+ *
+ * Deliberately "every benefit", not "most": a single fresh row means the app is
+ * still working and the empty list has some other cause worth naming instead.
+ */
+export function catalogIsStale(
+  benefits: readonly Benefit[],
+  now: Date,
+  freshness: FreshnessPolicy = DEFAULT_FRESHNESS,
+): boolean {
+  if (benefits.length === 0) return false;
+  return benefits.every((b) => daysSince(b.last_verified_at, now) > freshness.staleDays);
+}
+
+/**
  * Minimum confidence for a benefit to be surfaced without human review.
  * Anything below goes to the review queue in the extraction pipeline; if it
  * still reaches a client, we refuse to show it. KPI #2 (zero condition-level

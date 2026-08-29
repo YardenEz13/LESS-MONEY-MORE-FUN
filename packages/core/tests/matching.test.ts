@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Benefit, Program } from '../src/types';
 import {
+  catalogIsStale,
   estimateSaving,
   evaluateBenefit,
   expandOwnedPrograms,
@@ -379,5 +380,39 @@ describe('freshness for public offers', () => {
     };
     const old = makeBenefit({ program_id: 'public', last_verified_at: daysAgo(30) });
     expect(evaluateBenefit(old, ctx).status).not.toBe('blocked');
+  });
+});
+
+// The catalog ships inside the app, so a build that stops receiving updates
+// crosses staleDays all at once and every row blocks. This is the check that
+// the screen can still explain itself when that happens.
+describe('catalogIsStale', () => {
+  const fresh = makeBenefit({ id: 'fresh', last_verified_at: '2026-08-01T10:00:00Z' });
+  const old = makeBenefit({ id: 'old', last_verified_at: '2026-05-01T10:00:00Z' });
+
+  it('is false while anything is still inside the policy', () => {
+    expect(catalogIsStale([fresh, old], SUNDAY_NOON)).toBe(false);
+  });
+
+  it('is true once every benefit is past staleDays', () => {
+    expect(catalogIsStale([old], SUNDAY_NOON)).toBe(true);
+  });
+
+  // An empty catalog is a packaging failure, not an aged one, and saying "update
+  // the app for a fresh catalog" would send the reader after the wrong fix.
+  it('is false for an empty catalog rather than vacuously true', () => {
+    expect(catalogIsStale([], SUNDAY_NOON)).toBe(false);
+  });
+
+  it('tracks the policy it is given, not the default', () => {
+    expect(catalogIsStale([fresh], SUNDAY_NOON, { agingDays: 0, staleDays: 0 })).toBe(true);
+  });
+
+  // The real failure this exists for: the shipped catalog, 45 days on.
+  it('flips exactly once the shipped catalog ages out', () => {
+    const day44 = new Date(Date.parse('2026-08-01T10:00:00Z') + 44 * 86400000);
+    const day46 = new Date(Date.parse('2026-08-01T10:00:00Z') + 46 * 86400000);
+    expect(catalogIsStale([fresh], day44)).toBe(false);
+    expect(catalogIsStale([fresh], day46)).toBe(true);
   });
 });

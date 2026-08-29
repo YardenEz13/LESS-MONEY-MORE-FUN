@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
+  catalogIsStale,
   findCombos,
   hiddenBenefitIds,
   matchesQuery,
@@ -115,6 +116,10 @@ export function HomeScreen({
       }),
     [profile.program_ids, profile.muted_benefit_ids],
   );
+
+  // Checked against the whole catalog rather than the filtered list: the answer
+  // is about the bundle's age, not about what this user happens to hold.
+  const catalogStale = useMemo(() => catalogIsStale(benefits, new Date()), []);
 
   // Two offers on one purchase. Shown above the list because a combo is the
   // one thing a user cannot work out by scrolling — it only exists between
@@ -272,6 +277,7 @@ export function HomeScreen({
             filter={filter}
             hasPrograms={profile.program_ids.length > 0}
             here={hereIds && !venue ? here : null}
+            catalogStale={catalogStale}
             onEditPrograms={onOpenSettings}
           />
         ) : (
@@ -506,12 +512,15 @@ function EmptyState({
   filter,
   hasPrograms,
   here,
+  catalogStale,
   onEditPrograms,
 }: {
   filter: Filter;
   hasPrograms: boolean;
   /** A pinned point that returned nothing — the coverage case, not the no-deals case. */
   here: Coordinates | null;
+  /** The list is empty because the catalog aged out — see `catalogIsStale`. */
+  catalogStale: boolean;
   onEditPrograms: () => void;
 }) {
   // Nothing within walking distance has two very different causes, and telling
@@ -521,7 +530,17 @@ function EmptyState({
   // true is how an app reads as broken to everyone outside Gush Dan.
   const nearest = here ? nearestCatalogPlace(here) : null;
 
-  const copy = !hasPrograms
+
+  // Staleness is checked before the user's own choices, because it outranks
+  // them: when the catalog has aged out every row is blocked no matter what is
+  // ticked, and telling someone to go pick more clubs would send them to fix
+  // the one thing that is not broken.
+  const copy = catalogStale
+    ? {
+        title: 'הקטלוג לא עודכן מזמן',
+        body: 'כל ההטבות אומתו לפני יותר מ-45 יום, ולכן אינן מוצגות. עדכן את האפליקציה כדי לקבל קטלוג חדש — הרשימה תחזור מיד.',
+      }
+    : !hasPrograms
     ? {
         title: 'עוד לא סימנת מועדונים',
         body: 'פתח הגדרות וסמן את הכרטיסים והמועדונים שברשותך. זה לוקח פחות מדקה.',

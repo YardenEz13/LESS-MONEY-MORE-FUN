@@ -90,6 +90,28 @@ Offers are keyed by the collector's `content_hash`, so a re-crawl only pays the
 model for pages whose text actually changed. `--limit` defaults to 25 because a
 first run against an 800-offer catalog should be a choice, not a typo.
 
+### Collecting outside Gush Dan
+
+easy.co.il geo-ranks its results, so a plain `npm run scrape:easy` returns the
+region its own default location sits in — which is why the catalog was 84% Gush
+Dan, with 16 branches in Haifa and 10 in Be'er Sheva. Anchor the crawl somewhere
+else to add that region:
+
+```bash
+node scripts/scrape-easy.mjs --lat 32.7940 --lng 34.9896 --rad 15   # חיפה
+node scripts/scrape-easy.mjs --lat 31.7683 --lng 35.2137 --rad 15   # ירושלים
+node scripts/scrape-easy.mjs --lat 31.2530 --lng 34.7915 --rad 15   # באר שבע
+node scripts/scrape-easy.mjs --lat 31.8014 --lng 34.6435 --rad 15   # אשדוד
+node scripts/scrape-easy.mjs --lat 32.3215 --lng 34.8532 --rad 15   # נתניה
+```
+
+Roughly 20 minutes per city across all ~90 lists. A run with coordinates
+**merges** into what is already collected, so cities accumulate and the order
+you run them in does not matter. A run **without** coordinates still replaces,
+because that is the only way a business that closed ever leaves the file — so
+run the unscoped crawl first and the regional sweeps after it, never the other
+way around.
+
 ### Getting a benefit onto a phone
 
 ```bash
@@ -101,6 +123,36 @@ npm run publish:catalog                # merge into data/benefits.json
 fresh clone builds without ever running the pipeline. Promotion is a separate
 step on purpose: it is the last point a human sees what is about to appear at a
 till, and it refuses to publish anything still in the review queue.
+
+Then push it to phones already in the field:
+
+```bash
+npm run ship:catalog     # validate:data, then eas update --branch production
+```
+
+**Why this is not optional.** Every benefit carries `last_verified_at`, and past
+45 days `evaluateBenefit` blocks it. The catalog ships inside the JS bundle, so
+a build that stops receiving updates crosses that line all at once — 206
+relevant benefits become 0, on every phone, about six weeks after the last
+publish. `eas update` replaces the bundle, and the catalog rides along with it;
+without it, refreshing data costs a full store release.
+
+Two things follow from that. `runtimeVersion` is `appVersion`, so bumping
+`version` in `app.json` deliberately cuts existing installs off from further
+updates — bump it for native changes only, never for a catalog refresh. And the
+home screen names the failure rather than showing a blank list, so a phone that
+did fall behind says so instead of looking empty (`catalogIsStale`).
+
+First run on a machine needs an Expo account once, to create the project and
+write `updates.url` into `app.json`:
+
+```bash
+cd apps/mobile && npx eas update:configure
+```
+
+`npm run ship:catalog` is deliberately not wired into `weekly-refresh.ps1`: that
+script refreshes collected data and stops, because pushing to phones costs money
+and judgement and stays a decision made at a keyboard.
 
 ### Run the app
 
