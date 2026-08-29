@@ -83658,33 +83658,6 @@
     "reviewed_by_human": true
   },
   {
-    "id": "p100_members_unmapped_בתי_עסק_שונים_92dffc32af5d",
-    "program_id": "p100_members",
-    "merchant_id": "unmapped_בתי_עסק_שונים",
-    "merchant_name": "בתי עסק שונים",
-    "google_place_id": null,
-    "type": "percent",
-    "value": 10,
-    "conditions": {
-      "min_spend": null,
-      "max_discount": null,
-      "valid_days": null,
-      "valid_hours": null,
-      "channel": "both",
-      "stacks_with_club": null,
-      "exclusions": null,
-      "raw_text_summary": "עד 10% הנחה במעמד החיוב במגוון תחומי עניין (צרכנות, מסעדות ומזון, תיירות ונופש ועוד).",
-      "usage_limit": null,
-      "requires_voucher": null
-    },
-    "valid_from": null,
-    "valid_until": null,
-    "source_url": "https://www.isracard.co.il/credit-cards/p100",
-    "last_verified_at": "2026-08-29T13:38:24.257Z",
-    "confidence_score": 0.8,
-    "reviewed_by_human": true
-  },
-  {
     "id": "adif_members_unmapped_אחוזת_חוף_רשת_חניונים_בתל_אביב_e1581f087ca5",
     "program_id": "adif_members",
     "merchant_id": "unmapped_אחוזת_חוף_רשת_חניונים_בתל_אביב",
