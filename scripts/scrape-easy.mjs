@@ -495,6 +495,11 @@ async function main() {
     points = [{ name: 'custom point', params: geo.toString() }];
   }
 
+  // A geo-anchored run is a supplementary sweep, not a replacement: easy
+  // geo-ranks results, so a Haifa-anchored crawl returns Haifa's businesses
+  // and writing it straight out would replace most of the catalog.
+  const geoScoped = points.some((p) => p.params);
+
   await mkdir('collected/easy', { recursive: true });
 
   const slugs = only ? [only] : await discoverLists();
@@ -541,7 +546,7 @@ async function main() {
           // A geo-anchored run is a supplementary sweep, not a replacement. With
           // --cities every point is geo-anchored, so without this each city
           // would overwrite the one before it.
-          const merged = point.params ? await unionWithExisting(path, stamped) : stamped;
+          const merged = geoScoped ? await unionWithExisting(path, stamped) : stamped;
           await writeFile(path, merged.map((r) => JSON.stringify(r)).join('\n') + '\n', 'utf8');
           console.log(
             `  wrote ${path} (${records.length} offers)${program ? ` -> --program ${program}` : '  (no program mapped yet)'}`,
