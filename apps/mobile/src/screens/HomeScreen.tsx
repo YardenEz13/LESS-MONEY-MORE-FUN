@@ -6,6 +6,7 @@ import {
   hiddenBenefitIds,
   matchesQuery,
   rankBenefits,
+  REFERENCE_BASKET_ILS,
   type Combo,
   type Coordinates,
   type Evaluation,
@@ -363,9 +364,16 @@ function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
           ]}
         />
         <Text style={[type.caption, styles.comboVerdict]} numberOfLines={2}>
-          {combo.confirmed
-            ? 'שני התקנונים מתירים כפל · ההערכה לפי הסדר הפחות מיטיב'
-            : combo.caveats.join(' · ')}
+          {[
+            combo.confirmed
+              ? 'שני התקנונים מתירים כפל · ההערכה לפי הסדר הפחות מיטיב'
+              : combo.caveats.join(' · '),
+            // The plate figure assumes a cart, since a list screen has none —
+            // named here rather than left for the number to imply it's real.
+            combo.isEstimate ? `לפי סל לדוגמה של ₪${REFERENCE_BASKET_ILS}` : null,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
         </Text>
       </View>
     </Pressable>

@@ -34,6 +34,7 @@ export function BenefitDetailScreen({
 }: Props) {
   const { benefit, gates, actionsRequired } = evaluation;
   const { figure, unit } = formatValue(benefit);
+  const saving = formatSaving(evaluation);
 
   // Where this came from, in two parts, because they are two different claims.
   // `source_url` is the page we actually read — for 2731 of 2763 benefits that
@@ -67,7 +68,7 @@ export function BenefitDetailScreen({
               <Text style={styles.tillFigure}>{figure}</Text>
               <Text style={styles.tillUnit}>{unit}</Text>
             </View>
-            <Text style={styles.tillSaving}>{formatSaving(evaluation)}</Text>
+            {saving && <Text style={styles.tillSaving}>{saving}</Text>}
             <View style={styles.tillRule} />
             <Text style={styles.tillNote}>
               {actionsRequired.length === 0

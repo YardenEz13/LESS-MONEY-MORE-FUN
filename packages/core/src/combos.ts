@@ -34,6 +34,8 @@ export interface Combo {
   merchantName: string;
   /** Conservative estimate — the worse of the two application orders. */
   estimatedSavingIls: number;
+  /** True when the cart was unknown and `estimatedSavingIls` used the reference basket. */
+  isEstimate: boolean;
   /** True only when both T&Cs explicitly permit stacking. */
   confirmed: boolean;
   /** Why it might not hold. Never empty when `confirmed` is false. */
@@ -97,6 +99,7 @@ export function findCombos(
   options: ComboOptions = {},
 ): Combo[] {
   const { cartAmount, limit } = options;
+  const isEstimate = cartAmount === undefined;
   const basket = cartAmount ?? REFERENCE_BASKET_ILS;
 
   const usable = evaluations.filter(
@@ -140,6 +143,7 @@ export function findCombos(
             ? b.benefit.merchant_name
             : a.benefit.merchant_name,
         estimatedSavingIls: saving,
+        isEstimate,
         confirmed: caveats.length === 0,
         caveats,
       });

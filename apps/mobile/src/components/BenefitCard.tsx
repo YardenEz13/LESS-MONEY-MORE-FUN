@@ -57,6 +57,9 @@ export function BenefitCard({ evaluation, onPress }: Props) {
   // "מכולת · גבעתיים". Absent for the handful of merchants the source never
   // described, and then the name simply stands alone as it always did.
   const place = merchantLine(benefit.merchant_id);
+  // Null whenever the cart is unknown, which on this screen is always — the
+  // footer then ends at the readiness line and the plate figure stands alone.
+  const saving = formatSaving(evaluation);
 
   return (
     <Pressable
@@ -125,9 +128,11 @@ export function BenefitCard({ evaluation, onPress }: Props) {
         <Text style={styles.readiness} numberOfLines={1}>
           {ready ? 'אפשר ללכת לקופה' : actionsRequired.map((g) => g.label).join(' · ')}
         </Text>
-        <Text style={type.caption} numberOfLines={1}>
-          {formatSaving(evaluation)}
-        </Text>
+        {saving && (
+          <Text style={type.caption} numberOfLines={1}>
+            {saving}
+          </Text>
+        )}
       </View>
     </Pressable>
   );
