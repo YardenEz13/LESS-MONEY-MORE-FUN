@@ -14,7 +14,7 @@
   {
     "program_id": "isracard",
     "program_name": "ישראכרט",
-    "url": "https://www.isracard.co.il/",
+    "url": "https://benefits.isracard.co.il/",
     "fixture": "packages/extraction/fixtures/isracard-sample.html"
   },
   {

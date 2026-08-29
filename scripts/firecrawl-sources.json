@@ -1,0 +1,668 @@
+[
+  {
+    "program_id": "ashmoret_membership",
+    "name": "אשמורת",
+    "category": "retail_club",
+    "benefits": 99,
+    "status": "blocked",
+    "root": "https://www.itu.org.il/",
+    "note": "only 0 chars — shell, block or maintenance"
+  },
+  {
+    "program_id": "club_hot_discounts",
+    "name": "הוט",
+    "category": "retail_club",
+    "benefits": 94,
+    "status": "blocked",
+    "root": "https://www.hot.co.il/",
+    "note": "HTTP 403"
+  },
+  {
+    "program_id": "shotrim",
+    "name": "קרן השוטרים",
+    "category": "employer_club",
+    "benefits": 70,
+    "status": "blocked",
+    "root": "https://www.kranot.org.il/",
+    "note": "HTTP 403"
+  },
+  {
+    "program_id": "amit_kranot_benefits_card",
+    "name": "קרנות הטבות",
+    "category": "credit_card",
+    "benefits": 54,
+    "status": "blocked",
+    "root": "https://www.kranot.org.il/",
+    "note": "HTTP 403"
+  },
+  {
+    "program_id": "power_card",
+    "name": "PowerCard",
+    "category": "credit_card",
+    "benefits": 12,
+    "status": "blocked",
+    "root": "https://www.powercard.co.il/",
+    "note": "HTTP 403"
+  },
+  {
+    "program_id": "shufersal_life",
+    "name": "שופרסל LIFE",
+    "category": "retail_club",
+    "benefits": 1,
+    "status": "blocked",
+    "root": "https://www.shufersal.co.il/online/he/deals",
+    "note": "site was serving a maintenance image; re-probe before wiring"
+  },
+  {
+    "program_id": "leumi_goodies",
+    "name": "לאומי בונוס",
+    "category": "credit_card",
+    "benefits": 1,
+    "status": "blocked",
+    "root": "https://bonus.leumi.co.il/",
+    "note": "only 0 chars — shell, block or maintenance"
+  },
+  {
+    "program_id": "digitel_discounts",
+    "name": "דיגיתל",
+    "category": "retail_club",
+    "benefits": 1,
+    "status": "blocked",
+    "root": "https://www.tel-aviv.gov.il/Residents/Digitel/Pages/Benefits.aspx",
+    "note": "HTTP 472"
+  },
+  {
+    "program_id": "rami_levy_club",
+    "name": "רמי לוי המועדון",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "blocked",
+    "root": "https://hamoadon.rami-levy.co.il/",
+    "note": "only 0 chars — shell, block or maintenance"
+  },
+  {
+    "program_id": "pais_members",
+    "name": "פיס פלוס",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "blocked",
+    "root": "https://paisplus.co.il/",
+    "note": "HTTP 571"
+  },
+  {
+    "program_id": "yours_club",
+    "name": "מועדון שלך",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "blocked",
+    "root": "https://yours.co.il/",
+    "note": "HTTP 571"
+  },
+  {
+    "program_id": "your_club_for_pensioner",
+    "name": "שלך לגמלאי",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "blocked",
+    "root": "https://yoursg.co.il/",
+    "note": "only 0 chars — shell, block or maintenance"
+  },
+  {
+    "program_id": "friends_clube",
+    "name": "Friends Clube",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "blocked",
+    "root": "https://www.friends4students.co.il/%D7%AA%D7%A7%D7%A0%D7%95%D7%9F-friends-4-students/",
+    "note": "only 0 chars — shell, block or maintenance"
+  },
+  {
+    "program_id": "shachar_club",
+    "name": "מועדון שחר",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "blocked",
+    "root": "https://www.m-shachar.org.il/",
+    "note": "only 0 chars — shell, block or maintenance"
+  },
+  {
+    "program_id": "discount_for_senior_citizens",
+    "name": "הטבת גמלאי",
+    "category": "employer_club",
+    "benefits": 0,
+    "status": "blocked",
+    "root": "https://yoursg.co.il/",
+    "note": "HTTP 571"
+  },
+  {
+    "program_id": "behatsdaa",
+    "name": "בהצדעה",
+    "category": "employer_club",
+    "benefits": 102,
+    "status": "guarded",
+    "root": "https://www.behatsdaa.org.il/",
+    "note": "SPA returns only its accessibility widget on every path, plus sign-in cues"
+  },
+  {
+    "program_id": "hever",
+    "name": "חבר",
+    "category": "employer_club",
+    "benefits": 94,
+    "status": "guarded",
+    "root": "https://www.hvr.co.il/",
+    "note": "login wall; stays a manual session, never automated"
+  },
+  {
+    "program_id": "histadrut_for_you",
+    "name": "ביחד בשבילך",
+    "category": "retail_club",
+    "benefits": 90,
+    "status": "guarded",
+    "root": "https://www.hist.org.il/",
+    "note": "3 sign-in cues, only 3 offer terms"
+  },
+  {
+    "program_id": "bezeq_employees_association",
+    "name": "מועדון B Kef",
+    "category": "retail_club",
+    "benefits": 75,
+    "status": "guarded",
+    "root": "https://www.b-kef.co.il/",
+    "note": "6 sign-in cues, only 2 offer terms"
+  },
+  {
+    "program_id": "clalit_fun",
+    "name": "כללית פנאי",
+    "category": "retail_club",
+    "benefits": 13,
+    "status": "guarded",
+    "root": "https://www.clalitr.co.il/",
+    "note": "10 sign-in cues, only 5 offer terms"
+  },
+  {
+    "program_id": "living_members",
+    "name": "Living",
+    "category": "retail_club",
+    "benefits": 76,
+    "status": "needs_url",
+    "root": null,
+    "note": "no official-looking site in search results"
+  },
+  {
+    "program_id": "campus_card_members",
+    "name": "קמפוסכרט",
+    "category": "credit_card",
+    "benefits": 69,
+    "status": "needs_url",
+    "root": null,
+    "note": "campuscard.co.il returned 0 chars; search landed on isracard chever, which is a different card"
+  },
+  {
+    "program_id": "mizrahi_tefahot_members",
+    "name": "מזרחי טפחות",
+    "category": "credit_card",
+    "benefits": 29,
+    "status": "needs_url",
+    "root": null,
+    "note": "search returned a Google redirect blob; mizrahi-tefahot.co.il/card/ is a 404"
+  },
+  {
+    "program_id": "mastercard_day",
+    "name": "מאסטרקארד",
+    "category": "credit_card",
+    "benefits": 13,
+    "status": "needs_url",
+    "root": null,
+    "note": "mastercard.co.il is the global corporate site, not an Israeli benefits catalog"
+  },
+  {
+    "program_id": "student_group",
+    "name": "סטודנט גרופ",
+    "category": "employer_club",
+    "benefits": 13,
+    "status": "needs_url",
+    "root": null,
+    "note": "no official-looking site in search results"
+  },
+  {
+    "program_id": "max",
+    "name": "Max",
+    "category": "credit_card",
+    "benefits": 105,
+    "status": "open",
+    "root": "https://www.max.co.il/benefits",
+    "note": "verified: 80 offer pages, terms present"
+  },
+  {
+    "program_id": "calextra_discounts",
+    "name": "כ.א.ל Extra",
+    "category": "credit_card",
+    "benefits": 100,
+    "status": "open",
+    "root": "https://www.cal-online.co.il/benefits/",
+    "note": "17 offer terms in 8682 chars"
+  },
+  {
+    "program_id": "mystyle_discounts",
+    "name": "Mystyle",
+    "category": "retail_club",
+    "benefits": 100,
+    "status": "needs_offer_urls",
+    "root": "https://my.style.co.il/?aid=108",
+    "note": "root renders the site terms-of-use document, not a catalog"
+  },
+  {
+    "program_id": "magiayoter",
+    "name": "מגיע לך יותר",
+    "category": "retail_club",
+    "benefits": 100,
+    "status": "open",
+    "root": "https://yoter.co.il/",
+    "note": "29 offer terms in 24856 chars"
+  },
+  {
+    "program_id": "max_kranot",
+    "name": "כרטיס אשראי קרנות",
+    "category": "credit_card",
+    "benefits": 94,
+    "status": "open",
+    "root": "https://www.max.co.il/cards/kranot",
+    "note": "64 offer terms in 25288 chars"
+  },
+  {
+    "program_id": "yahad",
+    "name": "יחד",
+    "category": "retail_club",
+    "benefits": 94,
+    "status": "needs_offer_urls",
+    "root": "https://www.ima.org.il/yahadclub/default.aspx?m=1",
+    "note": "single page yields 605 chars, no offers"
+  },
+  {
+    "program_id": "isracard_top_members",
+    "name": "ישראכרט TOP",
+    "category": "credit_card",
+    "benefits": 85,
+    "status": "needs_offer_urls",
+    "root": "https://top.style.co.il/",
+    "note": "/map returns no offer URLs; scrape refused twice"
+  },
+  {
+    "program_id": "insurance_association_members",
+    "name": "לשכת סוכני הביטוח",
+    "category": "employer_club",
+    "benefits": 74,
+    "status": "needs_offer_urls",
+    "root": "https://www.isracard.co.il/credit-cards/insurance",
+    "note": "club overview page; offers are not linked from it"
+  },
+  {
+    "program_id": "i_card",
+    "name": "iCard",
+    "category": "credit_card",
+    "benefits": 73,
+    "status": "needs_offer_urls",
+    "root": "https://icard.style.co.il/",
+    "note": "SPA shell returns a generic default render — byte-identical to youngstyle"
+  },
+  {
+    "program_id": "meshekard",
+    "name": "משקארד",
+    "category": "retail_club",
+    "benefits": 73,
+    "status": "open",
+    "root": "https://www.meshekard.co.il/",
+    "note": "22 offer terms in 2672 chars"
+  },
+  {
+    "program_id": "youngstyle",
+    "name": "ישראכרט צעיר",
+    "category": "credit_card",
+    "benefits": 72,
+    "status": "needs_offer_urls",
+    "root": "https://young.style.co.il/",
+    "note": "SPA shell returns a generic default render — byte-identical to i_card"
+  },
+  {
+    "program_id": "adif_members",
+    "name": "עדיף",
+    "category": "retail_club",
+    "benefits": 72,
+    "status": "open",
+    "root": "https://adif.org.il/",
+    "note": "37 offer terms in 16840 chars"
+  },
+  {
+    "program_id": "vegan_active_discounts",
+    "name": "ויגן אקטיב",
+    "category": "retail_club",
+    "benefits": 71,
+    "status": "open",
+    "root": "https://www.isracard.co.il/credit-cards/veganfriendly",
+    "note": "63 offer terms in 16593 chars"
+  },
+  {
+    "program_id": "egged_driver_memebers",
+    "name": "מועדון אגד",
+    "category": "employer_club",
+    "benefits": 71,
+    "status": "open",
+    "root": "https://www.eggedclub.co.il/",
+    "note": "317 offer terms in 72670 chars"
+  },
+  {
+    "program_id": "corporate_members",
+    "name": "Corporate",
+    "category": "retail_club",
+    "benefits": 66,
+    "status": "open",
+    "root": "https://www.mycorporate.co.il/",
+    "note": "326 offer terms in 81158 chars"
+  },
+  {
+    "program_id": "p100_members",
+    "name": "P100",
+    "category": "retail_club",
+    "benefits": 61,
+    "status": "open",
+    "root": "https://www.isracard.co.il/credit-cards/p100",
+    "note": "48 offer terms in 14273 chars"
+  },
+  {
+    "program_id": "discounts_american_express",
+    "name": "AMEX",
+    "category": "credit_card",
+    "benefits": 60,
+    "status": "open",
+    "root": "https://rewards.americanexpress.co.il/",
+    "note": "60 offer terms in 14576 chars"
+  },
+  {
+    "program_id": "life_style_members",
+    "name": "LifeStyle",
+    "category": "retail_club",
+    "benefits": 53,
+    "status": "open",
+    "root": "https://lifestyle.style.co.il/",
+    "note": "240 offer terms in 62072 chars"
+  },
+  {
+    "program_id": "vegan_bonus",
+    "name": "ויגן בונוס",
+    "category": "retail_club",
+    "benefits": 46,
+    "status": "open",
+    "root": "https://business.vegan-friendly.com/he/va-terms-of-use/",
+    "note": "87 offer terms in 12025 chars"
+  },
+  {
+    "program_id": "max_tmura",
+    "name": "max תמורה",
+    "category": "credit_card",
+    "benefits": 43,
+    "status": "open",
+    "root": "https://www.max.co.il/cards/tmura",
+    "note": "52 offer terms in 26168 chars"
+  },
+  {
+    "program_id": "topcash",
+    "name": "Topcash",
+    "category": "retail_club",
+    "benefits": 41,
+    "status": "open",
+    "root": "https://www.topcash.co.il/",
+    "note": "45 offer terms in 15795 chars"
+  },
+  {
+    "program_id": "mafteach_discounts",
+    "name": "מפתח דיסקונט",
+    "category": "credit_card",
+    "benefits": 39,
+    "status": "open",
+    "root": "https://www.discountbank.co.il/private/credit-cards/discount-key/",
+    "note": "16 offer terms in 20209 chars"
+  },
+  {
+    "program_id": "yoter",
+    "name": "מועדון יותר",
+    "category": "retail_club",
+    "benefits": 38,
+    "status": "open",
+    "root": "https://yoter.co.il/",
+    "note": "29 offer terms in 24856 chars"
+  },
+  {
+    "program_id": "mercantile_smile",
+    "name": "מרכנתיל סמייל",
+    "category": "credit_card",
+    "benefits": 22,
+    "status": "open",
+    "root": "https://www.mercantile.co.il/private/credit-cards/mercantile-smile/",
+    "note": "23 offer terms in 17309 chars"
+  },
+  {
+    "program_id": "cuponofesh",
+    "name": "קופונופש",
+    "category": "retail_club",
+    "benefits": 20,
+    "status": "open",
+    "root": "https://cpnclub.co.il/",
+    "note": "59 offer terms in 82524 chars"
+  },
+  {
+    "program_id": "living_plus_members",
+    "name": "Living Plus",
+    "category": "retail_club",
+    "benefits": 18,
+    "status": "open",
+    "root": "https://www.isracard.co.il/credit-cards/living",
+    "note": "55 offer terms in 14609 chars"
+  },
+  {
+    "program_id": "reut_buy_it_for_me",
+    "name": "רעות תקני לי",
+    "category": "retail_club",
+    "benefits": 17,
+    "status": "open",
+    "root": "https://www.max.co.il/cards/reut-buy-it-for-me",
+    "note": "77 offer terms in 32210 chars"
+  },
+  {
+    "program_id": "my_max",
+    "name": "My MAX",
+    "category": "credit_card",
+    "benefits": 13,
+    "status": "open",
+    "root": "https://www.max.co.il/benefits/lobby",
+    "note": "94 offer terms in 39706 chars"
+  },
+  {
+    "program_id": "irgoon_hamorim_benefits",
+    "name": "ארגון המורים",
+    "category": "employer_club",
+    "benefits": 12,
+    "status": "open",
+    "root": "https://www.igm.org.il/site/pg/igm_allbenefits",
+    "note": "49 offer terms in 16919 chars"
+  },
+  {
+    "program_id": "isracard",
+    "name": "ישראכרט",
+    "category": "credit_card",
+    "benefits": 8,
+    "status": "open",
+    "root": "https://benefits.isracard.co.il",
+    "note": "catalog is on the benefits subdomain, not the corporate site"
+  },
+  {
+    "program_id": "tefahot_card",
+    "name": "טפחות ישראכרט",
+    "category": "credit_card",
+    "benefits": 8,
+    "status": "open",
+    "root": "https://www.mizrahi-tefahot.co.il/hacartis/",
+    "note": "70 offer terms in 10772 chars"
+  },
+  {
+    "program_id": "carrefour_club",
+    "name": "Carrefour Club",
+    "category": "retail_club",
+    "benefits": 8,
+    "status": "open",
+    "root": "https://www.cal-online.co.il/cards/carrefour/",
+    "note": "32 offer terms in 22624 chars"
+  },
+  {
+    "program_id": "hitechzone",
+    "name": "הייטקזון",
+    "category": "employer_club",
+    "benefits": 6,
+    "status": "open",
+    "root": "https://www.htzone.co.il/",
+    "note": "133 offer terms in 320267 chars"
+  },
+  {
+    "program_id": "dream_card_club",
+    "name": "מועדון Dream Card",
+    "category": "credit_card",
+    "benefits": 3,
+    "status": "open",
+    "root": "https://www.dreamcard.co.il/dreamcard-vip/",
+    "note": "19 offer terms in 19933 chars"
+  },
+  {
+    "program_id": "cal",
+    "name": "כאל",
+    "category": "credit_card",
+    "benefits": 1,
+    "status": "open",
+    "root": "https://www.cal-online.co.il/benefits",
+    "note": "needs waitFor + stealth to render"
+  },
+  {
+    "program_id": "cal_cash_pro",
+    "name": "Cash כאל Pro",
+    "category": "credit_card",
+    "benefits": 1,
+    "status": "open",
+    "root": "https://www.cal-online.co.il/benefits",
+    "note": "already configured"
+  },
+  {
+    "program_id": "max_back",
+    "name": "מקס בק",
+    "category": "credit_card",
+    "benefits": 0,
+    "status": "open",
+    "root": "https://www.max.co.il/",
+    "note": "already configured"
+  },
+  {
+    "program_id": "superpharm_lifestyle",
+    "name": "LIFESTYLE סופר-פארם",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "open",
+    "root": "https://www.super-pharm.co.il/sales",
+    "note": "one dense page, 2993 offer terms; split per offer"
+  },
+  {
+    "program_id": "fly_card",
+    "name": "Fly Card",
+    "category": "credit_card",
+    "benefits": 0,
+    "status": "open",
+    "root": "https://www.isracard.co.il/flycard/private",
+    "note": "79 offer terms in 29034 chars"
+  },
+  {
+    "program_id": "diners_club",
+    "name": "דיינרס",
+    "category": "credit_card",
+    "benefits": 0,
+    "status": "open",
+    "root": "https://www.diners.co.il/benefits/",
+    "note": "21 offer terms in 7996 chars"
+  },
+  {
+    "program_id": "tov_plus_club",
+    "name": "מועדון טוב פלוס",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "open",
+    "root": "https://tovplus.org.il/",
+    "note": "113 offer terms in 83144 chars"
+  },
+  {
+    "program_id": "megalean",
+    "name": "מגה לאן",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "open",
+    "root": "https://www.megalean.co.il/",
+    "note": "confirmed by re-probe"
+  },
+  {
+    "program_id": "poalim_wonder",
+    "name": "Poalim Wonder",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "open",
+    "root": "https://www.bankhapoalim.co.il/he/Poalim-Wonder",
+    "note": "37 offer terms in 20326 chars"
+  },
+  {
+    "program_id": "public_accountants_institute_members",
+    "name": "לשכת רו\"ח",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "open",
+    "root": "https://www.isracard.co.il/credit-cards/hi-benefit",
+    "note": "40 offer terms in 13767 chars"
+  },
+  {
+    "program_id": "security_forces_benefit",
+    "name": "הטבה לכוחות הביטחון",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "open",
+    "root": "https://mod.gov.il/%D7%9B%D7%AA%D7%91%D7%95%D7%AA-%D7%95%D7%9E%D7%91%D7%96%D7%A7%D7%99%D7%9D/%D7%97%D7%93%D7%A9%D7%95%D7%AA-%D7%9E%D7%A9%D7%A8%D7%93-%D7%94%D7%91%D7%99%D7%98%D7%97%D7%95%D7%9F/%D7%9B%D7%A8%D7%98%D7%99%D7%A1-%D7%94%D7%98%D7%91%D7%95%D7%AA-%D7%97%D7%93%D7%A9-%D7%9C%D7%97%D7%91%D7%A8%D7%99-%D7%91%D7%94%D7%A6%D7%93%D7%A2%D7%94",
+    "note": "42 offer terms in 12434 chars"
+  },
+  {
+    "program_id": "tau",
+    "name": "TAU",
+    "category": "employer_club",
+    "benefits": 45,
+    "status": "thin",
+    "root": "https://www.tauclub.co.il/",
+    "note": "0 offer terms in 457 chars"
+  },
+  {
+    "program_id": "uniq_club",
+    "name": "Uniq",
+    "category": "retail_club",
+    "benefits": 44,
+    "status": "thin",
+    "root": "https://www.uniq-club.co.il/",
+    "note": "0 offer terms in 457 chars"
+  },
+  {
+    "program_id": "mevalim_club",
+    "name": "מבלים",
+    "category": "retail_club",
+    "benefits": 0,
+    "status": "thin",
+    "root": "https://www.mevalim.co.il/friends-club-2/",
+    "note": "10 offer terms in 4861 chars"
+  },
+  {
+    "program_id": "student_discounts",
+    "name": "הטבת סטודנט",
+    "category": "employer_club",
+    "benefits": 0,
+    "status": "thin",
+    "root": "https://www.nuis.co.il/",
+    "note": "9 offer terms in 19944 chars"
+  }
+]
