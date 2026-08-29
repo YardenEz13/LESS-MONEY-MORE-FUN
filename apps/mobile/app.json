@@ -6,16 +6,24 @@
     "orientation": "portrait",
     "scheme": "sbr",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
-    "runtimeVersion": { "policy": "appVersion" },
-    "updates": { "fallbackToCacheTimeout": 0 },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
     "ios": {
       "bundleIdentifier": "com.sbr.mvp",
       "supportsTablet": false,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "כדי להזכיר לך על הטבות כשאתה מגיע לקניון",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "כדי להזכיר לך על הטבות גם כשהאפליקציה סגורה",
-        "UIBackgroundModes": ["location"]
+        "UIBackgroundModes": [
+          "location"
+        ]
       }
     },
     "android": {
@@ -29,12 +37,20 @@
       "intentFilters": [
         {
           "action": "android.intent.action.SEND",
-          "category": ["android.intent.category.DEFAULT"],
-          "data": [{ "mimeType": "text/plain" }]
+          "category": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "mimeType": "text/plain"
+            }
+          ]
         }
       ]
     },
-    "web": { "bundler": "metro" },
+    "web": {
+      "bundler": "metro"
+    },
     "plugins": [
       [
         "expo-location",
@@ -45,6 +61,12 @@
       ],
       "expo-notifications",
       "./plugins/withGradleMemory"
-    ]
+    ],
+    "owner": "yarden1311",
+    "extra": {
+      "eas": {
+        "projectId": "df888f9e-fae3-401c-9472-2a91f171124d"
+      }
+    }
   }
 }
