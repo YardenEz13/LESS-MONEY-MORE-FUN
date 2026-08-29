@@ -1,39 +1,32 @@
 import React, { useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import type { UserProfile } from '@sbr/core';
-import { ScarfBand } from '../components/Kit';
 import { GhostButton, ScreenHeader, Section, Text } from '../components/ui';
 import { programsById, venues } from '../services/catalog';
 import { handleVenueEnter } from '../services/geofencing';
-import { border, colors, radius, space, type, type KitIntensity } from '../theme';
+import { border, colors, radius, space, type } from '../theme';
 
 interface Props {
   profile: UserProfile;
   geofenceStatus: string;
   /** The failure is one only the OS settings page can clear — see App.tsx. */
   geofenceFixable: boolean;
-  kitIntensity: KitIntensity;
   onChange: (profile: UserProfile) => void;
-  onChangeKit: (intensity: KitIntensity) => void;
   onEditPrograms: () => void;
   onEnableGeofencing: () => void;
+  onClearRejections: () => void;
   onBack: () => void;
 }
 
-const KIT_OPTIONS: ReadonlyArray<{ value: KitIntensity; label: string; hint: string }> = [
-  { value: 'full', label: 'מלא', hint: 'פסים גלויים, צעיף מלא, מספרים בגודל לוח תוצאות.' },
-  { value: 'quiet', label: 'מאופק', hint: 'אותם צבעים ואותה פריסה, ברבע עוצמה.' },
-];
 
 export function SettingsScreen({
   profile,
   geofenceStatus,
   geofenceFixable,
-  kitIntensity,
   onChange,
-  onChangeKit,
   onEditPrograms,
   onEnableGeofencing,
+  onClearRejections,
   onBack,
 }: Props) {
   const [simulated, setSimulated] = useState<string | null>(null);
@@ -53,38 +46,25 @@ export function SettingsScreen({
         </View>
       </Section>
 
-      {/* Two readings of one screen, both real: nothing moves between them, so
-          this changes the volume and never the layout. Default is מלא — the kit
-          is the product's face, and quiet is a choice rather than a retreat. */}
-      <Section eyebrow="עוצמת המדים">
-        <View style={styles.card}>
-          <View style={styles.kitRow}>
-            {KIT_OPTIONS.map((option) => {
-              const active = option.value === kitIntensity;
-              return (
-                <Pressable
-                  key={option.value}
-                  accessibilityRole="radio"
-                  /* `checked`, not `selected`: a radio announces checkedness,
-                     and react-native-web maps `selected` to an aria attribute
-                     that role="radio" does not carry. */
-                  accessibilityState={{ checked: active }}
-                  onPress={() => onChangeKit(option.value)}
-                  style={[styles.kitOption, active && styles.kitOptionOn]}
-                >
-                  <Text style={[type.bodyStrong, active && styles.kitLabelOn]}>{option.label}</Text>
-                </Pressable>
-              );
-            })}
+      {/* The report loop's other half. A tap in the app cannot reach the
+          catalog on its own — there is no backend — so the ids have to be
+          readable here and handed to `npm run unpublish`, which is what moves
+          them out of the shipped catalog and back into the review queue.
+          Without this the button would only be a mute wearing a bug report's
+          name. Hidden entirely until something has been reported. */}
+      {profile.rejected_benefit_ids.length > 0 && (
+        <Section eyebrow="הטבות שדיווחת עליהן">
+          <View style={styles.card}>
+            <Text style={type.body}>
+              {`${profile.rejected_benefit_ids.length} הטבות סומנו כשגויות והוסתרו. כדי להוציא אותן מהקטלוג, הריצו:`}
+            </Text>
+            <Text selectable style={styles.command}>
+              {`npm run unpublish -- ${profile.rejected_benefit_ids.join(' ')}`}
+            </Text>
+            <GhostButton label="נקה את הרשימה" onPress={onClearRejections} />
           </View>
-          <Text style={type.small}>
-            {KIT_OPTIONS.find((o) => o.value === kitIntensity)?.hint}
-          </Text>
-          {/* The control shows its own result: the scarf below is drawn at the
-              intensity just chosen, so the choice is legible before leaving. */}
-          <ScarfBand />
-        </View>
-      </Section>
+        </Section>
+      )}
 
       <Section eyebrow="תזכורת בקניון">
         <View style={styles.card}>
@@ -130,6 +110,7 @@ export function SettingsScreen({
             <Pressable
               key={venue.id}
               accessibilityRole="button"
+              accessibilityLabel={`הרצת בדיקה: ${venue.name}, ${venue.city}`}
               onPress={async () => {
                 await handleVenueEnter(venue.id);
                 setSimulated(venue.name);
@@ -174,6 +155,15 @@ export function SettingsScreen({
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surfacePage },
   content: { paddingBottom: space.s6, gap: space.s4 },
+  /* Monospace and selectable: this exists to be copied out of the app, and a
+     benefit id in the body face is a line nobody can transcribe correctly. */
+  command: {
+    ...type.small,
+    fontFamily: 'monospace',
+    backgroundColor: colors.surfaceInset,
+    padding: space.s2,
+    borderRadius: radius.sharp,
+  },
   card: {
     marginHorizontal: space.s4,
     borderRadius: radius.sharp,
@@ -189,17 +179,6 @@ const styles = StyleSheet.create({
     gap: space.s3 - 4,
   },
   switchText: { flex: 1, gap: 2 },
-  kitRow: { flexDirection: 'row', gap: space.s2 },
-  kitOption: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: space.s2 + 2,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-    borderRadius: radius.sharp,
-  },
-  kitOptionOn: { backgroundColor: colors.surfaceAccent, borderColor: colors.surfaceAccent },
-  kitLabelOn: { color: colors.textInverse },
   venues: {
     marginHorizontal: space.s4,
     borderRadius: radius.sharp,

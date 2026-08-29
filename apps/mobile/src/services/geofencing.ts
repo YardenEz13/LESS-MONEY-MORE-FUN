@@ -4,6 +4,7 @@ import * as TaskManager from 'expo-task-manager';
 import {
   DEFAULT_NOTIFICATION_POLICY,
   distanceMeters,
+  hiddenBenefitIds,
   nearestFences,
   rankBenefits,
   shouldNotifyForVenue,
@@ -67,7 +68,7 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
   const evaluations = rankBenefits(place.benefits, {
     now: nowDate,
     ownedProgramIds: ownedProgramIds(profile.program_ids),
-    mutedBenefitIds: profile.muted_benefit_ids,
+    mutedBenefitIds: hiddenBenefitIds(profile),
   });
 
   const decision = shouldNotifyForVenue({

@@ -16,12 +16,19 @@ Extraction mints an `unmapped_<slug>` id for any merchant not listed here. Such
 a benefit still appears in the list — it just cannot be surfaced *proactively*
 until the merchant exists. Each field buys one specific capability:
 
+`branches`, `label` and the enum `categories` are not hand-maintained — run
+`npm run backfill:merchants -- --write` and they come from the easy.co.il
+sidecar. It fills `categories` only when empty, so a hand-classified merchant is
+never overruled by a regex table.
+
 | Field | Buys | If you leave it empty |
 |---|---|---|
 | `name` | The match itself | Nothing works — must be **byte-identical** to the extracted `merchant_name`, since `resolveMerchantId` compares a normalised form of this string |
 | `domains` | Share-sheet matching | Sharing a URL from that shop finds nothing |
 | `venue_ids` | Geofence reminders | Walking into the mall reminds you of nothing |
 | `categories` | Advisor intent ("איפה לתדלק") | Never returned for a category question |
+| `label` | The line under the name on a card — the source's own words for the trade ("מכולת", "מוסך"), and the free text the advisor matches an errand against when no enum member fits | The card shows a bare business name, which for most of a 1057-merchant catalog tells the reader nothing |
+| `branches[].city` | "מכולת · גבעתיים" on a card, and "the catalog does not reach here" instead of an empty list | A list with no location fix cannot say where anything is |
 
 Then re-run the import so the benefit picks up the real merchant id — **benefit
 ids are hashed from `merchant_id`**, so mapping a merchant changes the id and

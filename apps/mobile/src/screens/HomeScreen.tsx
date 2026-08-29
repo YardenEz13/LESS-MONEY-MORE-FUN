@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   findCombos,
+  hiddenBenefitIds,
+  matchesQuery,
   rankBenefits,
   type Combo,
   type Coordinates,
@@ -11,11 +13,13 @@ import {
 } from '@sbr/core';
 import { BenefitCard } from '../components/BenefitCard';
 import { Crest, PitchStripes, ScarfBand } from '../components/Kit';
-import { FilterRow, GhostButton, Hero, LivePill, Text } from '../components/ui';
+import { FilterRow, GhostButton, Hero, LivePill, SearchField, Text } from '../components/ui';
 import {
   benefits,
   benefitsAtVenue,
   benefitsNear,
+  merchantLine,
+  nearestCatalogPlace,
   ownedProgramIds,
   programNames,
   venues,
@@ -55,6 +59,7 @@ export function HomeScreen({
   onOpenAdvisor,
 }: Props) {
   const [filter, setFilter] = useState<Filter>('all');
+  const [query, setQuery] = useState('');
 
   /** Where the user is. Null means "everywhere" — the default, not an error. */
   const [venue, setVenue] = useState<Venue | null>(null);
@@ -106,7 +111,7 @@ export function HomeScreen({
       rankBenefits(benefits, {
         now: new Date(),
         ownedProgramIds: ownedProgramIds(profile.program_ids),
-        mutedBenefitIds: profile.muted_benefit_ids,
+        mutedBenefitIds: hiddenBenefitIds(profile),
       }),
     [profile.program_ids, profile.muted_benefit_ids],
   );
@@ -130,7 +135,23 @@ export function HomeScreen({
     if (here) return new Set(benefitsNear(here, WALKING_RADIUS_M).map((b) => b.id));
     return null;
   }, [venue, here]);
-  const shown = hereIds ? byFilter.filter((e) => hereIds.has(e.benefit.id)) : byFilter;
+  const atPlace = hereIds ? byFilter.filter((e) => hereIds.has(e.benefit.id)) : byFilter;
+
+  // Searched over the trade and city as well as the name, because most of the
+  // catalog is businesses nobody has heard of: "מכולת" and "גבעתיים" are how you
+  // find one whose name you never knew — the same line the card already shows.
+  const shown = useMemo(
+    () =>
+      query.trim() === ''
+        ? atPlace
+        : atPlace.filter((e) =>
+            matchesQuery(
+              [e.benefit.merchant_name, merchantLine(e.benefit.merchant_id), programNames[e.benefit.program_id]],
+              query,
+            ),
+          ),
+    [atPlace, query],
+  );
 
   // Counted off `evaluations`, not `shown`: the plate reports what this place is
   // worth to the user, and must not drop when they tick a filter above it.
@@ -210,6 +231,13 @@ export function HomeScreen({
         ]}
       />
 
+      <SearchField
+        value={query}
+        onChange={setQuery}
+        placeholder="חיפוש בית עסק, תחום או עיר"
+        resultCount={shown.length}
+      />
+
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
         {/* Geofencing armed is the one genuinely live state in the app, so it
             gets the system's live marker. Off keeps the quiet square — a pill
@@ -231,10 +259,19 @@ export function HomeScreen({
             />
           ))}
 
-        {shown.length === 0 ? (
+        {shown.length === 0 && query.trim() !== '' ? (
+          <View style={styles.empty}>
+            <Text style={styles.emptyTitle}>אין תוצאות</Text>
+            <Text style={styles.emptyBody}>
+              {`לא נמצא בית עסק שמתאים ל״${query.trim()}״ מבין ${evaluations.length} ההטבות שלך.`}
+            </Text>
+            <GhostButton label="נקה חיפוש" onPress={() => setQuery('')} />
+          </View>
+        ) : shown.length === 0 ? (
           <EmptyState
             filter={filter}
             hasPrograms={profile.program_ids.length > 0}
+            here={hereIds && !venue ? here : null}
             onEditPrograms={onOpenSettings}
           />
         ) : (
@@ -420,7 +457,12 @@ function VenueSheet({
     <View style={styles.sheet}>
       <View style={styles.sheetHead}>
         <Text style={type.bodyStrong}>איפה אתה עכשיו?</Text>
-        <Pressable accessibilityRole="button" onPress={onClose} hitSlop={12}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="סגור"
+          onPress={onClose}
+          hitSlop={12}
+        >
           <Text style={type.meta}>סגור</Text>
         </Pressable>
       </View>
@@ -429,6 +471,9 @@ function VenueSheet({
           <Pressable
             key={v.id}
             accessibilityRole="button"
+            // The city as well as the name: "קניון עזריאלי" alone is three
+            // different malls in this list.
+            accessibilityLabel={`${v.name}, ${v.city}`}
             onPress={() => onChoose(v)}
             style={({ pressed }) => [
               styles.sheetRow,
@@ -446,7 +491,12 @@ function VenueSheet({
 
 function IconAction({ label, onPress }: { label: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={styles.iconAction}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={styles.iconAction}
+    >
       <Text style={styles.iconActionLabel}>{label}</Text>
     </Pressable>
   );
@@ -455,17 +505,32 @@ function IconAction({ label, onPress }: { label: string; onPress: () => void }) 
 function EmptyState({
   filter,
   hasPrograms,
+  here,
   onEditPrograms,
 }: {
   filter: Filter;
   hasPrograms: boolean;
+  /** A pinned point that returned nothing — the coverage case, not the no-deals case. */
+  here: Coordinates | null;
   onEditPrograms: () => void;
 }) {
+  // Nothing within walking distance has two very different causes, and telling
+  // them apart is the whole job of this branch. "every benefit is blocked right
+  // now" is a statement about the day; "the catalog does not reach this city"
+  // is a statement about the catalog, and showing the first when the second is
+  // true is how an app reads as broken to everyone outside Gush Dan.
+  const nearest = here ? nearestCatalogPlace(here) : null;
+
   const copy = !hasPrograms
     ? {
         title: 'עוד לא סימנת מועדונים',
         body: 'פתח הגדרות וסמן את הכרטיסים והמועדונים שברשותך. זה לוקח פחות מדקה.',
       }
+    : nearest
+      ? {
+          title: 'הקטלוג לא מגיע לכאן',
+          body: `אין בקטלוג בית עסק בטווח הליכה מכאן. הקרוב ביותר נמצא ב${nearest.city}, כ-${Math.round(nearest.km)} ק״מ מכאן. הכיסוי כרגע מרוכז בגוש דן.`,
+        }
     : filter === 'ready'
       ? {
           title: 'אין הטבה שמוכנה כרגע',

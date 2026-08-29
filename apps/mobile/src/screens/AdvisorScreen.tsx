@@ -96,6 +96,7 @@ export function AdvisorScreen({ profile, onSelect, onBack }: Props) {
               <Pressable
                 key={example}
                 accessibilityRole="button"
+                accessibilityLabel={example}
                 onPress={() => void ask(example)}
                 style={({ pressed }) => [styles.example, pressed && styles.examplePressed]}
               >

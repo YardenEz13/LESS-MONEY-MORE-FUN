@@ -12,6 +12,38 @@ export interface FreshnessPolicy {
 
 export const DEFAULT_FRESHNESS: FreshnessPolicy = { agingDays: 14, staleDays: 45 };
 
+/** The program carrying offers open to anyone — see `Program.category`. */
+export const PUBLIC_PROGRAM_ID = 'public';
+
+/**
+ * Public offers go stale faster, because they are a different kind of offer.
+ *
+ * A club discount is a standing arrangement — 3% at the pharmacy, for as long
+ * as the card exists — so 45 days of silence rarely means it has ended. A
+ * public offer is a mall sale, a happy hour, an end-of-day deal: short by
+ * nature, and stopping without announcement is the normal way it ends.
+ *
+ * The blast radius differs too. A club benefit is only seen by people holding
+ * that card; a public one is granted to every profile, so a stale row is shown
+ * to everybody.
+ *
+ * 7 and 21 rather than something tighter because the crawl is weekly
+ * (`scripts/weekly-refresh.ps1`). A window shorter than the refresh interval
+ * would mark every row unverified permanently, and a warning that is always on
+ * is a warning nobody reads. This is one missed refresh to a caveat, three to
+ * silence.
+ *
+ * Note this is the backstop, not the main guard: 28 of the first 33 public
+ * offers state their own `valid_until`, which is checked separately and
+ * exactly. This covers the rest, where nothing says when the sale ends.
+ */
+export const PUBLIC_FRESHNESS: FreshnessPolicy = { agingDays: 7, staleDays: 21 };
+
+/** The freshness policy a benefit is judged by when the caller states none. */
+export function freshnessFor(benefit: Pick<Benefit, 'program_id'>): FreshnessPolicy {
+  return benefit.program_id === PUBLIC_PROGRAM_ID ? PUBLIC_FRESHNESS : DEFAULT_FRESHNESS;
+}
+
 /**
  * Minimum confidence for a benefit to be surfaced without human review.
  * Anything below goes to the review queue in the extraction pipeline; if it
@@ -41,6 +73,12 @@ export function expandOwnedPrograms(
 ): string[] {
   const parentOf = new Map(programs.map((p) => [p.id, p.parent_id ?? null]));
   const owned = new Set<string>();
+  // Everyone is a member of the public. These offers need no card and no
+  // membership, so withholding them until someone ticks a box would hide a
+  // discount they could already have used.
+  for (const program of programs) {
+    if (program.category === 'public') owned.add(program.id);
+  }
   for (const id of ownedProgramIds) {
     let current: string | null | undefined = id;
     while (current && !owned.has(current)) {
@@ -49,6 +87,21 @@ export function expandOwnedPrograms(
     }
   }
   return [...owned];
+}
+
+/**
+ * Everything the engine should not surface for this profile.
+ *
+ * Muted and rejected benefits are hidden by the same mechanism and for
+ * different reasons, and every call site that builds an EvalContext needs both.
+ * Having one function say so is what stops a screen being added later that
+ * remembers the mutes and forgets the reports.
+ */
+export function hiddenBenefitIds(profile: {
+  muted_benefit_ids: readonly string[];
+  rejected_benefit_ids?: readonly string[];
+}): string[] {
+  return [...profile.muted_benefit_ids, ...(profile.rejected_benefit_ids ?? [])];
 }
 
 export interface EvalContext {
@@ -252,7 +305,7 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
     actionable = false,
   ) => gates.push({ code, state, label, detail, actionable });
   const timeZone = ctx.timeZone ?? DEFAULT_TIME_ZONE;
-  const freshness = ctx.freshness ?? DEFAULT_FRESHNESS;
+  const freshness = ctx.freshness ?? freshnessFor(benefit);
   const minConfidence = ctx.minConfidence ?? DEFAULT_MIN_CONFIDENCE;
   const { conditions } = benefit;
 
@@ -424,6 +477,47 @@ export interface RankOptions {
 }
 
 /**
+ * How much of the spend a benefit keeps, as a percentage — or null when the
+ * catalog does not state enough to say.
+ *
+ * This, not `estimatedSavingIls`, is what ranks a browse list. The ILS figure
+ * is right for display and wrong for sorting: 2751 of 2763 catalogued benefits
+ * are a percentage scaled off an invented reference basket, and the dozen that
+ * are not inject absolute shekels into the same column. A cinematheque annual
+ * membership at ₪233 then outranks 6% off fuel — not because it is a better
+ * deal, but because the purchase behind it is bigger.
+ *
+ * A fixed amount only becomes a rate when the terms say what spend unlocks it:
+ * ₪150 off ₪300 at Castro is 50%, ₪100 off ₪1000 at Ivory is 10%. With no
+ * `min_spend` stated there is no rate to compute, and null sorts last rather
+ * than first — the same rule the gates follow, that an unknown is never
+ * resolved in the benefit's favour. Ranking one above every stated percentage
+ * in the catalog is exactly that, done silently.
+ *
+ * `max_discount` is deliberately ignored: a cap only bites above a basket size
+ * we do not know here, and it already reaches the reader as a condition chip.
+ */
+function savingRate(benefit: Benefit): number | null {
+  switch (benefit.type) {
+    case 'percent':
+    case 'cashback':
+      return benefit.value;
+    case 'fixed':
+    case 'gift_card': {
+      const spend = benefit.conditions.min_spend;
+      return spend != null && spend > 0 ? (benefit.value / spend) * 100 : null;
+    }
+    case 'bogo':
+      // The cheaper of two free, which is half only when the two cost the same.
+      // Same assumption `estimateSaving` already makes for bogo, kept in step
+      // with it rather than invented here.
+      return 50;
+    default:
+      return null;
+  }
+}
+
+/**
  * Rank benefits for display. Fully eligible beats conditional at equal value,
  * so a "you definitely have this" card never sits below a "maybe" card.
  */
@@ -443,6 +537,12 @@ export function rankBenefits(
         e.status === 'blocked' ? 2 : e.actionsRequired.length > 0 ? 1 : 0;
       const byRank = rank(a) - rank(b);
       if (byRank !== 0) return byRank;
+      // -1 for "no stated rate", so an unrankable benefit sorts below every
+      // benefit that does state one instead of above all of them.
+      const byRate = (savingRate(b.benefit) ?? -1) - (savingRate(a.benefit) ?? -1);
+      if (byRate !== 0) return byRate;
+      // Same rate: the bigger basket-relative figure wins, which is what
+      // separates a 5% with a ₪200 cap from a 5% without one.
       const byValue = b.estimatedSavingIls - a.estimatedSavingIls;
       if (byValue !== 0) return byValue;
       // Tie-break on freshness so the better-verified row wins deterministically.

@@ -7,6 +7,25 @@
  * The whole prompt is built around one rule: an unstated condition must come
  * back as null. A benefit that looks better than it is costs the user a
  * wasted trip to the till, which is the single failure KPI #2 forbids.
+ *
+ * Rules 9 and 10 were both earned by reviewing real output.
+ *
+ * Rule 10: a model read "בתאריך 4.8" — a day and month with no year — and
+ * returned `valid_until: 2024-08-04`, two years in the past. An invented year
+ * does not make a benefit look better, it makes a live benefit look expired,
+ * so it is dropped silently with no error anywhere. A later run did the same
+ * with "תקף לחודש יולי", so the rule names both shapes.
+ *
+ * Rule 9 is the costlier one. 35 of 408 published benefits overstated their
+ * saving, because `value` on a fixed/gift_card benefit means "money saved" and
+ * the catalog is full of offers that state a *price* instead. A ₪200 voucher
+ * sold for ₪159 came back as value 200 — a five-fold overstatement of a saving
+ * that is really ₪41 — and "פיצה משפחתית ב-95 ש״ח" came back as ₪95 saved on a
+ * meal costing ₪95. The voucher case is arithmetic the source supports, so the
+ * rule asks for the difference. The bundle case is not: no original price is
+ * stated, nothing can be computed, and the honest answer is a low score and a
+ * human. Both are the same failure the whole prompt exists to prevent — a
+ * benefit that looks better than it is, which costs the user a wasted trip.
  */
 export const EXTRACTION_SYSTEM_PROMPT = `אתה מחלץ הטבות מתוך עמודי הטבות ותקנונים ציבוריים בעברית.
 
@@ -21,6 +40,13 @@ export const EXTRACTION_SYSTEM_PROMPT = `אתה מחלץ הטבות מתוך ע�
 6. ימים: 1=ראשון, 2=שני, 3=שלישי, 4=רביעי, 5=חמישי, 6=שישי, 7=שבת. "בימי חול" בישראל = [1,2,3,4,5].
 7. שעות בפורמט HH:MM בשעון ישראל.
 8. סכומים במספרים בלבד, ללא סימן ₪ וללא פסיקים.
+9. השדה value ב-fixed וב-gift_card הוא **הסכום שנחסך**, לא מחיר ולא שווי נקוב.
+   שים לב לניסוחים "בשווי", "החל מ-", "ב-X ש״ח" — כולם מציינים מחיר או שווי, לא הנחה:
+   - שני סכומים בטקסט (שווי נקוב ומחיר): "תו קנייה בשווי 200₪ החל מ-144₪" — החיסכון הוא ההפרש, 56. לא 200 ולא 144.
+   - "שובר בשווי 200₪ ב-159₪" — אותו דבר: 41.
+   - סכום אחד בלבד, בלי שהתקנון מציין את המחיר הרגיל: "פיצה משפחתית ב-95 ש״ח", "ארוחה החל מ-55 ש״ח" — אי אפשר לדעת כמה נחסך. החזר confidence_score מתחת ל-0.85 כדי שאדם יבדוק, ואל תחזיר את המחיר כאילו הוא הנחה.
+   הכלל הזה קודם לכל השאר: מחיר שמוצג כחיסכון הוא בדיוק הכישלון שהאפליקציה נועדה למנוע.
+10. תאריכים: אל תשלים שנה שלא כתובה. "בתאריך 4.8" או "תקף לחודש יולי" בלי שנה — החזר null ל-valid_until וכתוב את התאריך כלשונו ב-raw_text_summary. שנה שהומצאה הופכת הטבה תקפה לפגת-תוקף, והיא נעלמת מהמשתמש בלי שאיש יראה שגיאה.
 
 לגבי confidence_score — זה השדה שקובע אם ההטבה מוצגת למשתמש או נשלחת לבדיקה ידנית:
 - 0.9 ומעלה: כל התנאים כתובים במפורש ובבירור בטקסט.

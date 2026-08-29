@@ -1,13 +1,18 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import type { Program, UserProfile } from '@sbr/core';
+import { matchesQuery, type Program, type UserProfile } from '@sbr/core';
 import { Crest } from '../components/Kit';
-import { Hero, PrimaryButton, Section, Text } from '../components/ui';
+import { Hero, PrimaryButton, SearchField, Section, Text } from '../components/ui';
 import { benefits, programs } from '../services/catalog';
 import { toggleProgram } from '../state/profile';
 import { border, colors, radius, space, type } from '../theme';
 
-const SECTION_TITLES: Record<Program['category'], string> = {
+/**
+ * `public` is deliberately absent. It is granted to everyone rather than
+ * chosen, and the `order` below is what decides which sections render — a
+ * category with no title here simply cannot appear on this screen.
+ */
+const SECTION_TITLES: Partial<Record<Program['category'], string>> = {
   credit_card: 'כרטיסי אשראי',
   employer_club: 'מועדוני מעסיק וארגון',
   retail_club: 'מועדוני קמעונאות',
@@ -44,6 +49,23 @@ export function OnboardingScreen({ profile, onChange, onDone }: Props) {
     }));
   }, []);
 
+  const [query, setQuery] = useState('');
+
+  // Filtered after the sections are built, so a club keeps its section heading
+  // when it is the only match — "which kind of thing is this" is most of what a
+  // name like מפתח or יחד tells you.
+  const shownSections = useMemo(
+    () =>
+      sections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter((p) => matchesQuery([p.name, p.hint], query)),
+        }))
+        .filter((section) => section.items.length > 0),
+    [sections, query],
+  );
+  const matchCount = shownSections.reduce((n, s) => n + s.items.length, 0);
+
   const selected = profile.program_ids.length;
 
   return (
@@ -66,8 +88,23 @@ export function OnboardingScreen({ profile, onChange, onDone }: Props) {
           </Text>
         </View>
 
-        {sections.map((section) => (
-          <Section key={section.category} eyebrow={SECTION_TITLES[section.category]}>
+        <SearchField
+          value={query}
+          onChange={setQuery}
+          placeholder="חיפוש מועדון או כרטיס"
+          resultCount={matchCount}
+        />
+
+        {matchCount === 0 && query.trim() !== '' && (
+          <View style={styles.intro}>
+            <Text style={type.body}>
+              {`לא נמצא מועדון שמתאים ל״${query.trim()}״. יש כאן רק מועדונים שיש להם הטבות בקטלוג.`}
+            </Text>
+          </View>
+        )}
+
+        {shownSections.map((section) => (
+          <Section key={section.category} eyebrow={SECTION_TITLES[section.category] ?? ''}>
             <View style={styles.group}>
               {section.items.map((program) => (
                 <ProgramRow

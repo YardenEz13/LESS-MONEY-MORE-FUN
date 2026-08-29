@@ -3,12 +3,13 @@ import {
   Pressable,
   StyleSheet,
   Text as RNText,
+  TextInput,
   View,
   type TextProps,
   type ViewStyle,
 } from 'react-native';
 import { latinRuns } from '@sbr/core';
-import { Crest, PitchStripes, ScarfBand, useKit } from './Kit';
+import { Crest, PitchStripes, ScarfBand } from './Kit';
 import { border, colors, fonts, kit, latinFace, radius, space, type, useCompact } from '../theme';
 
 /**
@@ -136,7 +137,6 @@ export function Hero({
   children?: React.ReactNode;
 }) {
   const compact = useCompact();
-  const intensity = useKit();
   return (
     <>
       <View style={styles.hero}>
@@ -149,7 +149,7 @@ export function Hero({
               <Text
                 style={[
                   styles.heroTitle,
-                  { fontSize: kit.heroSize[intensity], lineHeight: kit.heroSize[intensity] + 2 },
+                  { fontSize: kit.heroSize, lineHeight: kit.heroSize + 2 },
                   compact && styles.heroTitleCompact,
                 ]}
               >
@@ -194,7 +194,13 @@ export function ScreenHeader({
   return (
     <View style={styles.header}>
       {onBack && (
-        <Pressable onPress={onBack} accessibilityRole="button" hitSlop={12} style={styles.back}>
+        <Pressable
+          onPress={onBack}
+          accessibilityRole="button"
+          accessibilityLabel="חזרה"
+          hitSlop={12}
+          style={styles.back}
+        >
           <Text style={styles.backGlyph}>›</Text>
           <Text style={type.meta}>חזרה</Text>
         </Pressable>
@@ -243,6 +249,10 @@ export function PrimaryButton({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={label}
+      // Announced as well as painted: a greyed button that still reports itself
+      // as available is a tap a screen-reader user makes and gets nothing from.
+      accessibilityState={{ disabled: !!disabled }}
       disabled={!!disabled}
       onPress={onPress}
       style={({ pressed }) => [
@@ -272,6 +282,7 @@ export function GhostButton({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={label}
       onPress={onPress}
       style={({ pressed }) => [
         styles.ghost,
@@ -306,6 +317,67 @@ export function GhostButton({
  * through its own padding and sit visibly off-centre; a truncated "דורש פעו…"
  * would be worse than a second line.
  */
+/**
+ * The search box. One component for both lists that got too long to scan: 61
+ * clubs at onboarding and 1199 merchants after it.
+ *
+ * `textAlign: 'right'` rather than leaving it to the platform. The catalog is
+ * Hebrew with Latin brand names all through it ("Fox Home", "KSP"), and an
+ * input left to auto-align jumps its alignment the moment the first Latin
+ * character is typed — the field visibly moves while someone is using it. It is
+ * a Hebrew field that sometimes holds Latin text, so it is pinned that way.
+ *
+ * The clear button is a real control rather than relying on the keyboard's,
+ * because on a filtered list "how do I get everything back" is the second
+ * thing anyone needs and the platform's own clear affordance is inconsistent.
+ */
+export function SearchField({
+  value,
+  onChange,
+  placeholder,
+  resultCount,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  /** Shown once something has been typed, so a short list reads as filtered rather than empty. */
+  resultCount?: number;
+}) {
+  return (
+    <View style={styles.searchWrap}>
+      <View style={styles.search}>
+        <TextInput
+          value={value}
+          onChangeText={onChange}
+          placeholder={placeholder}
+          placeholderTextColor={colors.textMuted}
+          style={styles.searchInput}
+          accessibilityLabel={placeholder}
+          autoCorrect={false}
+          autoCapitalize="none"
+          returnKeyType="search"
+          clearButtonMode="never"
+        />
+        {value.length > 0 && (
+          <Pressable
+            onPress={() => onChange('')}
+            accessibilityRole="button"
+            accessibilityLabel="נקה חיפוש"
+            style={styles.searchClear}
+          >
+            <Text style={styles.searchClearMark}>×</Text>
+          </Pressable>
+        )}
+      </View>
+      {value.trim().length > 0 && resultCount != null && (
+        <Text style={styles.searchCount}>
+          {resultCount === 0 ? 'אין תוצאות' : `${resultCount} תוצאות`}
+        </Text>
+      )}
+    </View>
+  );
+}
+
 export function FilterRow<T extends string>({
   options,
   value,
@@ -323,6 +395,13 @@ export function FilterRow<T extends string>({
           <Pressable
             key={option.value}
             accessibilityRole="tab"
+            // The count is part of the name on purpose: "מוכן לקופה" and
+            // "מוכן לקופה, 238" are different amounts of information, and the
+            // number is the reason someone picks the tab.
+            accessibilityLabel={
+              option.count != null ? `${option.label}, ${option.count}` : option.label
+            }
+            accessibilityState={{ selected: active }}
             aria-selected={active}
             onPress={() => onChange(option.value)}
             style={[styles.filter, active && styles.filterActive]}
@@ -440,7 +519,7 @@ const styles = StyleSheet.create({
   },
   heroHeadline: { gap: space.s1, flexShrink: 1 },
   heroEyebrow: { ...type.meta, color: colors.textMutedOnPrimary },
-  /* Size and leading are set at the call site from the kit intensity — this is
+  /* Size and leading are set at the call site — this is
      everything about the headline that does not change between the two. */
   heroTitle: { ...type.display, color: colors.textInverse },
   /* One step down the display ramp, so the title still clears the gutters on a
@@ -483,6 +562,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  searchWrap: { paddingHorizontal: space.s4, paddingBottom: space.s2, gap: space.s1 },
+  /* Flat fill, 90 degrees, one hairline — the same three rules as every other
+     surface in the system. No focus glow: the caret already says where you are. */
+  search: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceRaised,
+    borderWidth: border.hairline,
+    borderColor: colors.borderHairline,
+    borderRadius: radius.sharp,
+    paddingHorizontal: space.s3,
+  },
+  searchInput: {
+    flex: 1,
+    ...type.body,
+    paddingVertical: space.s2 + 2,
+    textAlign: 'right',
+  },
+  searchClear: { paddingHorizontal: space.s2, paddingVertical: space.s1 },
+  searchClearMark: { ...type.body, color: colors.textMuted, fontSize: 20, lineHeight: 22 },
+  searchCount: { ...type.caption, paddingHorizontal: space.s1 },
   filterRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',

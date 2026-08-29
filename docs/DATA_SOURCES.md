@@ -191,7 +191,7 @@ moment easy.co.il is allowlisted for that environment — at which point it
 becomes the better home for this job, since it does not depend on one laptop
 being awake.
 
-Note the cloud sandbox also has no `ANTHROPIC_API_KEY`, so even with egress it
+Note the cloud sandbox also has no `GEMINI_API_KEY`, so even with egress it
 could only collect; extraction stays a local step either way.
 
 **How to read it, once it can run.** The run is unattended, so it always leaves

@@ -88,6 +88,18 @@ for (const [file, list] of [
     if (!/^https?:\/\//.test(benefit.source_url)) {
       fail(`${file} ${benefit.id}: source_url must be a URL a user can open`);
     }
+    // The shipped catalog must contain nothing invented. `benefits.sample.json`
+    // exists to exercise condition shapes and points at example.invalid exactly
+    // so it can never be mistaken for a scraped record — but the shipped file
+    // was seeded from it, and nine of those rows were still being surfaced to a
+    // user, one of them ranked first of 206. Confidence and the review queue
+    // both passed them: they carry `reviewed_by_human: true` and a recent
+    // verification date, so every gate the app has read them as trustworthy.
+    // The gate that was missing is this one, on the artifact rather than on a
+    // path into it.
+    if (file !== 'benefits.sample.json' && /example\.(invalid|com)$/.test(new URL(benefit.source_url).hostname)) {
+      fail(`${file} ${benefit.id}: synthetic source ${benefit.source_url} — invented benefits must never ship`);
+    }
     if (Number.isNaN(Date.parse(benefit.last_verified_at))) {
       fail(`${file} ${benefit.id}: last_verified_at is not a date`);
     }

@@ -70,7 +70,14 @@ export const Program = z
   .object({
     id: z.string().min(1),
     name: z.string().min(1),
-    category: z.enum(['credit_card', 'employer_club', 'retail_club']),
+    /**
+     * `public` is not a club and nobody holds it: it carries offers open to
+     * anyone — a mall sale, a restaurant happy hour, an end-of-day deal. It is
+     * granted to every profile automatically (see `expandOwnedPrograms`) and
+     * never appears in onboarding, because a checkbox for it would be asking
+     * whether you are a member of the public.
+     */
+    category: z.enum(['credit_card', 'employer_club', 'retail_club', 'public']),
     /** Public catalog entry point, used by the scraper. */
     catalog_url: z.string().url().nullish(),
     /** Shown during onboarding so the user recognises what they hold. */
@@ -132,9 +139,36 @@ export const Merchant = z
      * only ever describe the ten malls someone thought to type. A coordinate
      * matches a high street too, and comes from the source rather than a human.
      */
-    branches: z.array(z.object({ lat: z.number(), lng: z.number() }).strict()).default([]),
+    branches: z
+      .array(
+        z
+          .object({
+            lat: z.number(),
+            lng: z.number(),
+            /**
+             * Nullish because the source sometimes omits it, and an absent city
+             * has to read as "we don't know" rather than as a blank line under
+             * a shop name. It is what a list with no location fix can still say
+             * about where a benefit is, and what tells someone in Haifa that
+             * the catalog does not reach them yet instead of showing them an
+             * empty screen that looks broken.
+             */
+            city: z.string().min(1).nullish(),
+          })
+          .strict(),
+      )
+      .default([]),
     /** A merchant can be more than one — a supermarket that sells fuel. */
     categories: z.array(MerchantCategory).default([]),
+    /**
+     * The source's own words for what this shop is — "רשת חנויות ספרים",
+     * "מינימרקט", "מוסך". Free text on purpose, and not a substitute for
+     * `categories`: the closed enum is what the advisor filters on, this is
+     * what a human reads. 574 distinct values, most of which no ten-member
+     * enum could hold, and which is the difference between a list of 1057
+     * unfamiliar business names and a list you can actually scan.
+     */
+    label: z.string().min(1).nullish(),
   })
   .strict();
 export type Merchant = z.infer<typeof Merchant>;
@@ -162,6 +196,17 @@ export const UserProfile = z
     program_ids: z.array(z.string()),
     /** Merchants/benefits the user muted. */
     muted_benefit_ids: z.array(z.string()).default([]),
+    /**
+     * Benefits the user reported as wrong — the discount was not there, or not
+     * on these terms.
+     *
+     * Kept apart from `muted_benefit_ids` because the two say different things
+     * and only one of them is a bug report. A mute is "not for me" and stays on
+     * this device forever; a rejection is evidence the catalog is wrong, and is
+     * meant to leave the device and reach the review queue (`npm run unpublish`).
+     * Collapsing them would lose the distinction the moment it matters.
+     */
+    rejected_benefit_ids: z.array(z.string()).default([]),
     notifications_enabled: z.boolean().default(true),
     onboarded_at: z.string().datetime().nullish(),
   })
