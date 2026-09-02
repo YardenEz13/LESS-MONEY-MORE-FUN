@@ -263,7 +263,17 @@ async function extractWithGemini(record, key, systemPrompt) {
   const text = json?.candidates?.[0]?.content?.parts?.map((p) => p.text).join('') ?? '';
   if (!text) throw new Error(`empty response (${json?.candidates?.[0]?.finishReason ?? 'no reason'})`);
   const parsed = JSON.parse(text);
-  return (parsed.benefits ?? []).map((benefit) => ({
+  // A rate over 100% is a misread, not a giveaway. The model reliably reports
+  // the discount in `raw_text_summary` ("10% הנחה") while occasionally putting
+  // the *price* in `value` — AIWA came back as `percent 139.9` off a ₪139.90
+  // vacuum cleaner. `percent` and `cashback` are rates; `fixed` and `gift_card`
+  // are shekel amounts and may legitimately exceed 100. Dropped rather than
+  // salvaged: recovering the number from the model's own prose would be a
+  // second guess, and the page can be read again.
+  const RATE_TYPES = new Set(['percent', 'cashback']);
+  return (parsed.benefits ?? [])
+    .filter((b) => !(RATE_TYPES.has(b?.type) && Number(b?.value) > 100))
+    .map((benefit) => ({
     ...benefit,
     valid_from: toIsoDate(benefit.valid_from),
     valid_until: toIsoDate(benefit.valid_until),

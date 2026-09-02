@@ -87,4 +87,16 @@ assert.equal(n.requires_voucher, true, 'what the model did say survives');
 assert.ok(normalizeConditions({}).raw_text_summary.length > 0, 'summary is required downstream');
 assert.ok(normalizeConditions(null).raw_text_summary.length > 0);
 
+// --- a rate over 100% is a misread, not a giveaway ---
+// The model put a ₪139.90 price into `value` while its own summary said "10%".
+// `percent`/`cashback` are rates; `fixed`/`gift_card` are shekels and may exceed 100.
+const RATE = new Set(['percent', 'cashback']);
+const keep = (t, v) => !(RATE.has(t) && v > 100);
+assert.equal(keep('percent', 139.9), false, 'a 139.9% discount is a price misread');
+assert.equal(keep('cashback', 450), false, 'a 450% cashback is a shekel cap misread');
+assert.equal(keep('percent', 100), true, '100% off is possible');
+assert.equal(keep('percent', 30), true);
+assert.equal(keep('gift_card', 200), true, 'a 200-shekel gift card is not a rate');
+assert.equal(keep('fixed', 450), true, 'a 450-shekel discount is not a rate');
+
 console.log('ok — extract-catalog');

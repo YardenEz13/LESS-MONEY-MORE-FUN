@@ -453,12 +453,67 @@ export function toRecord(url, page, { site, program, maxChars = 20_000, catalogP
   };
 }
 
+/**
+ * Offer URLs without a paid API: the site's own sitemap, plus the links on the
+ * catalog page itself.
+ *
+ * `/map` was the only discovery route and it needs a Firecrawl key. Without one
+ * it returns nothing, and every source quietly degrades to a single page — 34
+ * of 39 collected exactly one record that way, which reads like a thin catalog
+ * rather than like broken discovery. Both routes here are plain HTTP, so the
+ * free transport is finally free end to end.
+ */
+async function discoverFree(root, limit) {
+  const origin = new URL(root).origin;
+  const found = new Set();
+
+  const readSitemap = async (url, depth = 0) => {
+    if (depth > 1 || found.size >= limit * 6) return;
+    const xml = await fetch(url, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(30_000) })
+      .then((r) => (r.ok ? r.text() : null))
+      .catch(() => null);
+    if (!xml || !/<(urlset|sitemapindex)/i.test(xml)) return;
+    const locs = [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map((m) => m[1]);
+    // A sitemap index points at more sitemaps; one level down is enough.
+    const nested = locs.filter((l) => /\.xml(\.gz)?$/i.test(l));
+    for (const l of locs) if (!nested.includes(l)) found.add(l);
+    for (const l of nested.slice(0, 5)) await readSitemap(l, depth + 1);
+  };
+
+  // robots.txt names the real sitemap when it is not at the conventional path.
+  const robots = await fetch(`${origin}/robots.txt`, { headers: { 'user-agent': UA }, signal: AbortSignal.timeout(20_000) })
+    .then((r) => (r.ok ? r.text() : ''))
+    .catch(() => '');
+  for (const m of robots.matchAll(/^\s*sitemap:\s*(\S+)/gim)) await readSitemap(m[1]);
+  if (found.size === 0) await readSitemap(`${origin}/sitemap.xml`);
+
+  // The catalog page's own links. Where these sites are server-rendered — which
+  // is the half that carries the offers — the list is right there in the HTML.
+  const html = await fetch(root, {
+    headers: { 'user-agent': UA, 'accept-language': 'he-IL,he;q=0.9' },
+    signal: AbortSignal.timeout(45_000),
+  })
+    .then((r) => (r.ok ? r.text() : ''))
+    .catch(() => '');
+  for (const m of html.matchAll(/href\s*=\s*["']([^"'#]+)["']/gi)) {
+    try {
+      const url = new URL(m[1], root);
+      if (url.origin === origin) found.add(url.origin + url.pathname);
+    } catch {
+      // A malformed href is not worth failing discovery over.
+    }
+  }
+  return [...found];
+}
+
 /** Offer detail URLs under the catalog root, minus the root itself. */
-async function discover(root, limit) {
-  const result = await firecrawl('/map', { url: root, limit });
-  const links = (result.links ?? result.data?.links ?? []).map((l) =>
-    typeof l === 'string' ? l : l.url,
-  );
+async function discover(root, limit, transport) {
+  const links =
+    transport === 'fetch'
+      ? await discoverFree(root, limit)
+      : (({ links: a, data }) => (a ?? data?.links ?? []).map((l) => (typeof l === 'string' ? l : l.url)))(
+          await firecrawl('/map', { url: root, limit }),
+        );
   const rootPath = new URL(root).pathname.replace(/\/$/, '');
   const seen = new Set();
   return links.filter((url) => {
@@ -496,7 +551,7 @@ async function collect({ program, root, limit, concurrency, transport }) {
 
   const seeds = await seedUrls(program);
   if (seeds) console.log(`${site}: ${seeds.length} seeded offer pages`);
-  let urls = (seeds ?? (await discover(root, limit))).slice(0, limit);
+  let urls = (seeds ?? (await discover(root, limit, transport))).slice(0, limit);
 
   // Some catalogs are a single client-rendered page: the offers exist, but as
   // DOM, not as links, so /map finds nothing to crawl. top.style.co.il returns

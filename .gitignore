@@ -23,3 +23,11 @@ local_*/
 # Validation progress cache (regenerable, chatty)
 collected/easy/.verified-cache.json
 data/generated/link-check.log
+
+# Signing keys. A keystore in git history is public forever, and Play ties the
+# app's identity to it — `eas credentials` downloads one straight into
+# apps/mobile, so this rule is what stands between that and a commit.
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
