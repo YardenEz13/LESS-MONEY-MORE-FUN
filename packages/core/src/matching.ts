@@ -1,4 +1,5 @@
-import type { Benefit, Program } from './types';
+import type { Benefit, Merchant, Program } from './types';
+import { nearestBranch, type Coordinates } from './geo';
 import { DEFAULT_TIME_ZONE, daysSince, isWithinHours, toLocalMoment } from './time';
 
 export type EvalChannel = 'in_store' | 'online';
@@ -571,4 +572,70 @@ export function rankBenefits(
       return a.ageDays - b.ageDays;
     });
   return limit != null ? evaluations.slice(0, limit) : evaluations;
+}
+
+
+export interface NearbyCandidate {
+  evaluation: Evaluation;
+  /** Metres to the nearest branch. Null: no fix, or the merchant has no coordinates. */
+  distanceM: number | null;
+  /** The city that nearest branch sits in, when the source recorded one. */
+  city: string | null;
+}
+
+/**
+ * The benefits worth putting in front of someone standing at a given point.
+ *
+ * This exists because the advisor was answering national questions to local
+ * people. `rankBenefits` knows nothing about geography, and the catalog is 84%
+ * Gush Dan — so "where is it cheapest to fuel up" asked in Haifa was answered
+ * from twenty-five Tel Aviv forecourts, every one of them a correct ranking and
+ * a useless reply. Distance is not a tiebreak here, it is the question.
+ *
+ * Engine order is preserved inside each group rather than re-sorted by metres:
+ * the nearest offer is not the best one, and the promise that the first row is
+ * the condition engine's verdict has to keep holding. What changes is *which*
+ * offers get to compete — reachable ones first, then the rest to fill.
+ *
+ * No position at all is not an error; it is a first run, a denied permission,
+ * or a phone that has not had a fix yet. That case returns exactly what the
+ * caller used to get, with every distance null.
+ *
+ * ponytail: a full near-set crowds the national rows out of the window
+ * entirely, so a materially better offer one town over goes unmentioned. Give
+ * the far group a reserved slice if that turns out to matter.
+ */
+export function nearbyCandidates(input: {
+  ranked: readonly Evaluation[];
+  merchantsById: ReadonlyMap<string, Merchant>;
+  position: Coordinates | null;
+  radiusM: number;
+  limit: number;
+}): NearbyCandidate[] {
+  const { ranked, merchantsById, position, radiusM, limit } = input;
+  if (!position) {
+    return ranked.slice(0, limit).map((evaluation) => ({
+      evaluation,
+      distanceM: null,
+      city: null,
+    }));
+  }
+
+  const near: NearbyCandidate[] = [];
+  const far: NearbyCandidate[] = [];
+  for (const evaluation of ranked) {
+    const merchant = merchantsById.get(evaluation.benefit.merchant_id);
+    const nearest = merchant ? nearestBranch(position, merchant) : null;
+    const candidate: NearbyCandidate = {
+      evaluation,
+      distanceM: nearest ? nearest.distanceM : null,
+      city: nearest?.branch.city ?? null,
+    };
+    // An uncoordinated merchant is not "far away", it is unplaced — it keeps
+    // its engine rank in the fill group rather than being dropped for a fact
+    // the catalog never had.
+    if (nearest && nearest.distanceM <= radiusM) near.push(candidate);
+    else far.push(candidate);
+  }
+  return [...near, ...far].slice(0, limit);
 }

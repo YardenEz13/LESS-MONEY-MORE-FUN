@@ -165,6 +165,28 @@ npm start
 The app is not part of the npm workspace — Metro reaches `@sbr/core` and
 `data/` through `metro.config.js` + the Babel module-resolver aliases.
 
+Geofencing and Android notifications need a development build; in Expo Go they
+are unavailable rather than off, and the app says so (`runtimeLimitation`).
+
+### Turning the advisor on
+
+The advisor needs a Gemini key, and it matters *where* the key lives:
+
+```bash
+# dogfooding on your own phone — key is inlined into the bundle and extractable
+EXPO_PUBLIC_GEMINI_API_KEY=...
+
+# anyone else's phone — key stays on the server, device sends only the question
+EXPO_PUBLIC_ADVISOR_URL=https://<deployment>/api/advisor
+```
+
+`api/advisor.ts` is that server: it forwards the request body verbatim and adds
+the key, so the prompt and model stay in the app where an `eas update` can
+change them. It does not authenticate callers yet — an open endpoint with a key
+behind it is fine for a closed test group and not for a store listing. Set
+whichever you use before `npm start`; Expo inlines `EXPO_PUBLIC_*` at bundle
+time, so a change needs a restart.
+
 ## What it actually does
 
 **Condition-awareness over headline numbers.** The engine reports every stated
