@@ -77,9 +77,17 @@ for (const [file, list] of [
     // isn't in merchants.json yet. That is a supported state, not an error —
     // the benefit still lists, it just can't fire a geofence or match a share
     // until someone adds the merchant. Counted so the number stays visible.
-    if (benefit.merchant_id.startsWith('unmapped_')) {
+    //
+    // Resolution is tested first, and that order is the whole point: the id is
+    // load-bearing for the benefit hash, so a merchant promoted out of the
+    // proposal keeps its `unmapped_` name for ever. Asking about the prefix
+    // first measured the spelling of the id rather than whether it resolves,
+    // and reported merchants as unfenceable that had just been given branches.
+    if (merchantIds.has(benefit.merchant_id)) {
+      // Resolves. Nothing to report.
+    } else if (benefit.merchant_id.startsWith('unmapped_')) {
       unmapped += 1;
-    } else if (!merchantIds.has(benefit.merchant_id)) {
+    } else {
       fail(`${file} ${benefit.id}: unknown merchant ${benefit.merchant_id}`);
     }
     if (benefit.type === 'percent' && benefit.value > 100) {

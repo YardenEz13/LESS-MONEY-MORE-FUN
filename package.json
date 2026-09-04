@@ -15,7 +15,7 @@
     "status": "node scripts/status.mjs",
     "validate:easy": "node scripts/validate-easy.mjs",
     "mine:merchants": "node scripts/mine-merchants.mjs",
-    "test:scripts": "node scripts/easy-category.test.mjs && node scripts/scrape-easy.test.mjs && node scripts/scrape-keeps-verification.test.mjs && node scripts/validate-easy.test.mjs && node scripts/extract-easy.test.mjs && node scripts/publish-catalog.test.mjs && node scripts/collect-catalog.test.mjs && node scripts/extract-catalog.test.mjs && node scripts/scrape-geo-sweep.test.mjs",
+    "test:scripts": "node scripts/easy-category.test.mjs && node scripts/scrape-easy.test.mjs && node scripts/scrape-keeps-verification.test.mjs && node scripts/validate-easy.test.mjs && node scripts/extract-easy.test.mjs && node scripts/publish-catalog.test.mjs && node scripts/collect-catalog.test.mjs && node scripts/extract-catalog.test.mjs && node scripts/scrape-geo-sweep.test.mjs && node scripts/map-unmapped.test.mjs",
     "publish:catalog": "node scripts/publish-catalog.mjs",
     "ship:catalog": "npm run validate:data && cd apps/mobile && npx eas update --branch production",
     "validate:data": "node scripts/validate-data.mjs",
@@ -26,6 +26,7 @@
     "backfill:merchants": "node scripts/backfill-merchants.mjs",
     "unpublish": "node scripts/unpublish.mjs",
     "collect:catalog": "node scripts/collect-catalog.mjs",
+    "map:unmapped": "node scripts/map-unmapped.mjs",
     "extract:catalog": "node scripts/extract-catalog.mjs"
   },
   "devDependencies": {
