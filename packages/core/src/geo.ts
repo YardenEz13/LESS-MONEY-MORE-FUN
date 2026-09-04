@@ -49,14 +49,35 @@ export function merchantsNear(
 ): Merchant[] {
   const hits: { merchant: Merchant; distance: number }[] = [];
   for (const merchant of merchants) {
-    let nearest = Infinity;
-    for (const branch of merchant.branches) {
-      const d = distanceMeters(position, branch);
-      if (d < nearest) nearest = d;
+    const nearest = nearestBranch(position, merchant);
+    if (nearest && nearest.distanceM <= radiusM) {
+      hits.push({ merchant, distance: nearest.distanceM });
     }
-    if (nearest <= radiusM) hits.push({ merchant, distance: nearest });
   }
   return hits.sort((a, b) => a.distance - b.distance).map((h) => h.merchant);
+}
+
+/** One of a merchant's physical locations. */
+export type Branch = Merchant['branches'][number];
+
+/**
+ * The branch of this merchant closest to a point, or null when it has none.
+ *
+ * Null is a real answer, not a failure: 19 of 1057 merchants arrived without a
+ * single coordinate, and they can be listed but never located. Every caller
+ * that asks "how far is this shop" has to be able to say "we do not know"
+ * rather than fall back to zero, which would read as "you are standing in it".
+ */
+export function nearestBranch(
+  position: Coordinates,
+  merchant: Merchant,
+): { branch: Branch; distanceM: number } | null {
+  let best: { branch: Branch; distanceM: number } | null = null;
+  for (const branch of merchant.branches) {
+    const distanceM = distanceMeters(position, branch);
+    if (!best || distanceM < best.distanceM) best = { branch, distanceM };
+  }
+  return best;
 }
 
 /** Prefix marking a fence around a single shop rather than a whole complex. */
@@ -111,11 +132,7 @@ export function nearestFences(input: {
   }
 
   for (const merchant of input.merchants) {
-    let nearest: { branch: Coordinates; distance: number } | null = null;
-    for (const branch of merchant.branches) {
-      const distance = distanceMeters(input.position, branch);
-      if (!nearest || distance < nearest.distance) nearest = { branch, distance };
-    }
+    const nearest = nearestBranch(input.position, merchant);
     if (!nearest) continue;
     candidates.push({
       fence: {
@@ -125,7 +142,7 @@ export function nearestFences(input: {
         lng: nearest.branch.lng,
         radius_m: input.shopRadiusM,
       },
-      distance: nearest.distance,
+      distance: nearest.distanceM,
     });
   }
 
@@ -137,8 +154,62 @@ export function nearestFences(input: {
 
 export interface DwellState {
   venueId: string;
+  /** When this visit began, or 0 — the marker `dwellOnExit` writes for "not inside". */
   enteredAt: number;
+  /**
+   * When the reminder for this venue lands. A timestamp in the future means one
+   * is armed and pending, which is what stops a second one being stacked.
+   */
   notifiedAt?: number;
+  /** OS handle for a reminder armed but not yet delivered. */
+  scheduledId?: string;
+}
+
+/**
+ * The dwell record a fresh enter event should work from.
+ *
+ * `enteredAt: 0` is the exit marker, not a timestamp, and reading it back as a
+ * live entry is what broke the gate: `now - 0` is about fifty years, so it
+ * cleared a three-minute threshold instantly and every visit after the first
+ * exit notified on the doorstep. `dwellMinutes` already treated 0 as absent;
+ * the enter path did not, and one reader honouring a sentinel the other ignores
+ * is the whole bug.
+ *
+ * A returning visitor starts a fresh clock but keeps the cooldown the previous
+ * visit earned, so leaving and walking back in cannot buy a second reminder.
+ */
+export function dwellOnEnter(
+  previous: DwellState | undefined,
+  venueId: string,
+  now: number,
+): DwellState {
+  if (previous?.enteredAt) return previous;
+  return { venueId, enteredAt: now, notifiedAt: previous?.notifiedAt };
+}
+
+/**
+ * The dwell record after leaving, plus any reminder that has to be withdrawn.
+ *
+ * A reminder still in the future never happened — the user left before the
+ * dwell matured — so it is cancelled and the cooldown handed back. Without that
+ * a drive-past would arm a reminder, cancel it, and still silence the venue for
+ * twelve hours having shown nothing. A reminder already delivered keeps its
+ * cooldown, which is what makes leaving and returning quiet.
+ */
+export function dwellOnExit(
+  previous: DwellState,
+  now: number,
+): { next: DwellState; cancelId?: string } {
+  const pending =
+    previous.scheduledId != null && previous.notifiedAt != null && now < previous.notifiedAt;
+  return {
+    next: {
+      venueId: previous.venueId,
+      enteredAt: 0,
+      notifiedAt: pending ? undefined : previous.notifiedAt,
+    },
+    cancelId: pending ? previous.scheduledId : undefined,
+  };
 }
 
 export interface NotificationPolicy {

@@ -4,6 +4,8 @@ import * as TaskManager from 'expo-task-manager';
 import {
   DEFAULT_NOTIFICATION_POLICY,
   distanceMeters,
+  dwellOnEnter,
+  dwellOnExit,
   hiddenBenefitIds,
   nearestFences,
   rankBenefits,
@@ -16,7 +18,7 @@ import {
   type Venue,
 } from '@sbr/core';
 import { merchants, ownedProgramIds, placeAt, venues } from './catalog';
-import { notifyVenue } from './notifications';
+import { cancelVenueNotification, notifyVenue } from './notifications';
 import { canGeofenceInBackground } from './runtime';
 import { loadProfile } from '../state/profile';
 
@@ -59,33 +61,52 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
   const dwell = await readDwell();
   // Re-entering a fence we're already inside (GPS drift) must not restart the
   // dwell clock, or the timer never matures.
-  const state: DwellState = dwell[venueId] ?? { venueId, enteredAt: now };
-  const nowDate = new Date(now);
+  const state: DwellState = dwellOnEnter(dwell[venueId], venueId, now);
+
+  // Already armed for this visit: a drift re-entry must not stack a second
+  // reminder for the same doorway.
+  if (state.scheduledId && state.notifiedAt != null && now < state.notifiedAt) return;
+
+  const policy = DEFAULT_NOTIFICATION_POLICY;
+  // The reminder is judged at the moment it would land, not the moment the
+  // fence fired, and the OS holds it until then. Before this, the dwell gate
+  // could only mature if a *second* enter event happened to arrive three
+  // minutes later — which Android supplies by GPS drift and iOS never does,
+  // because Core Location reports a boundary crossing once. An iPhone that
+  // walked into a mall and stayed was silent forever.
+  const fireAt = now + policy.minDwellMs;
+  const fireDate = new Date(fireAt);
 
   // Channel is deliberately left unset: standing in a mall says nothing about
   // whether the user will buy in-store or on their phone, and guessing would
   // promote an online-only benefit to "eligible".
   const evaluations = rankBenefits(place.benefits, {
-    now: nowDate,
+    now: fireDate,
     ownedProgramIds: ownedProgramIds(profile.program_ids),
     mutedBenefitIds: hiddenBenefitIds(profile),
   });
 
   const decision = shouldNotifyForVenue({
     state,
-    now,
-    localMinutes: toLocalMoment(nowDate).minutes,
+    now: fireAt,
+    localMinutes: toLocalMoment(fireDate).minutes,
     matchCount: evaluations.length,
-    policy: DEFAULT_NOTIFICATION_POLICY,
+    policy,
   });
 
   if (decision.notify) {
-    const sent = await notifyVenue({
+    const scheduledId = await notifyVenue({
       venueId,
       venueName: place.name,
       evaluations: evaluations.slice(0, 5),
+      delayMs: policy.minDwellMs,
     });
-    if (sent) state.notifiedAt = now;
+    if (scheduledId) {
+      state.scheduledId = scheduledId;
+      // Cooldown runs from when the reminder lands. A future timestamp here is
+      // also what marks this visit as already armed, above.
+      state.notifiedAt = fireAt;
+    }
   }
 
   dwell[venueId] = state;
@@ -112,15 +133,18 @@ export async function dwellMinutes(
   return Math.max(0, Math.floor((now - enteredAt) / 60_000));
 }
 
-export async function handleVenueExit(venueId: string): Promise<void> {
+export async function handleVenueExit(venueId: string, now: number = Date.now()): Promise<void> {
   const dwell = await readDwell();
-  // Keep `notifiedAt` so the cooldown survives leaving and coming back;
-  // clear the dwell clock so the next visit has to earn its own timer.
   const previous = dwell[venueId];
-  if (previous) {
-    dwell[venueId] = { venueId, enteredAt: 0, notifiedAt: previous.notifiedAt };
-    await writeDwell(dwell);
-  }
+  if (!previous) return;
+
+  // Keep `notifiedAt` so a delivered reminder's cooldown survives leaving and
+  // coming back; clear the dwell clock so the next visit earns its own timer.
+  // A reminder still pending is withdrawn instead, and gives the cooldown back.
+  const { next, cancelId } = dwellOnExit(previous, now);
+  if (cancelId) await cancelVenueNotification(cancelId);
+  dwell[venueId] = next;
+  await writeDwell(dwell);
 }
 
 TaskManager.defineTask(GEOFENCE_TASK, async ({ data, error }) => {
