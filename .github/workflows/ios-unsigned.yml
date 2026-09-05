@@ -1,0 +1,118 @@
+# Build an unsigned .ipa on a macOS runner, for sideloading with a free Apple ID.
+#
+# Why this exists: there is no iOS toolchain on Windows, and the $99 Developer
+# Programme is the only way to get a signed build out of EAS. This is the $0
+# route — the runner compiles, and *you* sign, on your own machine, with your
+# own Apple ID:
+#
+#   1. Run this workflow (Actions -> ios unsigned -> Run workflow).
+#   2. Download the `ios-unsigned-ipa` artifact and unzip it.
+#   3. Open Sideloadly (or AltServer), plug the iPhone in, drop the .ipa on it
+#      and sign in with a plain Apple ID. It mints the App ID, certificate and
+#      provisioning profile through Apple's developer-services API, so no Xcode
+#      and no Mac are involved on your side.
+#
+# The free-team limits are real and none of them are worked around here: the
+# profile dies after 7 days (re-run Sideloadly, the app and its data survive),
+# 3 devices, 10 App IDs. It is enough to test the geofence reminder on your own
+# phone, which is the thing the browser cannot exercise.
+#
+# This only signs because `expo-notifications` is out of app.json's plugins —
+# that plugin injects the `aps-environment` entitlement, which a free personal
+# team cannot provision. See the commit that removed it.
+#
+# Manual trigger on purpose. macOS runners bill at 10x on private repos, and
+# nothing here needs to run per-push.
+name: ios unsigned
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ipa:
+    name: unsigned ipa
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Same two-step install as ci.yml, for the same reason: apps/mobile sits
+      # outside the npm workspace and reaches @sbr/core through a source-path
+      # alias, so its own install never resolves @sbr/core's dependencies —
+      # zod in particular, which packages/core/src/types.ts imports directly.
+      - run: npm install
+      - run: npm install
+        working-directory: apps/mobile
+
+      # No ios/ directory is committed — it is generated from app.json, which is
+      # the source of truth (.gitignore says so). --clean keeps the runner's
+      # output identical to a fresh machine's. Runs pod install itself on macOS.
+      - name: Generate the iOS project
+        run: npx expo prebuild --platform ios --clean
+        working-directory: apps/mobile
+
+      # The scheme is named after the .xcodeproj that prebuild just wrote, which
+      # is derived from `expo.name`. Read it rather than hardcoding
+      # "SmartBenefitsRecall", so renaming the app does not silently break this.
+      - name: Locate the workspace and scheme
+        id: xc
+        working-directory: apps/mobile
+        run: |
+          set -euo pipefail
+          workspace=$(ls -d ios/*.xcworkspace | head -1)
+          scheme=$(basename "$(ls -d ios/*.xcodeproj | head -1)" .xcodeproj)
+          echo "workspace=$workspace" >> "$GITHUB_OUTPUT"
+          echo "scheme=$scheme" >> "$GITHUB_OUTPUT"
+          echo "building $scheme from $workspace"
+
+      # `build`, not `archive`: an archive still wants a signing identity even
+      # with signing disabled, and fails late. This produces the same .app.
+      #
+      # The JS bundle is written by the "Bundle React Native code and images"
+      # build phase, which runs inside this step — so EXPO_PUBLIC_* has to be
+      # set HERE, not at install time. Expo inlines those at bundle time, which
+      # is also why changing the advisor URL means a rebuild, not an eas update.
+      - name: Build unsigned
+        working-directory: apps/mobile
+        env:
+          EXPO_PUBLIC_ADVISOR_URL: ${{ secrets.EXPO_PUBLIC_ADVISOR_URL }}
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace "${{ steps.xc.outputs.workspace }}" \
+            -scheme "${{ steps.xc.outputs.scheme }}" \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_ENTITLEMENTS="" \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      # An .ipa is a zip with the .app inside a top-level Payload/ directory.
+      # Nothing more — Sideloadly re-signs and repacks it anyway.
+      - name: Package as .ipa
+        working-directory: apps/mobile
+        run: |
+          set -euo pipefail
+          app=$(ls -d build/Build/Products/Release-iphoneos/*.app | head -1)
+          echo "packaging $app"
+          mkdir -p Payload
+          cp -R "$app" Payload/
+          zip -qry app-unsigned.ipa Payload
+          ls -lh app-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-unsigned-ipa
+          path: apps/mobile/app-unsigned.ipa
+          # A 7-day signature makes a month-old build pointless to keep.
+          retention-days: 7
+          if-no-files-found: error
