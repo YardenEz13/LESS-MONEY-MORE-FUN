@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, AppState, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { useFonts } from 'expo-font';
@@ -63,21 +65,41 @@ const GEOFENCE_FAILURE: Record<string, string> = {
 const canOpenAppSettings = Platform.OS !== 'web';
 const SETTINGS_FIXABLE = new Set(['foreground_denied', 'background_denied']);
 
-type Screen =
-  | { name: 'loading' }
-  | { name: 'onboarding' }
-  | { name: 'home' }
-  | { name: 'detail'; evaluation: Evaluation }
-  | { name: 'settings' }
-  | { name: 'stats' }
-  | { name: 'advisor' }
-  | { name: 'share'; result: ShareResult };
+type RootStackParamList = {
+  onboarding: undefined;
+  home: undefined;
+  detail: { evaluation: Evaluation };
+  settings: undefined;
+  stats: undefined;
+  advisor: undefined;
+  share: { result: ShareResult };
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
- * Navigation is a discriminated union rather than a router library: six
- * screens, one back-target each. A router would be more code to configure
- * than the whole flow contains.
+ * Navigation was a discriminated union, and for six screens with one back
+ * target each that really was less code than configuring a router. What it
+ * could not produce is the edge swipe: on iOS every screen is expected to
+ * come back with a drag from the edge, and a state machine has no gesture and
+ * no transition to interrupt. `native-stack` is a real UINavigationController,
+ * so the swipe, the interactive cancel and the parallax come from the platform
+ * rather than from us imitating them.
+ *
+ * The header stays hidden. Screens draw their own `ScreenHeader`, which is part
+ * of the type system this app is built on, and a native title bar above it
+ * would be a second, conflicting one.
+ *
+ * `enforceRtl` forces RTL, so the gesture lives on the right edge — UIKit
+ * mirrors it from the layout direction, which is the reason to let it own this
+ * rather than hand-rolling a PanResponder that would have to know.
  */
+
+/**
+ * Lets the effects outside the navigator drive it — a share intent and a
+ * notification tap both arrive from the OS, not from a button on screen.
+ */
+const navigationRef = createNavigationContainerRef<RootStackParamList>();
 export default function App() {
   return (
     <SafeAreaProvider>
@@ -87,7 +109,6 @@ export default function App() {
 }
 
 function AppRoot() {
-  const [screen, setScreen] = useState<Screen>({ name: 'loading' });
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [geofenceStatus, setGeofenceStatus] = useState('תזכורת בקניון כבויה');
   const [geofenceActive, setGeofenceActive] = useState(false);
@@ -111,7 +132,6 @@ function AppRoot() {
     void (async () => {
       const loaded = await loadProfile();
       setProfile(loaded);
-      setScreen(loaded.onboarded_at ? { name: 'home' } : { name: 'onboarding' });
       // Re-arms a fence the OS dropped since last launch, and never prompts —
       // see `resumeGeofencing`. Silent when nothing was granted yet.
       if (await resumeGeofencing()) {
@@ -134,7 +154,9 @@ function AppRoot() {
   // A share can arrive while the app is cold or already open; both land here.
   useEffect(() => {
     return subscribeToShares((shared) => {
-      void resolveShare(shared).then((result) => setScreen({ name: 'share', result }));
+      void resolveShare(shared).then((result) => {
+        if (navigationRef.isReady()) navigationRef.navigate('share', { result });
+      });
     });
   }, []);
 
@@ -146,7 +168,9 @@ function AppRoot() {
         kind: 'notification_opened',
         venueId: typeof venueId === 'string' ? venueId : undefined,
       });
-      setScreen({ name: 'home' });
+      // Back to the list rather than onto it: the tap came from outside the
+      // app, so whatever stack was left over belongs to a previous session.
+      if (navigationRef.isReady()) navigationRef.navigate('home');
     });
     return () => subscription.remove();
   }, []);
@@ -205,7 +229,7 @@ function AppRoot() {
     [enableGeofencing, persist, profile?.notifications_enabled],
   );
 
-  if (!fontsLoaded || !profile || screen.name === 'loading') {
+  if (!fontsLoaded || !profile) {
     return (
       <SafeAreaView style={styles.centered}>
         <ActivityIndicator color={colors.surfacePrimary} />
@@ -216,104 +240,132 @@ function AppRoot() {
   return (
     <SafeAreaView style={styles.root}>
       <StatusBar style="dark" />
-      <View style={styles.body}>
-        {screen.name === 'onboarding' && (
-          <OnboardingScreen
-            profile={profile}
-            onChange={persist}
-            onDone={async () => {
-              await persist({ ...profile, onboarded_at: new Date().toISOString() });
-              setScreen({ name: 'home' });
-              // Permission dialogs are asked for over the benefit list, not
-              // instead of it. Blocking the transition on them leaves the user
-              // staring at the form they just finished.
-              void enableGeofencing();
-            }}
-          />
-        )}
+      <NavigationContainer ref={navigationRef}>
+        <Stack.Navigator
+          initialRouteName={profile.onboarded_at ? 'home' : 'onboarding'}
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.surfacePage },
+          }}
+        >
+          <Stack.Screen name="onboarding">
+            {({ navigation }) => (
+              <OnboardingScreen
+                profile={profile}
+                onChange={persist}
+                onDone={async () => {
+                  await persist({ ...profile, onboarded_at: new Date().toISOString() });
+                  // First run has nothing behind it; reached from settings it
+                  // does, and resetting there would strand the user at home.
+                  if (navigation.canGoBack()) navigation.goBack();
+                  else navigation.reset({ index: 0, routes: [{ name: 'home' }] });
+                  // Permission dialogs are asked for over the benefit list, not
+                  // instead of it. Blocking the transition on them leaves the user
+                  // staring at the form they just finished.
+                  void enableGeofencing();
+                }}
+              />
+            )}
+          </Stack.Screen>
 
-        {screen.name === 'home' && (
-          <HomeScreen
-            profile={profile}
-            geofenceStatus={geofenceStatus}
-            geofenceActive={geofenceActive}
-            onSelect={(evaluation) => {
-              void logEvent({ kind: 'benefit_viewed', benefitId: evaluation.benefit.id });
-              setScreen({ name: 'detail', evaluation });
-            }}
-            onOpenSettings={() => setScreen({ name: 'settings' })}
-            onOpenStats={() => setScreen({ name: 'stats' })}
-            onOpenAdvisor={() => setScreen({ name: 'advisor' })}
-          />
-        )}
+          <Stack.Screen name="home">
+            {({ navigation }) => (
+              <HomeScreen
+                profile={profile}
+                geofenceStatus={geofenceStatus}
+                geofenceActive={geofenceActive}
+                onSelect={(evaluation) => {
+                  void logEvent({ kind: 'benefit_viewed', benefitId: evaluation.benefit.id });
+                  navigation.navigate('detail', { evaluation });
+                }}
+                onOpenSettings={() => navigation.navigate('settings')}
+                onOpenStats={() => navigation.navigate('stats')}
+                onOpenAdvisor={() => navigation.navigate('advisor')}
+              />
+            )}
+          </Stack.Screen>
 
-        {screen.name === 'advisor' && (
-          <AdvisorScreen
-            profile={profile}
-            onSelect={(evaluation) => {
-              void logEvent({ kind: 'benefit_viewed', benefitId: evaluation.benefit.id });
-              setScreen({ name: 'detail', evaluation });
-            }}
-            onBack={() => setScreen({ name: 'home' })}
-          />
-        )}
+          <Stack.Screen name="advisor">
+            {({ navigation }) => (
+              <AdvisorScreen
+                profile={profile}
+                onSelect={(evaluation) => {
+                  void logEvent({ kind: 'benefit_viewed', benefitId: evaluation.benefit.id });
+                  navigation.navigate('detail', { evaluation });
+                }}
+                onBack={() => navigation.goBack()}
+              />
+            )}
+          </Stack.Screen>
 
-        {screen.name === 'detail' && (
-          <BenefitDetailScreen
-            evaluation={screen.evaluation}
-            isMuted={profile.muted_benefit_ids.includes(screen.evaluation.benefit.id)}
-            isRejected={profile.rejected_benefit_ids.includes(screen.evaluation.benefit.id)}
-            onBack={() => setScreen({ name: 'home' })}
-            onRedeemed={async () => {
-              await logEvent({
-                kind: 'benefit_redeemed',
-                benefitId: screen.evaluation.benefit.id,
-              });
-              setScreen({ name: 'home' });
+          <Stack.Screen name="detail">
+            {({ navigation, route }) => {
+              const { evaluation } = route.params;
+              // These three change what the list contains, so they return to it
+              // rather than to whichever screen opened the card — `navigate`
+              // pops back to the existing `home` instead of stacking a second.
+              const backToList = () => navigation.navigate('home');
+              return (
+                <BenefitDetailScreen
+                  evaluation={evaluation}
+                  isMuted={profile.muted_benefit_ids.includes(evaluation.benefit.id)}
+                  isRejected={profile.rejected_benefit_ids.includes(evaluation.benefit.id)}
+                  onBack={() => navigation.goBack()}
+                  onRedeemed={async () => {
+                    await logEvent({ kind: 'benefit_redeemed', benefitId: evaluation.benefit.id });
+                    backToList();
+                  }}
+                  onToggleMute={async () => {
+                    await persist(toggleMuted(profile, evaluation.benefit.id));
+                    backToList();
+                  }}
+                  onReport={async () => {
+                    await persist(rejectBenefit(profile, evaluation.benefit.id));
+                    backToList();
+                  }}
+                />
+              );
             }}
-            onToggleMute={async () => {
-              await persist(toggleMuted(profile, screen.evaluation.benefit.id));
-              setScreen({ name: 'home' });
-            }}
-            onReport={async () => {
-              await persist(rejectBenefit(profile, screen.evaluation.benefit.id));
-              setScreen({ name: 'home' });
-            }}
-          />
-        )}
+          </Stack.Screen>
 
-        {screen.name === 'share' && (
-          <ShareResultScreen
-            result={screen.result}
-            onSelect={(evaluation) => {
-              void logEvent({ kind: 'benefit_viewed', benefitId: evaluation.benefit.id });
-              setScreen({ name: 'detail', evaluation });
-            }}
-            onClose={() => setScreen({ name: 'home' })}
-          />
-        )}
+          <Stack.Screen name="share">
+            {({ navigation, route }) => (
+              <ShareResultScreen
+                result={route.params.result}
+                onSelect={(evaluation) => {
+                  void logEvent({ kind: 'benefit_viewed', benefitId: evaluation.benefit.id });
+                  navigation.navigate('detail', { evaluation });
+                }}
+                onClose={() => navigation.navigate('home')}
+              />
+            )}
+          </Stack.Screen>
 
-        {screen.name === 'settings' && (
-          <SettingsScreen
-            profile={profile}
-            geofenceStatus={geofenceStatus}
-            geofenceFixable={geofenceFixable}
-            onClearRejections={() => void persist(clearRejections(profile))}
-            onChange={setNotificationsEnabled}
-            onEditPrograms={() => setScreen({ name: 'onboarding' })}
-            onEnableGeofencing={enableGeofencing}
-            onBack={() => setScreen({ name: 'home' })}
-          />
-        )}
+          <Stack.Screen name="settings">
+            {({ navigation }) => (
+              <SettingsScreen
+                profile={profile}
+                geofenceStatus={geofenceStatus}
+                geofenceFixable={geofenceFixable}
+                onClearRejections={() => void persist(clearRejections(profile))}
+                onChange={setNotificationsEnabled}
+                onEditPrograms={() => navigation.navigate('onboarding')}
+                onEnableGeofencing={enableGeofencing}
+                onBack={() => navigation.goBack()}
+              />
+            )}
+          </Stack.Screen>
 
-        {screen.name === 'stats' && <StatsScreen onBack={() => setScreen({ name: 'home' })} />}
-      </View>
+          <Stack.Screen name="stats">
+            {({ navigation }) => <StatsScreen onBack={() => navigation.goBack()} />}
+          </Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.surfacePage },
-  body: { flex: 1 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfacePage },
 });
