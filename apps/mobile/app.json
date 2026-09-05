@@ -59,7 +59,6 @@
           "isAndroidBackgroundLocationEnabled": true
         }
       ],
-      "expo-notifications",
       "./plugins/withGradleMemory"
     ],
     "owner": "yarden1311",
