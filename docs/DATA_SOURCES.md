@@ -147,6 +147,7 @@ Each benefit already carries `last_verified_at`, `valid_until`, `source_url`,
 | **daily** | `npm run validate:easy` (scheduled task) | delisted businesses, and the slice of unproven links that fits in easy's daily budget |
 | weekly | `npm run scrape:easy` then `npm run validate:easy` | changed/new/removed easy deals |
 | weekly | `npm run verify:catalog -- --sources` | dead domains, source pages that stopped 200ing → candidates for removal |
+| **Mon + Thu 10:00** | `scripts/refresh-catalogs.ps1` (Cowork task `refresh-official-catalogs`) | new and changed terms on the open official catalogs — collected, extracted, **published and pushed** |
 | monthly | Cowork session per Tier-1 catalog (Max rotates monthly; חבר needs your login) | condition changes the aggregator can't see |
 | after any import | `npm run -w @sbr/extraction review`, then `npm run publish:catalog` | low-confidence rows never ship un-reviewed |
 
@@ -172,6 +173,30 @@ RESULT: FAILED (exit N) - existing catalog left untouched
 It deliberately stops after refreshing the JSONL: extraction costs money and
 judgement, so `npm run extract` stays a keyboard decision. Inspect, remove, or
 retime it with `Get-ScheduledTask`/`Unregister-ScheduledTask`.
+
+**The official catalogs are the exception, by the owner's choice.** A Cowork
+scheduled task, `refresh-official-catalogs`, runs `scripts/refresh-catalogs.ps1`
+every Monday and Thursday at 10:00 and *does* extract, publish, commit and push.
+That is safe for the catalogs and not for easy for a specific reason: catalog
+pages carry real terms, so most of what the model reads clears the 0.85 gate on
+its own, while easy's one-liners almost never do and would only grow the queue.
+The judgement has not been removed, it has moved into gates the run cannot
+skip — the confidence gate, `validate:data` (which once blocked a 221.85%
+discount) and `shipped-data.test`. Any of them failing restores the owned paths
+and publishes nothing. It owns only `collected/catalogs` and `data/benefits.json`
+and never stages anything else, so the easy files this task above leaves dirty
+are never swept into its commits. Every model answer is cached by
+`content_hash`, so an unchanged page costs nothing on the next run.
+
+```
+RESULT: PUBLISHED - catalog N -> M
+RESULT: no changes - catalog N
+RESULT: FAILED - <which gate, or why>         owned paths restored
+RESULT: COMMITTED LOCALLY, PUSH FAILED        commit kept; push by hand
+```
+
+Log: `data/generated/catalog-refresh.log`. Try it without publishing:
+`powershell -File scripts/refresh-catalogs.ps1 -DryRun`.
 
 A cloud routine also exists — `trig_01AEToRq65jECsxYHChuokTR` at
 https://claude.ai/code/routines — but it is **disabled**, because the cloud

@@ -25,6 +25,7 @@ import { pathToFileURL } from 'node:url';
 
 const CACHE = 'data/generated/extraction-cache.json';
 const SKIPPED = 'data/generated/extract-catalog-skipped.json';
+const ANSWERED = 'data/generated/gemini-answered.json';
 
 /* ---------------------------------------------------------------- *
  * Gemini mode (`--gemini`)
@@ -453,6 +454,18 @@ async function main() {
  * a re-run after a re-crawl only pays for pages whose text actually changed —
  * and a page already read by the model is never read twice.
  */
+/**
+ * Does this page still need a model read?
+ *
+ * `answered` is what makes an empty result final. Without it a page the model
+ * read and found nothing on looks identical to one it never saw.
+ */
+export function needsModel(hash, cache, answered) {
+  if (answered.has(hash)) return false;
+  // Back-compat: non-empty model answers cached before `answered` existed.
+  return cache[hash]?.[0]?.by !== 'gemini';
+}
+
 async function runGemini(files, cache) {
   const key = await geminiKey();
   if (!key) {
@@ -463,6 +476,19 @@ async function runGemini(files, cache) {
   // copies of these rules would drift, and the rules are the product
   // ("null means not written, not no limit").
   const systemPrompt = await readPromptFromSource();
+
+  // Every hash the model has answered — including the answer "this page has no
+  // benefit". The cache cannot say that on its own: an empty array reads the
+  // same whether the model found nothing or never looked, and parser output
+  // (which this pass replaces) writes empty arrays too. Skipping on the cache
+  // alone re-read ~190 empty pages on every run, which a twice-a-week schedule
+  // turns into a standing quota leak.
+  const answered = new Set(JSON.parse(await readFile(ANSWERED, 'utf8').catch(() => '[]')));
+  const save = async () => {
+    await mkdir(dirname(CACHE), { recursive: true });
+    await writeFile(CACHE, JSON.stringify(cache, null, 1), 'utf8');
+    await writeFile(ANSWERED, JSON.stringify([...answered]), 'utf8');
+  };
 
   let calls = 0;
   let failures = 0;
@@ -477,7 +503,7 @@ async function runGemini(files, cache) {
 
     // Skip only what the *model* already answered. Parser output is exactly
     // what this pass exists to replace, so it is not a cache hit here.
-    const todo = rows.filter((row) => cache[row.content_hash]?.[0]?.by !== 'gemini');
+    const todo = rows.filter((row) => needsModel(row.content_hash, cache, answered));
     let got = 0;
     let cursor = 0;
 
@@ -489,6 +515,7 @@ async function runGemini(files, cache) {
           // Provenance: which model actually read this page, so a later pass can
           // tell a weak model's answer from a strong one's.
           cache[row.content_hash] = found.map((b) => ({ ...b, by: 'gemini', model: GEMINI_MODEL }));
+          answered.add(row.content_hash);
           got += found.length;
           benefits += found.length;
         } catch (error) {
@@ -502,15 +529,19 @@ async function runGemini(files, cache) {
     await Promise.all(Array.from({ length: CONCURRENCY }, worker));
     // Flush per file: a run that dies at page 90 keeps the first 89 answers
     // rather than paying for them again.
-    await mkdir(dirname(CACHE), { recursive: true });
-    await writeFile(CACHE, JSON.stringify(cache, null, 1), 'utf8');
-    console.log(`${file.split('/').pop().padEnd(34)} ${String(rows.length).padStart(3)} pages, ${String(got).padStart(3)} benefits`);
+    await save();
+    // `read` is what actually went to the model; the rest were cache hits.
+    console.log(`${file.split('/').pop().padEnd(34)} ${String(todo.length).padStart(3)} read of ${String(rows.length).padStart(3)}, ${String(got).padStart(3)} benefits`);
   }
 
-  await mkdir(dirname(CACHE), { recursive: true });
-  await writeFile(CACHE, JSON.stringify(cache, null, 1), 'utf8');
+  await save();
   console.log(`\n${calls} pages read by ${GEMINI_MODEL} — ${benefits} benefits, ${failures} failed`);
   console.log(`cache -> ${CACHE}`);
+
+  // Every call failed: the API is down or the quota is gone, not the pages.
+  // Exit loud so an unattended refresh stops before publishing a stale run as
+  // if it were fresh.
+  if (calls > 0 && failures === calls) process.exit(3);
 }
 
 /** The prompt file is TypeScript; read the template literal out of it. */

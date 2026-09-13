@@ -9,7 +9,7 @@
  * Run: node scripts/extract-catalog.test.mjs
  */
 import assert from 'node:assert/strict';
-import { parseOffer, parseConditions, toExtracted, toIsoDate, normalizeConditions } from './extract-catalog.mjs';
+import { parseOffer, parseConditions, toExtracted, toIsoDate, normalizeConditions, needsModel } from './extract-catalog.mjs';
 
 const record = (headings, extra = {}) => ({
   merchant_name: 'בית עסק',
@@ -98,5 +98,21 @@ assert.equal(keep('percent', 100), true, '100% off is possible');
 assert.equal(keep('percent', 30), true);
 assert.equal(keep('gift_card', 200), true, 'a 200-shekel gift card is not a rate');
 assert.equal(keep('fixed', 450), true, 'a 450-shekel discount is not a rate');
+
+// --- a page the model found nothing on is answered, not unread ---
+// An empty cache entry means the same thing whether the model read the page or
+// the parser did, so ~190 empty pages were re-sent to the model every run.
+const cacheFixture = {
+  modelHit: [{ by: 'gemini', merchant_name: 'x' }],
+  modelEmpty: [],
+  parserEmpty: [],
+  parserHit: [{ merchant_name: 'y' }],
+};
+const answeredFixture = new Set(['modelEmpty']);
+assert.equal(needsModel('modelEmpty', cacheFixture, answeredFixture), false, 'an empty model answer is final');
+assert.equal(needsModel('modelHit', cacheFixture, answeredFixture), false, 'a model answer from before `answered` still counts');
+assert.equal(needsModel('parserEmpty', cacheFixture, answeredFixture), true, 'a parser empty is not a model answer');
+assert.equal(needsModel('parserHit', cacheFixture, answeredFixture), true, 'parser output is what the model replaces');
+assert.equal(needsModel('neverSeen', cacheFixture, answeredFixture), true);
 
 console.log('ok — extract-catalog');
