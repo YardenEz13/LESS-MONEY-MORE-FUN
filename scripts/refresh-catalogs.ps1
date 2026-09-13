@@ -1,5 +1,8 @@
 # Twice-weekly official-catalog refresh, run by a Claude Cowork scheduled task.
 #
+# Collect over plain HTTP -> extract (the pipeline calls Gemini for changed
+# pages only) -> publish -> prove it -> commit -> push.
+#
 # Unlike weekly-refresh.ps1, this one DOES extract, publish, commit and push —
 # the owner asked for new discounts to reach the data unattended. What makes
 # that safe is not this script being careful; it is the gates it refuses to
@@ -86,44 +89,79 @@ Write-Log "catalog before: $before"
 # Plain HTTP, no API key. A catalog that returns less than half its previous
 # size is refused inside the collector, so a site that is down this morning
 # leaves its last good file in place.
-node scripts/collect-catalog.mjs --all --limit 60 --concurrency 3 2>&1 | ForEach-Object { Write-Log $_ }
+# --limit 150, not 60: at 60, max lost 13 of its 73 seeded offers every run and
+# fly_card and p100_members both stopped at exactly 60.
+node scripts/collect-catalog.mjs --all --limit 150 --concurrency 3 2>&1 | ForEach-Object { Write-Log $_ }
 if ($LASTEXITCODE -ne 0) { Stop-Run "collection crashed (exit $LASTEXITCODE)" -Restore }
 
 # --- extract ---------------------------------------------------------------
-# Keyed by content_hash: pages whose text did not change since the last run are
-# cache hits and never reach the model.
-node scripts/extract-catalog.mjs --gemini 2>&1 | ForEach-Object { Write-Log $_ }
-switch ($LASTEXITCODE) {
-    0 { }
-    2 { Stop-Run "no working Gemini key (apps/mobile/.env)" -Restore }
-    3 { Stop-Run "every Gemini call failed - API down or quota exhausted" -Restore }
-    default { Stop-Run "extraction crashed (exit $LASTEXITCODE)" -Restore }
+# The extraction pipeline itself calls Gemini (with a model pool that steps down
+# when a model's daily quota runs out), so there is no separate model pass here.
+# Keyed by content_hash: a page whose text did not change since the last run is
+# a cache hit and never reaches the model.
+#
+# The app's key in apps/mobile/.env is the key of record and wins over any
+# GEMINI_API_KEY already in the environment: one stale value there once cost a
+# whole pass to "API key not valid" while the working key sat in .env.
+$envFile = Join-Path $repo 'apps\mobile\.env'
+$appKey = if (Test-Path $envFile) {
+    (Select-String -Path $envFile -Pattern '^EXPO_PUBLIC_GEMINI_API_KEY=(.+)$' | Select-Object -First 1).Matches.Groups[1].Value.Trim()
+}
+if ($appKey) {
+    $env:GEMINI_API_KEY = $appKey
+    Write-Log "gemini key: apps/mobile/.env"
+} elseif ($env:GEMINI_API_KEY) {
+    Write-Log "gemini key: GEMINI_API_KEY from the environment"
+} else {
+    Stop-Run "no Gemini key: set EXPO_PUBLIC_GEMINI_API_KEY in apps/mobile/.env" -Restore
 }
 
+# npm.cmd, never bare `npm`. In PowerShell `npm` resolves to the npm.ps1 shim,
+# and PowerShell consumes the `--` as its own end-of-parameters marker before
+# npm sees it — so `--collected` reached npm as an unknown config flag and every
+# program failed with EUNKNOWNCONFIG. It went unnoticed because a positional
+# argument after `--` (the test file below) still gets through.
 $pipelineFailures = @()
-foreach ($file in Get-ChildItem collected/catalogs -Filter *.jsonl) {
+$pageFailures = 0
+$programs = @(Get-ChildItem collected/catalogs -Filter *.jsonl)
+foreach ($file in $programs) {
     $program = $file.BaseName
-    npm run extract -- --collected "collected/catalogs/$($file.Name)" --program $program --all 2>&1 |
+    npm.cmd run extract -- --collected "collected/catalogs/$($file.Name)" --program $program --all 2>&1 |
         Select-String -Pattern '^(benefits|published|review|failures):' |
-        ForEach-Object { Write-Log "  $program  $($_.Line)" }
+        ForEach-Object {
+            Write-Log "  $program  $($_.Line)"
+            # A page the model could not read exits 0 — only a crash or a missing
+            # key is a non-zero exit — so page failures are counted from the report.
+            if ($_.Line -match '^failures:\s*(\d+)') { $pageFailures += [int]$Matches[1] }
+        }
     # One program failing keeps its previous benefits live; the gates below
     # still decide whether anything else ships.
     if ($LASTEXITCODE -ne 0) { $pipelineFailures += $program }
 }
 
+# Every program failing is a broken pipeline, not a quiet week. Without this the
+# catalog comes out unchanged, every gate passes on the unchanged catalog, and
+# the run reports "no changes" — the one outcome indistinguishable from health.
+if ($programs.Count -gt 0 -and $pipelineFailures.Count -eq $programs.Count) {
+    Stop-Run "the extraction pipeline failed for all $($programs.Count) programs" -Restore
+}
+
 # --- publish, then prove it ------------------------------------------------
-npm run publish:catalog 2>&1 | ForEach-Object { Write-Log $_ }
+npm.cmd run publish:catalog 2>&1 | ForEach-Object { Write-Log $_ }
 if ($LASTEXITCODE -ne 0) { Stop-Run "publish:catalog failed" -Restore }
 
-npm run validate:data 2>&1 | ForEach-Object { Write-Log $_ }
+npm.cmd run validate:data 2>&1 | ForEach-Object { Write-Log $_ }
 if ($LASTEXITCODE -ne 0) { Stop-Run "validate:data rejected the catalog - nothing published" -Restore }
 
-npm run -w @sbr/core test -- tests/shipped-data.test.ts 2>&1 | ForEach-Object { Write-Log $_ }
+npm.cmd run -w @sbr/core test -- tests/shipped-data.test.ts 2>&1 | ForEach-Object { Write-Log $_ }
 if ($LASTEXITCODE -ne 0) { Stop-Run "shipped catalog no longer parses with the app's schemas" -Restore }
 
 $after = Get-CatalogCount
 $changes = git status --porcelain -- $owned
-$note = if ($pipelineFailures.Count) { " (pipeline failed for: $($pipelineFailures -join ', '))" } else { '' }
+$notes = @()
+if ($pipelineFailures.Count) { $notes += "pipeline failed for: $($pipelineFailures -join ', ')" }
+if ($pageFailures) { $notes += "$pageFailures pages unread by the model, retried next run" }
+$note = if ($notes.Count) { " ($($notes -join '; '))" } else { '' }
 
 if (-not $changes) {
     Write-Log "RESULT: no changes - catalog $before$note"
