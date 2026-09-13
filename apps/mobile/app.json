@@ -60,7 +60,8 @@
         }
       ],
       "expo-notifications",
-      "./plugins/withGradleMemory"
+      "./plugins/withGradleMemory",
+      "expo-asset"
     ],
     "owner": "yarden1311",
     "extra": {
