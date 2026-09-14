@@ -74,6 +74,26 @@ describe('toBenefit', () => {
     // A fresh extraction is never pre-approved, whatever the model claimed.
     expect(benefit.reviewed_by_human).toBe(false);
   });
+
+  // One of these used to throw inside Benefit.parse and abort every offer in
+  // the catalog behind it — the max catalog was lost to a single expiry date.
+  it('reads a local date-time with no offset as the edge of that day', () => {
+    const benefit = toBenefit({ ...extracted, valid_until: '2026-12-31T23:59:59' }, context);
+    expect(() => Benefit.parse(benefit)).not.toThrow();
+    expect(benefit.valid_until).toBe(toBenefit({ ...extracted, valid_until: '2026-12-31' }, context).valid_until);
+  });
+
+  it('keeps an instant that carries its own offset', () => {
+    const benefit = toBenefit({ ...extracted, valid_from: '2026-09-01T08:00:00+03:00' }, context);
+    expect(benefit.valid_from).toBe('2026-09-01T05:00:00.000Z');
+  });
+
+  it('drops a validity it cannot read instead of throwing', () => {
+    for (const valid_until of ['5 שנים מיום הרכישה', '31.08', 'soon']) {
+      expect(() => toBenefit({ ...extracted, valid_until }, context)).not.toThrow();
+      expect(toBenefit({ ...extracted, valid_until }, context).valid_until).toBeNull();
+    }
+  });
 });
 
 describe('partitionByConfidence', () => {

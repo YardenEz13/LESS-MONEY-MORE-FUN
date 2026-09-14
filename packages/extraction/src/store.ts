@@ -68,7 +68,26 @@ export function benefitId(parts: {
  */
 function toInstant(value: string | null | undefined, edge: 'start' | 'end'): string | null {
   if (!value) return null;
-  return dateOnlyToInstant(value, edge) ?? value;
+  const dateOnly = dateOnlyToInstant(value, edge);
+  if (dateOnly) return dateOnly;
+
+  // A local date-time with no offset — `2026-12-31T23:59:59` — is how the model
+  // writes "valid until the end of that day". Passed through raw it fails
+  // Benefit's datetime check, and three such values aborted the max, amex and
+  // mercantile catalogs outright. The day is the unit these terms are written
+  // in, so it is read at the same edge a bare date would be.
+  const local = /^(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.exec(value);
+  if (local) return dateOnlyToInstant(local[1], edge);
+
+  // An instant that carries its offset is already what the schema wants.
+  if (/(?:[zZ]|[+-]\d{2}:?\d{2})$/.test(value) && !Number.isNaN(Date.parse(value))) {
+    return new Date(value).toISOString();
+  }
+
+  // Anything else is not a date the schema can hold. Null means "not written" —
+  // never a guessed expiry, and never a throw that takes a whole catalog down
+  // with one malformed row.
+  return null;
 }
 
 export function toBenefit(
