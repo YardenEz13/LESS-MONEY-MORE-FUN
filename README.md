@@ -150,9 +150,31 @@ write `updates.url` into `app.json`:
 cd apps/mobile && npx eas update:configure
 ```
 
-`npm run ship:catalog` is deliberately not wired into `weekly-refresh.ps1`: that
-script refreshes collected data and stops, because pushing to phones costs money
-and judgement and stays a decision made at a keyboard.
+`npm run ship:catalog` is not wired into `weekly-refresh.ps1`, which refreshes
+collected data and stops. `refresh-catalogs.ps1` does ship: it runs twice a week
+through the same gates, and a commit alone reaches no phone.
+
+If that schedule dies, the weekly `freshness` job in `ci.yml` fails and GitHub
+emails the repo owner, whether or not this computer is on.
+
+**easy.co.il rows only stay live while easy answers.** Each takes the date of its
+last real link check, and from about September easy has answered 403 from this
+address. Those rows are hidden until `validate:easy` gets through again.
+
+### Install on a phone
+
+Android: `cd apps/mobile && npx eas build --profile preview --platform android`,
+then open the APK link on the phone. EAS deletes the file after 14 days; the
+installed app is unaffected.
+
+iPhone without the $99 programme: run the `ios unsigned` workflow, then sign the
+artifact with Sideloadly. The signature lasts 7 days, so re-sign weekly; the data
+survives. Catalog and JS updates arrive over the air in between.
+
+The advisor stays off in these builds, on purpose: the repo is public and an
+update is downloadable, so no key ships in one. To turn it on, deploy
+`api/advisor.ts` with `GEMINI_API_KEY` set and rebuild with
+`EXPO_PUBLIC_ADVISOR_URL`.
 
 ### Run the app
 

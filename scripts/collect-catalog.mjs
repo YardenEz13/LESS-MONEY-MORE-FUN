@@ -448,6 +448,7 @@ export function toRecord(url, page, { site, program, maxChars = 20_000, catalogP
     sections,
     terms_text,
     content_hash: createHash('sha256').update(terms_text).digest('hex'),
+    collected_at: new Date().toISOString(),
     // Terms live behind a link often enough to be worth flagging, not chasing.
     warning: binding ? undefined : 'no חשוב לדעת section — terms may be linked or absent',
   };

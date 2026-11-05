@@ -32,8 +32,18 @@ const UA =
 const DIR = process.env.EASY_DIR ?? 'collected/easy';
 /** Overridable so the deletion path can be tested against a local server. */
 const BASE = process.env.EASY_BASE ?? 'https://easy.co.il';
-/** Re-verify a record this old or older. A business does not vanish hourly. */
-const MAX_AGE_MS = Number(process.env.EASY_MAX_AGE_DAYS ?? 7) * 24 * 60 * 60 * 1000;
+/**
+ * Re-verify a record this old or older. A business does not vanish hourly.
+ * 14, not 7: at easy's ~500 requests a day, 4266 links take nine days to walk.
+ */
+const MAX_AGE_MS = Number(process.env.EASY_MAX_AGE_DAYS ?? 14) * 24 * 60 * 60 * 1000;
+/**
+ * The last day this script actually sent a request, before verdicts carried a
+ * date. An undated "live" verdict used to settle a link forever and re-stamp it
+ * with today on every run, so from here on the log read "100% proven, 0 to
+ * check" while easy answered 403 to everything. Older proof is rewound to this.
+ */
+const LAST_REAL_PASS = '2026-09-10T00:00:00.000Z';
 /** Stop a pass that is being refused wholesale rather than grinding through it. */
 const GIVE_UP_AFTER = 20;
 /**
@@ -103,6 +113,9 @@ async function saveCache() {
   await rename(`${CACHE}.tmp`, CACHE);
 }
 
+const undated = new Set(Object.keys(cache).filter((url) => !cache[url].at));
+for (const url of undated) cache[url].at = LAST_REAL_PASS;
+
 const files = (await readdir(DIR)).filter((f) => f.endsWith('.jsonl'));
 const byFile = new Map();
 const urls = new Set();
@@ -128,6 +141,7 @@ for (const file of files) {
   for (const r of rows) {
     if (!r.offer_url) continue;
     urls.add(r.offer_url);
+    if (undated.has(r.offer_url) && r.verified_at > LAST_REAL_PASS) r.verified_at = LAST_REAL_PASS;
     if (r.verified_at && Date.parse(r.verified_at) > freshBefore) {
       fresh.add(r.offer_url);
       const seen = provenAt.get(r.offer_url);
@@ -138,7 +152,7 @@ for (const file of files) {
 
 // Incremental on purpose: skipping what is already proven lets successive runs
 // converge on full coverage instead of restarting from zero every time.
-const settled = (u) => fresh.has(u) || cache[u]?.state === 'live' || cache[u]?.state === 'gone';
+const settled = (u) => fresh.has(u) || cache[u]?.state === 'gone' || Date.parse(cache[u]?.at) > freshBefore;
 const todo = [...urls].filter((u) => !settled(u));
 const total = [...byFile.values()].reduce((n, rows) => n + rows.length, 0);
 console.log(
@@ -159,7 +173,7 @@ for (const [index, url] of todo.entries()) {
   }
 
   // Only settled facts are cached; an unreachable link is retried next run.
-  if (verdict.state !== 'unreachable') cache[url] = verdict;
+  if (verdict.state !== 'unreachable') cache[url] = { ...verdict, at: new Date().toISOString() };
   if ((sinceFlush += 1) >= 50) {
     sinceFlush = 0;
     await saveCache();
@@ -189,7 +203,6 @@ for (const [index, url] of todo.entries()) {
 
 await saveCache();
 
-const now = new Date().toISOString();
 let kept = 0;
 let removed = 0;
 let unproven = 0;
@@ -205,7 +218,8 @@ for (const [file, rows] of byFile) {
       continue;
     }
     if (verdict?.state === 'live') {
-      r.verified_at = now;
+      // The verdict's own date: stamping today is what made an old check look new.
+      r.verified_at = !r.verified_at || verdict.at > r.verified_at ? verdict.at : r.verified_at;
       kept += 1;
     } else if (provenAt.has(r.offer_url)) {
       // Proven by an earlier run, on some other copy of this same url. Stamp

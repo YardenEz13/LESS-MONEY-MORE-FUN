@@ -3,8 +3,29 @@ name: smart-benefits-recall
 on:
   push:
   pull_request:
+  schedule:
+    - cron: '0 6 * * 1'
 
 jobs:
+  # The catalog ages whether or not anyone pushes, and past 45 days a row stops
+  # being shown. It once sat unrefreshed for two months with every check green.
+  # A failed scheduled run emails the repo owner, with no computer of theirs on.
+  freshness:
+    name: catalog is being refreshed
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          node -e '
+            const rows = require("./data/benefits.json");
+            const age = (b) => (Date.now() - Date.parse(b.last_verified_at)) / 864e5;
+            const live = rows.filter((b) => age(b) <= 45).length;
+            const newest = Math.floor(Math.min(...rows.map(age)));
+            console.log(`${live}/${rows.length} rows live, newest verified ${newest} days ago`);
+            if (newest > 14) process.exit(1);
+          '
+
   core:
     name: engine + pipeline
     runs-on: ubuntu-latest

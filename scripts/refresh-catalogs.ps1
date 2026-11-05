@@ -1,7 +1,7 @@
-# Twice-weekly official-catalog refresh, run by a Claude Cowork scheduled task.
+# Twice-weekly official-catalog refresh, run by Windows Task Scheduler.
 #
 # Collect over plain HTTP -> extract (the pipeline calls Gemini for changed
-# pages only) -> publish -> prove it -> commit -> push.
+# pages only) -> publish -> prove it -> commit -> push -> ship to phones.
 #
 # Unlike weekly-refresh.ps1, this one DOES extract, publish, commit and push —
 # the owner asked for new discounts to reach the data unattended. What makes
@@ -123,10 +123,18 @@ if ($appKey) {
 # argument after `--` (the test file below) still gets through.
 $pipelineFailures = @()
 $pageFailures = 0
-$programs = @(Get-ChildItem collected/catalogs -Filter *.jsonl)
+$programs = @(Get-ChildItem collected/catalogs -Filter *.jsonl | ForEach-Object {
+    [pscustomobject]@{ Path = "collected/catalogs/$($_.Name)"; Program = $_.BaseName }
+})
+# easy lists too, or their rows age out however often the catalogs refresh. No
+# model and no request: each row takes the date of its last real link check, so
+# while easy is refusing the check these stay stale instead of looking renewed.
+node scripts/extract-easy.mjs 2>&1 | Select-String -Pattern '--collected (S+) --program (S+)' | ForEach-Object {
+    $programs += [pscustomobject]@{ Path = $_.Matches[0].Groups[1].Value; Program = $_.Matches[0].Groups[2].Value }
+}
 foreach ($file in $programs) {
-    $program = $file.BaseName
-    npm.cmd run extract -- --collected "collected/catalogs/$($file.Name)" --program $program --all 2>&1 |
+    $program = $file.Program
+    npm.cmd run extract -- --collected $file.Path --program $program --all 2>&1 |
         Select-String -Pattern '^(benefits|published|review|failures):' |
         ForEach-Object {
             Write-Log "  $program  $($_.Line)"
@@ -183,7 +191,6 @@ refresh official catalogs: $before -> $after benefits
 Unattended twice-weekly run of scripts/refresh-catalogs.ps1. Passed the
 0.85 confidence gate, validate:data and shipped-data.test before commit.$note
 
-Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
 "@
 git commit --quiet -m $message 2>&1 | ForEach-Object { Write-Log $_ }
 if ($LASTEXITCODE -ne 0) { Stop-Run "git commit failed" -Restore }
@@ -196,5 +203,12 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-Write-Log "RESULT: PUBLISHED - catalog $before -> $after$note"
+# The commit alone reaches nobody: the catalog lives in the bundle on the phone.
+npm.cmd run ship:catalog 2>&1 | ForEach-Object { Write-Log $_ }
+if ($LASTEXITCODE -ne 0) {
+    Write-Log "RESULT: PUSHED, UPDATE FAILED - catalog $before -> $after; run npm run ship:catalog by hand"
+    exit 1
+}
+
+Write-Log "RESULT: PUBLISHED AND SHIPPED - catalog $before -> $after$note"
 exit 0

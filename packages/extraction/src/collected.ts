@@ -38,6 +38,10 @@ export interface CollectedRecord {
   terms_text: string;
   content_hash: string;
   warning?: string;
+  /** Link check's proof date (easy lists). */
+  verified_at?: string;
+  /** When the collector last read this page off the source. */
+  collected_at?: string;
 }
 
 /** The section Israeli card catalogs put the binding terms in. */
@@ -192,7 +196,9 @@ export async function runCollected(options: CollectedOptions): Promise<PipelineR
           programId: options.programId,
           sourceUrl: record.offer_url,
           merchants,
-          now,
+          // When the source was last read, not when this ran: extracting an old
+          // file must not make it look freshly verified. Legacy rows have neither.
+          now: new Date(record.verified_at ?? record.collected_at ?? now),
         }),
         reason: parsed.data.confidence_reason,
       });

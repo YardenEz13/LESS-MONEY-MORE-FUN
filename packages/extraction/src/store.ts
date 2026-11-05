@@ -77,7 +77,7 @@ function toInstant(value: string | null | undefined, edge: 'start' | 'end'): str
   // mercantile catalogs outright. The day is the unit these terms are written
   // in, so it is read at the same edge a bare date would be.
   const local = /^(\d{4}-\d{2}-\d{2})T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.exec(value);
-  if (local) return dateOnlyToInstant(local[1], edge);
+  if (local) return dateOnlyToInstant(local[1]!, edge);
 
   // An instant that carries its offset is already what the schema wants.
   if (/(?:[zZ]|[+-]\d{2}:?\d{2})$/.test(value) && !Number.isNaN(Date.parse(value))) {

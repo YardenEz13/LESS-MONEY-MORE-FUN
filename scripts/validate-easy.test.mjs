@@ -72,6 +72,25 @@ const { stdout } = await execFileP(
   [join(import.meta.dirname, 'validate-easy.mjs')],
   { cwd: dir, env: { ...process.env, EASY_BASE: base, EASY_DIR: easyDir } },
 );
+
+// An undated verdict once settled a link forever and re-stamped it with today,
+// so a site answering 403 to everything still logged "100% proven". Old-format
+// proof must be rewound and re-checked, and a refusal must not renew it.
+{
+  const staleDir = join(dir, 'stale');
+  await mkdir(staleDir, { recursive: true });
+  await writeFile(
+    join(staleDir, 'S.jsonl'),
+    JSON.stringify({ ...rec('333', 'נחסם'), verified_at: new Date().toISOString() }),
+  );
+  await writeFile(join(staleDir, '.verified-cache.json'), JSON.stringify({ [`${base}/page/333`]: { state: 'live' } }));
+  const { stdout } = await execFileP(process.execPath, ['scripts/validate-easy.mjs'], {
+    env: { ...process.env, EASY_DIR: staleDir, EASY_BASE: base, EASY_GAP_MS: '0' },
+  }).catch((e) => e);
+  assert.match(stdout, /1 to check/, 'an undated verdict is not proof');
+  const row = JSON.parse(await readFile(join(staleDir, 'S.jsonl'), 'utf8'));
+  assert.equal(row.verified_at, '2026-09-10T00:00:00.000Z', 'a refused check must not renew the date');
+}
 server.close();
 
 const out = (await readFile(join(easyDir, 'Test.jsonl'), 'utf8'))

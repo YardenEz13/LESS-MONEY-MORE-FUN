@@ -13,7 +13,11 @@
       "policy": "appVersion"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "url": "https://u.expo.dev/df888f9e-fae3-401c-9472-2a91f171124d",
+      "fallbackToCacheTimeout": 0,
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      }
     },
     "ios": {
       "bundleIdentifier": "com.sbr.mvp",
@@ -67,6 +71,7 @@
       "eas": {
         "projectId": "df888f9e-fae3-401c-9472-2a91f171124d"
       }
-    }
+    },
+    "icon": "./assets/icon.png"
   }
 }

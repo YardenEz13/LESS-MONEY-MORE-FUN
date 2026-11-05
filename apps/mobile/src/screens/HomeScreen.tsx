@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   catalogIsStale,
   findCombos,
@@ -244,60 +244,70 @@ export function HomeScreen({
         resultCount={shown.length}
       />
 
-      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
-        {/* Geofencing armed is the one genuinely live state in the app, so it
-            gets the system's live marker. Off keeps the quiet square — a pill
-            that is always there stops meaning "now". */}
-        <View style={[styles.geofence, geofenceActive && styles.geofenceOn]}>
-          {geofenceActive && <PitchStripes />}
-          {geofenceActive ? <LivePill /> : <View style={[styles.dot, styles.dotOff]} />}
-          <Text style={[type.caption, geofenceActive && styles.geofenceOnText]}>
-            {geofenceStatus}
-          </Text>
-        </View>
+      {/* FlatList, not map-in-a-ScrollView: someone holding a few clubs has
+          thousands of rows, and mounting them all froze the screen on a phone. */}
+      <FlatList
+        data={shown}
+        keyExtractor={(evaluation) => evaluation.benefit.id}
+        renderItem={({ item }) => <BenefitCard evaluation={item} onPress={() => onSelect(item)} />}
+        initialNumToRender={12}
+        windowSize={7}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <>
+            {/* Geofencing armed is the one genuinely live state in the app, so it
+                gets the system's live marker. Off keeps the quiet square — a pill
+                that is always there stops meaning "now". */}
+            <View style={[styles.geofence, geofenceActive && styles.geofenceOn]}>
+              {geofenceActive && <PitchStripes />}
+              {geofenceActive ? <LivePill /> : <View style={[styles.dot, styles.dotOff]} />}
+              <Text style={[type.caption, geofenceActive && styles.geofenceOnText]}>
+                {geofenceStatus}
+              </Text>
+            </View>
 
-        {filter === 'all' &&
-          combos.map((combo) => (
-            <ComboCard
-              key={combo.parts.map((p) => p.benefit.id).join('+')}
-              combo={combo}
-              onPress={() => onSelect(combo.parts[0])}
+            {filter === 'all' &&
+              combos.map((combo) => (
+                <ComboCard
+                  key={combo.parts.map((p) => p.benefit.id).join('+')}
+                  combo={combo}
+                  onPress={() => onSelect(combo.parts[0])}
+                />
+              ))}
+          </>
+        }
+        ListEmptyComponent={
+          query.trim() !== '' ? (
+            <View style={styles.empty}>
+              <Text style={styles.emptyTitle}>אין תוצאות</Text>
+              <Text style={styles.emptyBody}>
+                {`לא נמצא בית עסק שמתאים ל״${query.trim()}״ מבין ${evaluations.length} ההטבות שלך.`}
+              </Text>
+              <GhostButton label="נקה חיפוש" onPress={() => setQuery('')} />
+            </View>
+          ) : (
+            <EmptyState
+              filter={filter}
+              hasPrograms={profile.program_ids.length > 0}
+              here={hereIds && !venue ? here : null}
+              catalogStale={catalogStale}
+              onEditPrograms={onOpenSettings}
             />
-          ))}
-
-        {shown.length === 0 && query.trim() !== '' ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>אין תוצאות</Text>
-            <Text style={styles.emptyBody}>
-              {`לא נמצא בית עסק שמתאים ל״${query.trim()}״ מבין ${evaluations.length} ההטבות שלך.`}
+          )
+        }
+        ListFooterComponent={
+          <>
+            {/* Full time. The same band that closes the hero closes the list, so
+                the reader knows the scroll ended rather than stalled. */}
+            <ScarfBand style={styles.listEnd} />
+            <Text style={styles.footnote}>
+              הטבות שתנאי בהן לא מתקיים כרגע — יום, שעה, תוקף או אימות ישן — לא מוצגות כאן בכלל.
             </Text>
-            <GhostButton label="נקה חיפוש" onPress={() => setQuery('')} />
-          </View>
-        ) : shown.length === 0 ? (
-          <EmptyState
-            filter={filter}
-            hasPrograms={profile.program_ids.length > 0}
-            here={hereIds && !venue ? here : null}
-            catalogStale={catalogStale}
-            onEditPrograms={onOpenSettings}
-          />
-        ) : (
-          shown.map((evaluation) => (
-            <BenefitCard
-              key={evaluation.benefit.id}
-              evaluation={evaluation}
-              onPress={() => onSelect(evaluation)}
-            />
-          ))
-        )}
-
-        {/* Full time. The same band that closes the hero closes the list, so
-            the reader knows the scroll ended rather than stalled. */}
-        <ScarfBand style={styles.listEnd} />
-        <Text style={styles.footnote}>
-          הטבות שתנאי בהן לא מתקיים כרגע — יום, שעה, תוקף או אימות ישן — לא מוצגות כאן בכלל.
-        </Text>
-      </ScrollView>
+          </>
+        }
+      />
     </View>
   );
 }
