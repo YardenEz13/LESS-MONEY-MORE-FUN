@@ -1,0 +1,2925 @@
+{
+ "located": [
+  {
+   "id": "unmapped_סינמה_סיטי",
+   "name": "סינמה סיטי",
+   "benefit_count": 4,
+   "programs": [
+    "calextra_discounts",
+    "discounts_american_express",
+    "max"
+   ],
+   "merchant": {
+    "id": "unmapped_סינמה_סיטי",
+    "name": "סינמה סיטי",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 31.234138,
+      "lng": 34.799462,
+      "city": "באר שבע"
+     }
+    ],
+    "categories": [],
+    "label": "רשת בתי קולנוע"
+   },
+   "evidence": [
+    "חיטה 1, באר שבע, באר שבע"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "באר שבע"
+   ]
+  },
+  {
+   "id": "unmapped_פיצה_סטורי",
+   "name": "פיצה סטורי",
+   "benefit_count": 4,
+   "programs": [
+    "i_card",
+    "youngstyle"
+   ],
+   "merchant": {
+    "id": "unmapped_פיצה_סטורי",
+    "name": "פיצה סטורי",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.0745049,
+      "lng": 34.8236167,
+      "city": "רמת גן"
+     },
+     {
+      "lat": 32.006952,
+      "lng": 34.7539231,
+      "city": "בת ים"
+     },
+     {
+      "lat": 32.0141093,
+      "lng": 34.748507,
+      "city": "בת ים"
+     },
+     {
+      "lat": 32.0294005,
+      "lng": 34.7988926,
+      "city": "אזור"
+     },
+     {
+      "lat": 32.0175172,
+      "lng": 34.745661,
+      "city": "בת ים"
+     },
+     {
+      "lat": 31.9961104,
+      "lng": 34.7406055,
+      "city": "ראשון לציון"
+     },
+     {
+      "lat": 32.0216186,
+      "lng": 34.7649769,
+      "city": "חולון"
+     },
+     {
+      "lat": 32.0313989,
+      "lng": 34.8555771,
+      "city": "אור יהודה"
+     }
+    ],
+    "categories": [],
+    "label": "רשת פיצה"
+   },
+   "evidence": [
+    "שדרות ירושלים 42, רמת גן, רמת גן",
+    "אנה פרנק 29, בת ים, בת ים",
+    "הנביאים 3, בת ים, בת ים",
+    "המצודה 6, אזור, אזור",
+    "בלפור 101, בת ים, בת ים"
+   ],
+   "review": null,
+   "cities": [
+    "רמת גן",
+    "בת ים",
+    "אזור",
+    "ראשון לציון",
+    "חולון",
+    "אור יהודה"
+   ]
+  },
+  {
+   "id": "unmapped_רמי_לוי",
+   "name": "רמי לוי",
+   "benefit_count": 2,
+   "programs": [
+    "adif_members",
+    "meshekard"
+   ],
+   "merchant": {
+    "id": "unmapped_רמי_לוי",
+    "name": "רמי לוי",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.0791,
+      "lng": 34.7744,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.292497,
+      "lng": 34.862195,
+      "city": "נתניה"
+     }
+    ],
+    "categories": [],
+    "label": "רשת מזון"
+   },
+   "evidence": [
+    "אסתר המלכה 4, תל אביב יפו, תל אביב יפו",
+    "סינמה סיטי נתניה, נתניה, נתניה"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "תל אביב יפו",
+    "נתניה"
+   ]
+  },
+  {
+   "id": "unmapped_חמי_געש",
+   "name": "חמי געש",
+   "benefit_count": 2,
+   "programs": [
+    "calextra_discounts",
+    "max"
+   ],
+   "merchant": {
+    "id": "unmapped_חמי_געש",
+    "name": "חמי געש",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.2312905,
+      "lng": 34.8265997,
+      "city": "געש"
+     }
+    ],
+    "categories": [],
+    "label": "מעיין חם"
+   },
+   "evidence": [
+    "געש, געש"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "געש"
+   ]
+  },
+  {
+   "id": "unmapped_פיצה_האט",
+   "name": "פיצה האט",
+   "benefit_count": 2,
+   "programs": [
+    "discounts_american_express",
+    "meshekard"
+   ],
+   "merchant": {
+    "id": "unmapped_פיצה_האט",
+    "name": "פיצה האט",
+    "domains": [],
+    "venue_ids": [
+     "dizengoff_center"
+    ],
+    "branches": [
+     {
+      "lat": 32.0610777,
+      "lng": 34.869623,
+      "city": "קרית אונו"
+     },
+     {
+      "lat": 32.0618,
+      "lng": 34.7912,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.0757732,
+      "lng": 34.7763428,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.027075,
+      "lng": 34.747477,
+      "city": "בת ים"
+     },
+     {
+      "lat": 32.074008143893906,
+      "lng": 34.79878061321198,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.0715,
+      "lng": 34.8286,
+      "city": "רמת גן"
+     },
+     {
+      "lat": 32.0906342,
+      "lng": 34.8228249,
+      "city": "בני ברק"
+     },
+     {
+      "lat": 32.075671,
+      "lng": 34.853592,
+      "city": "גבעת שמואל"
+     },
+     {
+      "lat": 32.074579,
+      "lng": 34.870758,
+      "city": "פתח תקווה"
+     },
+     {
+      "lat": 31.9886,
+      "lng": 34.7649,
+      "city": "ראשון לציון"
+     },
+     {
+      "lat": 32.013257890320936,
+      "lng": 34.73810318153375,
+      "city": "בת ים"
+     },
+     {
+      "lat": 32.1067,
+      "lng": 34.7974,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.0134,
+      "lng": 34.7697,
+      "city": "חולון"
+     },
+     {
+      "lat": 31.893509,
+      "lng": 34.807027,
+      "city": "רחובות"
+     }
+    ],
+    "categories": [],
+    "label": "רשת פיצה"
+   },
+   "evidence": [
+    "הרי יהודה 56, קרית אונו, קרית אונו",
+    "היכל מנורה מבטחים, תל אביב יפו, תל אביב יפו",
+    "המלך ג'ורג' 79, תל אביב יפו, תל אביב יפו",
+    "רוטשילד 32, בת ים, בת ים",
+    "תוצרת הארץ 9, תל אביב יפו, תל אביב יפו"
+   ],
+   "review": null,
+   "cities": [
+    "קרית אונו",
+    "תל אביב יפו",
+    "בת ים",
+    "רמת גן",
+    "בני ברק",
+    "גבעת שמואל",
+    "פתח תקווה",
+    "ראשון לציון",
+    "חולון",
+    "רחובות"
+   ]
+  },
+  {
+   "id": "unmapped_אגאדיר",
+   "name": "אגאדיר",
+   "benefit_count": 2,
+   "programs": [
+    "i_card",
+    "youngstyle"
+   ],
+   "merchant": {
+    "id": "unmapped_אגאדיר",
+    "name": "אגאדיר",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.093437,
+      "lng": 34.824835,
+      "city": "בני ברק"
+     },
+     {
+      "lat": 31.8637,
+      "lng": 34.8163,
+      "city": "קרית עקרון"
+     },
+     {
+      "lat": 32.0693,
+      "lng": 34.7703,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.10155,
+      "lng": 34.77575,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 31.9916,
+      "lng": 34.7752,
+      "city": "ראשון לציון"
+     },
+     {
+      "lat": 32.087295,
+      "lng": 34.859005,
+      "city": "פתח תקווה"
+     }
+    ],
+    "categories": [],
+    "label": "רשת המבורגריות"
+   },
+   "evidence": [
+    "מצדה 7, בני ברק, בני ברק",
+    "עופר בילו סנטר אאוטלט, קרית עקרון, קרית עקרון",
+    "נחלת בנימין 2, תל אביב יפו, תל אביב יפו",
+    "יוסף יקותיאלי 6, תל אביב יפו, תל אביב יפו",
+    "לזרוב 33, ראשון לציון, ראשון לציון"
+   ],
+   "review": null,
+   "cities": [
+    "בני ברק",
+    "קרית עקרון",
+    "תל אביב יפו",
+    "ראשון לציון",
+    "פתח תקווה"
+   ]
+  },
+  {
+   "id": "unmapped_ג_אפן_ג_אפן",
+   "name": "ג'אפן ג'אפן",
+   "benefit_count": 2,
+   "programs": [
+    "i_card",
+    "youngstyle"
+   ],
+   "merchant": {
+    "id": "unmapped_ג_אפן_ג_אפן",
+    "name": "ג'אפן ג'אפן",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.7903,
+      "lng": 35.5341,
+      "city": "טבריה"
+     }
+    ],
+    "categories": [],
+    "label": "רשת מסעדות אסייתיות"
+   },
+   "evidence": [
+    "יהודה הלוי 1, טבריה (מרכז מסחרי דנילוף), טבריה"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "טבריה"
+   ]
+  },
+  {
+   "id": "unmapped_לג_נדה",
+   "name": "לג'נדה",
+   "benefit_count": 2,
+   "programs": [
+    "i_card",
+    "youngstyle"
+   ],
+   "merchant": {
+    "id": "unmapped_לג_נדה",
+    "name": "לג'נדה",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.0641,
+      "lng": 34.7745,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.0535,
+      "lng": 34.7501,
+      "city": "תל אביב יפו"
+     }
+    ],
+    "categories": [],
+    "label": "רשת גלידריות"
+   },
+   "evidence": [
+    "שדרות רוטשילד 41, תל אביב יפו, תל אביב יפו",
+    "נמל יפו, תל אביב יפו, תל אביב יפו"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "תל אביב יפו"
+   ]
+  },
+  {
+   "id": "unmapped_מושיק_עפיה",
+   "name": "מושיק עפיה",
+   "benefit_count": 2,
+   "programs": [
+    "max"
+   ],
+   "merchant": {
+    "id": "unmapped_מושיק_עפיה",
+    "name": "מושיק עפיה",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.0618,
+      "lng": 34.792,
+      "city": "תל אביב יפו"
+     }
+    ],
+    "categories": [],
+    "label": "מוזיקה ים תיכונית"
+   },
+   "evidence": [
+    "היכל מנורה מבטחים, תל אביב יפו, תל אביב יפו"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "תל אביב יפו"
+   ]
+  },
+  {
+   "id": "unmapped_נגיסה_סושי",
+   "name": "נגיסה סושי",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "merchant": {
+    "id": "unmapped_נגיסה_סושי",
+    "name": "נגיסה סושי",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.604439,
+      "lng": 35.293568,
+      "city": "עפולה"
+     }
+    ],
+    "categories": [],
+    "label": "רשת סושי"
+   },
+   "evidence": [
+    "קניון העמקים, עפולה, עפולה"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "עפולה"
+   ]
+  },
+  {
+   "id": "unmapped_בירה_אלכסנדר",
+   "name": "בירה אלכסנדר",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "merchant": {
+    "id": "unmapped_בירה_אלכסנדר",
+    "name": "בירה אלכסנדר",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.401462,
+      "lng": 34.897434,
+      "city": "פארק תעשיות עמק חפר"
+     }
+    ],
+    "categories": [],
+    "label": "מבשלות בירה"
+   },
+   "evidence": [
+    "המסיק 2, פארק תעשיות עמק חפר, פארק תעשיות עמק חפר"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "פארק תעשיות עמק חפר"
+   ]
+  },
+  {
+   "id": "unmapped_escape_land",
+   "name": "Escape Land",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "merchant": {
+    "id": "unmapped_escape_land",
+    "name": "Escape Land",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.7928681,
+      "lng": 35.0421528,
+      "city": "חיפה"
+     }
+    ],
+    "categories": [],
+    "label": "מתחם חדרי בריחה"
+   },
+   "evidence": [
+    "המוסכים 22, חיפה, חיפה"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "חיפה"
+   ]
+  },
+  {
+   "id": "unmapped_איילת_מטיילת",
+   "name": "איילת מטיילת",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "merchant": {
+    "id": "unmapped_איילת_מטיילת",
+    "name": "איילת מטיילת",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.1694,
+      "lng": 34.8287,
+      "city": "הרצליה"
+     },
+     {
+      "lat": 31.8745,
+      "lng": 34.735,
+      "city": "יבנה"
+     }
+    ],
+    "categories": [],
+    "label": "מחזמר"
+   },
+   "evidence": [
+    "היכל אמנויות הבמה הרצליה, הרצליה, הרצליה",
+    "היכל התרבות יבנה, יבנה, יבנה"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "הרצליה",
+    "יבנה"
+   ]
+  },
+  {
+   "id": "unmapped_הבית_של_יעל",
+   "name": "הבית של יעל",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "merchant": {
+    "id": "unmapped_הבית_של_יעל",
+    "name": "הבית של יעל",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 31.8745,
+      "lng": 34.735,
+      "city": "יבנה"
+     }
+    ],
+    "categories": [],
+    "label": "הצגה"
+   },
+   "evidence": [
+    "היכל התרבות יבנה, יבנה, יבנה"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "יבנה"
+   ]
+  },
+  {
+   "id": "unmapped_כספיון",
+   "name": "כספיון",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "merchant": {
+    "id": "unmapped_כספיון",
+    "name": "כספיון",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 31.8964,
+      "lng": 34.8166,
+      "city": "רחובות"
+     },
+     {
+      "lat": 31.2515,
+      "lng": 34.7974,
+      "city": "באר שבע"
+     }
+    ],
+    "categories": [],
+    "label": "אירוע לילדים"
+   },
+   "evidence": [
+    "בית העם, רחובות, רחובות",
+    "משכן אמנויות הבמה (יצחק רגר 41, באר שבע), באר שבע"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "רחובות",
+    "באר שבע"
+   ]
+  },
+  {
+   "id": "unmapped_פלאנט",
+   "name": "פלאנט",
+   "benefit_count": 1,
+   "programs": [
+    "calextra_discounts"
+   ],
+   "merchant": {
+    "id": "unmapped_פלאנט",
+    "name": "פלאנט",
+    "domains": [],
+    "venue_ids": [
+     "ramat_aviv_mall"
+    ],
+    "branches": [
+     {
+      "lat": 32.1122101,
+      "lng": 34.7966227,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.099772,
+      "lng": 34.826939,
+      "city": "רמת גן"
+     },
+     {
+      "lat": 31.7618,
+      "lng": 35.2261,
+      "city": "ירושלים"
+     },
+     {
+      "lat": 31.979677,
+      "lng": 34.747637,
+      "city": "ראשון לציון"
+     },
+     {
+      "lat": 32.7930108,
+      "lng": 35.0381147,
+      "city": "חיפה"
+     },
+     {
+      "lat": 31.221791,
+      "lng": 34.803399,
+      "city": "באר שבע"
+     },
+     {
+      "lat": 32.5691,
+      "lng": 34.9335,
+      "city": "זכרון יעקב"
+     }
+    ],
+    "categories": [],
+    "label": "חנות תכשיטים ושעונים"
+   },
+   "evidence": [
+    "קניון רמת אביב, תל אביב יפו, תל אביב יפו",
+    "קניון איילון, רמת גן, רמת גן",
+    "נעמי 4, ירושלים, ירושלים",
+    "המאה ועשרים 4, ראשון לציון, ראשון לציון",
+    "קניון סינמול, חיפה, חיפה"
+   ],
+   "review": null,
+   "cities": [
+    "תל אביב יפו",
+    "רמת גן",
+    "ירושלים",
+    "ראשון לציון",
+    "חיפה",
+    "באר שבע",
+    "זכרון יעקב"
+   ]
+  },
+  {
+   "id": "unmapped_רב_חן",
+   "name": "רב חן",
+   "benefit_count": 1,
+   "programs": [
+    "calextra_discounts"
+   ],
+   "merchant": {
+    "id": "unmapped_רב_חן",
+    "name": "רב חן",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.078156,
+      "lng": 34.773703,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.0671,
+      "lng": 34.8093,
+      "city": "גבעתיים"
+     }
+    ],
+    "categories": [],
+    "label": "רשת בתי קולנוע"
+   },
+   "evidence": [
+    "בן עמי 16, תל אביב יפו, תל אביב יפו",
+    "קניון גבעתיים, גבעתיים, גבעתיים"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "תל אביב יפו",
+    "גבעתיים"
+   ]
+  },
+  {
+   "id": "unmapped_rebar",
+   "name": "rebar",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "merchant": {
+    "id": "unmapped_rebar",
+    "name": "rebar",
+    "domains": [],
+    "venue_ids": [
+     "azrieli_tlv",
+     "dizengoff_center"
+    ],
+    "branches": [
+     {
+      "lat": 32.0716622,
+      "lng": 34.7855897,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.074976,
+      "lng": 34.775144,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.069287,
+      "lng": 34.786841,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.0743894,
+      "lng": 34.7917884,
+      "city": "תל אביב יפו"
+     }
+    ],
+    "categories": [],
+    "label": "רשת בר מיצים"
+   },
+   "evidence": [
+    "אלוף קלמן מגן 12, תל אביב יפו, תל אביב יפו",
+    "דיזנגוף סנטר, תל אביב יפו, תל אביב יפו",
+    "החשמונאים 100, תל אביב יפו (קניון האופנה גינדי), תל אביב יפו",
+    "קניון עזריאלי, תל אביב יפו, תל אביב יפו"
+   ],
+   "review": null,
+   "cities": [
+    "תל אביב יפו"
+   ]
+  },
+  {
+   "id": "unmapped_זמן_אמיתי",
+   "name": "זמן אמיתי",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "merchant": {
+    "id": "unmapped_זמן_אמיתי",
+    "name": "זמן אמיתי",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.0575967,
+      "lng": 34.7640929,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.0751486,
+      "lng": 34.7820792,
+      "city": "תל אביב יפו"
+     }
+    ],
+    "categories": [],
+    "label": "רשת קורס ברמנים"
+   },
+   "evidence": [
+    "אילת 22, תל אביב יפו, תל אביב יפו",
+    "שדרות שאול המלך 2, תל אביב יפו, תל אביב יפו"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "תל אביב יפו"
+   ]
+  },
+  {
+   "id": "unmapped_המסע_לאנטרקטיקה_נפלאות_העולם_הקפוא",
+   "name": "המסע לאנטרקטיקה - נפלאות העולם הקפוא",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "merchant": {
+    "id": "unmapped_המסע_לאנטרקטיקה_נפלאות_העולם_הקפוא",
+    "name": "המסע לאנטרקטיקה - נפלאות העולם הקפוא",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 32.1634,
+      "lng": 34.7965,
+      "city": "הרצליה"
+     }
+    ],
+    "categories": [],
+    "label": "לוח אירועים"
+   },
+   "evidence": [
+    "קניון ארנה, הרצליה, הרצליה"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "הרצליה"
+   ]
+  },
+  {
+   "id": "unmapped_רוקפור",
+   "name": "רוקפור",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "merchant": {
+    "id": "unmapped_רוקפור",
+    "name": "רוקפור",
+    "domains": [],
+    "venue_ids": [],
+    "branches": [
+     {
+      "lat": 31.062823,
+      "lng": 35.0192015,
+      "city": "דימונה"
+     }
+    ],
+    "categories": [],
+    "label": "בר מסעדה"
+   },
+   "evidence": [
+    "הפועלים, דימונה, דימונה"
+   ],
+   "review": "few_branches_verify_chain_size",
+   "cities": [
+    "דימונה"
+   ]
+  },
+  {
+   "id": "unmapped_yolo",
+   "name": "YOLO",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "merchant": {
+    "id": "unmapped_yolo",
+    "name": "YOLO",
+    "domains": [],
+    "venue_ids": [
+     "grand_canyon_beersheva"
+    ],
+    "branches": [
+     {
+      "lat": 32.0825389,
+      "lng": 34.7810952,
+      "city": "תל אביב יפו"
+     },
+     {
+      "lat": 32.0667435,
+      "lng": 34.8099068,
+      "city": "גבעתיים"
+     },
+     {
+      "lat": 32.065441,
+      "lng": 34.875352,
+      "city": "גני תקווה"
+     },
+     {
+      "lat": 32.142354,
+      "lng": 34.8435587,
+      "city": "רמת השרון"
+     },
+     {
+      "lat": 32.165456,
+      "lng": 34.824196,
+      "city": "הרצליה"
+     },
+     {
+      "lat": 32.170579,
+      "lng": 34.926271,
+      "city": "כפר סבא"
+     },
+     {
+      "lat": 32.2791567,
+      "lng": 34.8470675,
+      "city": "נתניה"
+     },
+     {
+      "lat": 31.2506405,
+      "lng": 34.7716625,
+      "city": "באר שבע"
+     }
+    ],
+    "categories": [],
+    "label": "חנות כלי כתיבה"
+   },
+   "evidence": [
+    "גן עופר גן העיר, תל אביב יפו, תל אביב יפו",
+    "קניון גבעתיים, גבעתיים, גבעתיים",
+    "צים אורבן, גני תקווה, גני תקווה",
+    "אוסישקין 54, רמת השרון, רמת השרון",
+    "קניון שבעת הכוכבים, הרצליה, הרצליה"
+   ],
+   "review": null,
+   "cities": [
+    "תל אביב יפו",
+    "גבעתיים",
+    "גני תקווה",
+    "רמת השרון",
+    "הרצליה",
+    "כפר סבא",
+    "נתניה",
+    "באר שבע"
+   ]
+  }
+ ],
+ "unlocatable": [
+  {
+   "id": "unmapped_max_ביטוח",
+   "name": "max ביטוח",
+   "benefit_count": 4,
+   "programs": [
+    "max"
+   ],
+   "hint": "programme_self_reference"
+  },
+  {
+   "id": "unmapped_ויגן_פרנדלי",
+   "name": "ויגן פרנדלי",
+   "benefit_count": 4,
+   "programs": [
+    "vegan_active_discounts"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_max",
+   "name": "MAX",
+   "benefit_count": 3,
+   "programs": [
+    "adif_members",
+    "max",
+    "max_kranot"
+   ],
+   "hint": "programme_self_reference"
+  },
+  {
+   "id": "unmapped_מועדון_חברי_לשכת_סוכני_ביטוח",
+   "name": "מועדון חברי לשכת סוכני ביטוח",
+   "benefit_count": 3,
+   "programs": [
+    "insurance_association_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_isic_card",
+   "name": "ISIC CARD",
+   "benefit_count": 2,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_מועדון_צרכנות_עדיף",
+   "name": "מועדון צרכנות עדיף",
+   "benefit_count": 2,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אבא_חטוב",
+   "name": "אבא חטוב",
+   "benefit_count": 2,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_flowers",
+   "name": "FLOWERS",
+   "benefit_count": 2,
+   "programs": [
+    "adif_members",
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מכלול",
+   "name": "מכלול",
+   "benefit_count": 2,
+   "programs": [
+    "adif_members",
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_כאל",
+   "name": "כאל",
+   "benefit_count": 2,
+   "programs": [
+    "calextra_discounts"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אצה",
+   "name": "אצה",
+   "benefit_count": 2,
+   "programs": [
+    "i_card",
+    "youngstyle"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_משלוחה",
+   "name": "משלוחה",
+   "benefit_count": 2,
+   "programs": [
+    "i_card",
+    "youngstyle"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_גורילה_בר",
+   "name": "גורילה בר",
+   "benefit_count": 2,
+   "programs": [
+    "i_card",
+    "youngstyle"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ליראק_פריז",
+   "name": "ליראק פריז",
+   "benefit_count": 2,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_hoam",
+   "name": "HOAM",
+   "benefit_count": 2,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_בנק_דיסקונט",
+   "name": "בנק דיסקונט",
+   "benefit_count": 2,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קל_נופש",
+   "name": "קל נופש",
+   "benefit_count": 2,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_max_ביטוח_נסיעות_לחו_ל",
+   "name": "max ביטוח נסיעות לחו\"ל",
+   "benefit_count": 2,
+   "programs": [
+    "max"
+   ],
+   "hint": "programme_self_reference"
+  },
+  {
+   "id": "unmapped_עולם_החיות_המופלא",
+   "name": "עולם החיות המופלא",
+   "benefit_count": 2,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_בליקר_בייקרי",
+   "name": "בליקר בייקרי",
+   "benefit_count": 2,
+   "programs": [
+    "youngstyle"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_pharm_plus_קמפוס_ברושים",
+   "name": "PHARM PLUS | קמפוס ברושים",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_שלוותה_תל_אביב",
+   "name": "שלוותה | תל אביב",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קופי_סנטר",
+   "name": "קופי סנטר",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_flowers_תערוכת_הפרחים_הגדולה_בישראל",
+   "name": "FLOWERS | תערוכת הפרחים הגדולה בישראל",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_tax_free_beauty_בישום_וקוסמטיקה",
+   "name": "Tax Free Beauty | בישום וקוסמטיקה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ברכבת_יושבת_ארנבת_הצגה_לקטנטנים",
+   "name": "ברכבת יושבת ארנבת | הצגה לקטנטנים",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_הבית_של_יעל_שעת_סיפור",
+   "name": "הבית של יעל | שעת סיפור",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_פילים_בכל_הצבעים_ההצגה",
+   "name": "פילים בכל הצבעים | ההצגה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_כספיון_שעת_סיפור_לקטנטנים",
+   "name": "כספיון - שעת סיפור לקטנטנים",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_השוק_האורגני",
+   "name": "השוק האורגני",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קצביה_של_השף_ישראל_אהרוני",
+   "name": "קצביה של השף ישראל אהרוני",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_רימונה_חנות_וקפה_חברתי",
+   "name": "רימונה - חנות וקפה חברתי",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מש_קר_באוניברסיטת_בר_אילן",
+   "name": "מש-קר - באוניברסיטת בר אילן",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מש_קר_באוניברסיטה_העברית",
+   "name": "מש-קר - באוניברסיטה העברית",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מש_קר_באוניברסיטת_בן_גוריון",
+   "name": "מש-קר - באוניברסיטת בן גוריון",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אתר_זה_גאוני",
+   "name": "אתר זה גאוני",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_lokal_burger",
+   "name": "Lokal Burger",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_soulmate",
+   "name": "SOULMATE",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_סיפור_חוזר_שכולו_טוב",
+   "name": "סיפור חוזר - שכולו טוב",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_רוזנברג_מטבח_ישראלי",
+   "name": "רוזנברג מטבח ישראלי",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קומיקאזה",
+   "name": "קומיקאזה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_סקנקס_הדפסות_קנבס",
+   "name": "סקנקס | הדפסות קנבס",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_חומוס_מדאמס",
+   "name": "חומוס מדאמס",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_לה_גרדיה",
+   "name": "לה גרדיה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אלפין_סטייל_בע_מ",
+   "name": "אלפין סטייל בע\"מ",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מסעדת_jaja",
+   "name": "מסעדת JAJA",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_spikeball",
+   "name": "spikeball",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_lenovo",
+   "name": "lenovo",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_coffee_art",
+   "name": "COFFEE ART",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קורס_הכנה_לטיול_הגדול",
+   "name": "קורס הכנה לטיול הגדול",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מלון_בראון_ביץ_האוס_תל_אביב",
+   "name": "מלון בראון ביץ' האוס תל אביב",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אוקטובר_בר",
+   "name": "אוקטובר בר",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_rosa_parks_bar",
+   "name": "Rosa Parks bar",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ברנרד_סנדוויץ_בר",
+   "name": "ברנרד סנדוויץ בר",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_esimo_חבילות_גלישה_לכל_העולם",
+   "name": "Esimo | חבילות גלישה לכל העולם",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_גיפט_קארד_נטען_max",
+   "name": "גיפט קארד נטען - MAX",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_גיפט_קארד_נטען_golf",
+   "name": "גיפט קארד נטען - GOLF",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_גיפט_קארד_נטען_billabong",
+   "name": "גיפט קארד נטען - billabong",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_גיפט_קארד_נטען_דקה_90",
+   "name": "גיפט קארד נטען - דקה 90",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_גיפט_קארד_נטען_skechers",
+   "name": "גיפט קארד נטען - skechers",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_גיפט_קארד_נטען_מגה_ספורט",
+   "name": "גיפט קארד נטען - מגה ספורט",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_גיפט_קארד_נטען_foot_locker",
+   "name": "גיפט קארד נטען - foot locker",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_גיפט_קארד_נטען_laline",
+   "name": "גיפט קארד נטען - LALINE",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_גיפט_קארד_נטען_שילב",
+   "name": "גיפט קארד נטען - שילב",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_guess",
+   "name": "Guess",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_new_balance",
+   "name": "New Balance",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_hard_rock_cafe",
+   "name": "Hard Rock Cafe",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_mcdonald_s",
+   "name": "Mcdonald's",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אוטו_שי_auto_shay",
+   "name": "אוטו שי Auto Shay",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_fish_market",
+   "name": "Fish Market",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מועדון_צרכנות_עדיף_בתי_עסק_נבחרים",
+   "name": "מועדון צרכנות עדיף - בתי עסק נבחרים",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_רשתות_אופנה_מסעדות_ובתי_קפה",
+   "name": "רשתות אופנה מסעדות ובתי קפה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_urbanica",
+   "name": "URBANICA",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_delta",
+   "name": "Delta",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ד_ר_גב_online",
+   "name": "ד\"ר גב online",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_panda",
+   "name": "Panda",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_סופר_פארם_אונליין",
+   "name": "סופר פארם אונליין",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_booking_com",
+   "name": "Booking.com",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_temu",
+   "name": "Temu",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_aliexpress",
+   "name": "AliExpress",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_shein",
+   "name": "SHEIN",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_תערוכת_הפרחים_הגדולה_בישראל",
+   "name": "תערוכת הפרחים הגדולה בישראל",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_דקה_90",
+   "name": "דקה 90",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_nofdeal",
+   "name": "NOFDEAL",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אמא_חטובה",
+   "name": "אמא חטובה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ג_ון_ג_ון_בר",
+   "name": "ג'ון ג'ון בר",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_שלוותה",
+   "name": "שלוותה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_m32_burger",
+   "name": "M32 BURGER",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_burgerim",
+   "name": "Burgerim",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_kura",
+   "name": "Kura",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_barrio_bar",
+   "name": "BARRIO BAR",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_denim_drinks_first",
+   "name": "Denim - Drinks First",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_יקב_tulip",
+   "name": "יקב Tulip",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_תיאטרון_הסימטה",
+   "name": "תיאטרון הסימטה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_java_cafe",
+   "name": "Java Cafe",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_olive_korner",
+   "name": "Olive Korner",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_sidewalk_cafe",
+   "name": "Sidewalk Cafe",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_סימטא",
+   "name": "סימטא",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_zuza",
+   "name": "ZUZA",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ניהון_נו_בה_שגב_בר_יפני",
+   "name": "ניהון נו-בה – שגב בר יפני",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_japanika_ג_פאניקה",
+   "name": "Japanika - ג'פאניקה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מחנה_יהודה_brown_hotel",
+   "name": "מחנה יהודה - Brown Hotel",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אבא_חטוב_אמא_חטובה",
+   "name": "אבא חטוב - אמא חטובה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_pharm_plus",
+   "name": "PHARM PLUS",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_tax_free_beauty",
+   "name": "Tax Free Beauty",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ברכבת_יושבת_ארנבת",
+   "name": "ברכבת יושבת ארנבת",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_פילים_בכל_הצבעים",
+   "name": "פילים בכל הצבעים",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_חנן_הגנן",
+   "name": "חנן הגנן",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_רימונה",
+   "name": "רימונה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_זה_גאוני",
+   "name": "זה גאוני",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_סקנקס",
+   "name": "סקנקס",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_esimo",
+   "name": "Esimo",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_skechers",
+   "name": "skechers",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_laline",
+   "name": "LALINE",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_pokeshop",
+   "name": "POKESHOP",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_גרקו",
+   "name": "גרקו",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_יקב_בהט",
+   "name": "יקב בהט",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_א_ש_שואבי_אבק_לרכב",
+   "name": "א.ש שואבי אבק לרכב",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_superzone",
+   "name": "SuperZone",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קסם_ביער",
+   "name": "קסם ביער",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_הבאגיס_במסע_לארץ_עוץ",
+   "name": "הבאגיס במסע לארץ עוץ",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_bischool_בית_ספר_לקורסי_העשרה",
+   "name": "BIschool- בית ספר לקורסי העשרה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_good_market_אוניברסיטת_ת_א",
+   "name": "Good Market אוניברסיטת ת\"א",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_good_market_טכניון",
+   "name": "Good Market טכניון",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ארט_סנטר_חומרי_אומנות_גרפיקה_ועיצוב",
+   "name": "ארט סנטר | חומרי אומנות גרפיקה ועיצוב",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קומיקאיזה_חנות_קומיקס",
+   "name": "קומיקאיזה | חנות קומיקס",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_bird",
+   "name": "Bird",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מכונות_שתייה_אוטומטיות_באוניברסיטת_ת_א",
+   "name": "מכונות שתייה אוטומטיות באוניברסיטת ת\"א",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_solo_שירותי_רכב_אונליין",
+   "name": "Solo - שירותי רכב אונליין",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_isic_card_כרטיס_סטודנט_בינלאומי",
+   "name": "ISIC CARD - כרטיס סטודנט בינלאומי",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_מרכז_הספורט_אוניברסיטת_תל_אביב",
+   "name": "מרכז הספורט - אוניברסיטת תל אביב",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מורפיקסקול_מבית_מורפיקס",
+   "name": "מורפיקסקול מבית מורפיקס",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_עברי",
+   "name": "עברי",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_דני_באומן",
+   "name": "דני באומן",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_למדא_ספרי_האוניברסיטה_הפתוחה",
+   "name": "למדא – ספרי האוניברסיטה הפתוחה",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_החברים_של_נטאשה",
+   "name": "החברים של נטאשה",
+   "benefit_count": 1,
+   "programs": [
+    "calextra_discounts"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_התקווה_6",
+   "name": "התקווה 6",
+   "benefit_count": 1,
+   "programs": [
+    "calextra_discounts"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קו_רקיע",
+   "name": "קו רקיע",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_יקב_ליבנה",
+   "name": "יקב ליבנה",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_יקב_אסף",
+   "name": "יקב אסף",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_nespresso",
+   "name": "Nespresso",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_lululemon",
+   "name": "lululemon",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_factory54",
+   "name": "FACTORY54",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_travel",
+   "name": "TRAVEL",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_יין_בעיר",
+   "name": "יין בעיר",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מסעדת_הגריל_רום_ת_א",
+   "name": "מסעדת הגריל רום ת\"א",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קולנוע_פלאנט_ורב_חן",
+   "name": "קולנוע פלאנט ורב חן",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קולנוע_לב",
+   "name": "קולנוע לב",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קולנוע_hot_cinema",
+   "name": "קולנוע HOT CINEMA",
+   "benefit_count": 1,
+   "programs": [
+    "discounts_american_express"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ליקר_בייקרי_קריית_גת",
+   "name": "ליקר בייקרי קריית גת",
+   "benefit_count": 1,
+   "programs": [
+    "i_card"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ליקר_בייקרי_אשדוד",
+   "name": "ליקר בייקרי אשדוד",
+   "benefit_count": 1,
+   "programs": [
+    "i_card"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_פנסי_nitecore",
+   "name": "פנסי NITECORE",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_high_q",
+   "name": "HIGH Q",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_forest",
+   "name": "FOREST",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מייקו_קורסים_דיגיטליים_אונליין",
+   "name": "מייקו קורסים דיגיטליים אונליין",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_מכבי_חיפה",
+   "name": "מכבי חיפה",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_יורוספורט",
+   "name": "יורוספורט",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_lalun",
+   "name": "LALUN",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_tripheist",
+   "name": "TRIPHEIST",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_שירוחן",
+   "name": "שירוחן",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מועדון_כדורגל_מכבי_חיפה",
+   "name": "מועדון כדורגל מכבי חיפה",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_adashot",
+   "name": "Adashot",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_סמוראיו_סושי_בר",
+   "name": "סמוראיו סושי בר",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_רשת_מלונות_אוליב",
+   "name": "רשת מלונות אוליב",
+   "benefit_count": 1,
+   "programs": [
+    "magiayoter"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ישי_ריבו_בליווי_תזמורת_סימפונית",
+   "name": "ישי ריבו בליווי תזמורת סימפונית",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_איתי_לוי_בהיכל_מנורה",
+   "name": "איתי לוי בהיכל מנורה",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_הפרויקט_של_רביבו",
+   "name": "הפרויקט של רביבו",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_רעש_לבן",
+   "name": "רעש לבן",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_שלמה_ארצי_בבית_גבריאל",
+   "name": "שלמה ארצי בבית גבריאל",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אגם_בוחבוט_בהיכל_מנורה",
+   "name": "אגם בוחבוט בהיכל מנורה",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_wipark_וויפארק",
+   "name": "WIPARK - וויפארק",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_gray",
+   "name": "GRAY",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_max_travel",
+   "name": "MAX Travel",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "programme_self_reference"
+  },
+  {
+   "id": "unmapped_max_adventure",
+   "name": "MAX Adventure",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "programme_self_reference"
+  },
+  {
+   "id": "unmapped_קו_רקיע_מתחם_המופעים_בפארק_אריאל_שרון",
+   "name": "קו רקיע – מתחם המופעים בפארק אריאל שרון",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_huba_cuba_קרקס_הובה_קובה",
+   "name": "HUBA CUBA - קרקס הובה קובה",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_balloon_wonderland",
+   "name": "Balloon Wonderland",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_סינמטק_חיפה",
+   "name": "סינמטק חיפה",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_comy",
+   "name": "COMY",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_רותם_אבוהב",
+   "name": "רותם אבוהב",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_brennerock_גבעת_ברנר",
+   "name": "BRENNEROCK – גבעת ברנר",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מיקי_גבע",
+   "name": "מיקי גבע",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_כפר_השעשועים_אונליין",
+   "name": "כפר השעשועים אונליין",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "online_only"
+  },
+  {
+   "id": "unmapped_max_ביטוח_רכב_aig",
+   "name": "MAX ביטוח רכב (AIG)",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "programme_self_reference"
+  },
+  {
+   "id": "unmapped_טריפ_גרנטי",
+   "name": "טריפ גרנטי",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_talking",
+   "name": "TALKING",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_momento_בית_הספר_הדיגיטלי_ללימוד_ספרדית",
+   "name": "Momento - בית הספר הדיגיטלי ללימוד ספרדית",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_דריה_ספא_מלון_נבל_דוד_גליל_ריזורט",
+   "name": "דריה ספא - מלון נבל דוד גליל ריזורט",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_בריכת_הכפר_הקסום",
+   "name": "בריכת הכפר הקסום",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_max_back_total",
+   "name": "MAX Back Total",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "programme_self_reference"
+  },
+  {
+   "id": "unmapped_easycount",
+   "name": "EasyCount",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_הדרדסים_ההצגה_live",
+   "name": "הדרדסים ההצגה - LIVE",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_נינטנדו",
+   "name": "נינטנדו",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_קרקס_בראבו",
+   "name": "קרקס בראבו",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": "event"
+  },
+  {
+   "id": "unmapped_ספא_מלון_ורט_לגון_נתניה",
+   "name": "ספא מלון ורט לגון נתניה",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_סינדרלה",
+   "name": "סינדרלה",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ספר_הג_ונגל_הפקה_מרהיבה_בכיכובה_של_ענבלי",
+   "name": "ספר הג'ונגל – הפקה מרהיבה בכיכובה של ענבלי",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ג_רוזלם_פוסט_זון_jpost_zone",
+   "name": "ג'רוזלם פוסט זון - Jpost Zone",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ווטרלנד_פארק_המים_של_אילת",
+   "name": "ווטרלנד - פארק המים של אילת",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ג_רוזלם_פוסט_ג_וניור",
+   "name": "ג'רוזלם פוסט ג'וניור",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ג_רוזלם_פוסט_לייט",
+   "name": "ג'רוזלם פוסט לייט",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_נאפיס_פתח_תקווה",
+   "name": "נאפיס פתח תקווה",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_מלון_לאונרדו_ירושלים",
+   "name": "מלון לאונרדו ירושלים",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_יקב_גוש_עציון",
+   "name": "יקב גוש עציון",
+   "benefit_count": 1,
+   "programs": [
+    "max"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אתרי_אינטרנט_pay_back",
+   "name": "אתרי אינטרנט (Pay Back)",
+   "benefit_count": 1,
+   "programs": [
+    "max_kranot"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_maxtravel",
+   "name": "MaxTravel",
+   "benefit_count": 1,
+   "programs": [
+    "max_kranot"
+   ],
+   "hint": "programme_self_reference"
+  },
+  {
+   "id": "unmapped_רשתות_נבחרות_gift_card",
+   "name": "רשתות נבחרות (GIFT CARD)",
+   "benefit_count": 1,
+   "programs": [
+    "p100_members"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_עסקאות_במטבע_חוץ",
+   "name": "עסקאות במטבע חוץ",
+   "benefit_count": 1,
+   "programs": [
+    "p100_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ביטוח_נסיעות_לחו_ל",
+   "name": "ביטוח נסיעות לחו\"ל",
+   "benefit_count": 1,
+   "programs": [
+    "p100_members"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_dream_card_gift_card",
+   "name": "DREAM CARD GIFT CARD",
+   "benefit_count": 1,
+   "programs": [
+    "meshekard"
+   ],
+   "hint": "gift_card"
+  },
+  {
+   "id": "unmapped_רשת_גולף",
+   "name": "רשת גולף",
+   "benefit_count": 1,
+   "programs": [
+    "meshekard"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_wolt",
+   "name": "WOLT",
+   "benefit_count": 1,
+   "programs": [
+    "meshekard"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_ביג_אלקטריק",
+   "name": "ביג אלקטריק",
+   "benefit_count": 1,
+   "programs": [
+    "meshekard"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_swish_plus",
+   "name": "SWISH PLUS",
+   "benefit_count": 1,
+   "programs": [
+    "meshekard"
+   ],
+   "hint": null
+  },
+  {
+   "id": "unmapped_אחוזת_חוף_רשת_חניונים_בתל_אביב",
+   "name": "אחוזת חוף - רשת חניונים בתל אביב",
+   "benefit_count": 1,
+   "programs": [
+    "adif_members"
+   ],
+   "hint": null
+  }
+ ]
+}

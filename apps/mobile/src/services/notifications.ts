@@ -31,18 +31,44 @@ export async function notifyVenue(input: {
   venueId: string;
   venueName: string;
   evaluations: readonly Evaluation[];
-}): Promise<boolean> {
+  /** Hold the reminder this long before delivering. Omitted or 0 fires now. */
+  delayMs?: number;
+}): Promise<string | null> {
   const content = formatVenueNotification(input.venueName, input.evaluations, programNames);
-  if (!content) return false;
+  if (!content) return null;
 
-  await Notifications.scheduleNotificationAsync({
+  const seconds = Math.round((input.delayMs ?? 0) / 1000);
+  const id = await Notifications.scheduleNotificationAsync({
     content: {
       title: content.title,
       body: content.body,
       data: { venueId: input.venueId },
     },
-    trigger: null,
+    // Letting the OS hold the reminder is what makes the dwell threshold real.
+    // Nothing in this app is running three minutes after a geofence enter
+    // event, so an immediate send could only ever fire at zero dwell — the
+    // gate could not wait, it could only refuse.
+    trigger:
+      seconds > 0
+        ? {
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+            seconds,
+            repeats: false,
+          }
+        : null,
   });
+  // ponytail: counted when armed, not when delivered, so a cancelled
+  // drive-through still logs one. A scheduled local notification has no fire
+  // callback; route it through the received listener if the KPI needs to be exact.
   await logEvent({ kind: 'notification_sent', venueId: input.venueId });
-  return true;
+  return id;
+}
+
+/** Withdraw a reminder that was armed but never earned — see `handleVenueExit`. */
+export async function cancelVenueNotification(id: string): Promise<void> {
+  try {
+    await Notifications.cancelScheduledNotificationAsync(id);
+  } catch {
+    // Already delivered, or already gone: the same outcome either way.
+  }
 }

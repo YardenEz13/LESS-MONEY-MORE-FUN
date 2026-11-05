@@ -85,7 +85,8 @@ export function AdvisorScreen({ profile, onSelect, onBack }: Props) {
           <View style={styles.notice}>
             <View style={styles.noticeBar} />
             <Text style={styles.noticeText}>
-              העוזר כבוי — לא הוגדר מפתח Gemini. הגדירו EXPO_PUBLIC_GEMINI_API_KEY והפעילו מחדש.
+              העוזר כבוי — לא הוגדר שרת ולא מפתח. הגדירו EXPO_PUBLIC_ADVISOR_URL (מומלץ) או
+              EXPO_PUBLIC_GEMINI_API_KEY והפעילו מחדש.
             </Text>
           </View>
         )}

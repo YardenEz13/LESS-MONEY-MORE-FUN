@@ -336,19 +336,6 @@ async function unionWithExisting(path, records) {
  * 100%. Keyed on `content_hash` as well as url: if the deal text changed the
  * record is genuinely new and has to earn its proof again.
  */
-/** Records already on disk, as [offer_url, record] pairs. Empty on first run. */
-async function previousRecords(path) {
-  try {
-    return (await readFile(path, 'utf8'))
-      .split(String.fromCharCode(10))
-      .filter((line) => line.trim())
-      .map((line) => JSON.parse(line))
-      .map((record) => [record.offer_url, record]);
-  } catch {
-    return [];
-  }
-}
-
 async function keepVerification(path, records) {
   let previous;
   try {
@@ -511,19 +498,19 @@ async function main() {
     const program = PROGRAMS[slug];
     done += 1;
     try {
-      // Every point's results for one list, unioned with what is already on
-      // disk and keyed by offer_url, so the same shop found from two cities is
-      // one record.
+      // Every point's results for one list, keyed by offer_url so the same shop
+      // found from two cities is one record.
       //
-      // Unioning rather than replacing is what makes `--cities` chunkable: a
-      // 42-point crawl is hours, so it gets run a few cities at a time, and a
-      // replacing write would mean each sitting deleted the last one's cities.
-      // Retraction is not lost, it just does not happen here — `verify:catalog`
-      // removes an offer whose page 404s, and an offer that simply stops being
-      // re-found keeps its old `last_verified_at`, so the freshness policy
-      // flags it at 14 days and stops surfacing it at 45.
+      // Seeded EMPTY, and that is the whole distinction: this map unions the
+      // points *within this run*, which is what makes `--cities` chunkable. The
+      // union with what previous runs left on disk is a different question, and
+      // `unionWithExisting` below is the one allowed to answer it — only for a
+      // geo-anchored run. Seeding this from the file collapsed the two, so an
+      // unscoped crawl carried every old row back into its own output and could
+      // never retract anything: a business that closed stayed in the catalog
+      // for ever, which is the one job the unscoped crawl exists to do.
       const path = `collected/easy/${slug}.jsonl`;
-      const byUrl = new Map(await previousRecords(path));
+      const byUrl = new Map();
       const candidates = [];
       let complete = true;
       for (const point of points) {

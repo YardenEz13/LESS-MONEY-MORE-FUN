@@ -9,13 +9,17 @@ jobs:
     name: engine + pipeline
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
       - run: npm install
       - run: npm run validate:data
       - run: npm test
+      # The pipeline scripts have their own suite, and it was not running here.
+      # A retraction bug in scrape-easy sat red for several commits because of
+      # it — the tests existed and nothing looked at them.
+      - run: npm run test:scripts
       - run: npm run typecheck
       # No API key in CI: prove the scrape + wiring still runs end to end
       # against the committed fixtures without calling the model.
@@ -25,8 +29,8 @@ jobs:
     name: app typecheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
       # apps/mobile is deliberately outside the npm workspace (it reaches
