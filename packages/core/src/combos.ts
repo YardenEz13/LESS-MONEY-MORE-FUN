@@ -1,6 +1,6 @@
 import type { Benefit } from './types';
 import type { Evaluation } from './matching';
-import { REFERENCE_BASKET_ILS } from './matching';
+import { isUpperBound, offerKey, REFERENCE_BASKET_ILS } from './matching';
 
 /**
  * Stacking two benefits on one purchase — "₪150 gift card *and* 1% cashback",
@@ -119,12 +119,20 @@ export function findCombos(
       // Two offers from the same club on one purchase is the case the T&C word
       // "כפל מבצעים" exists to forbid; don't invent it.
       if (a.benefit.program_id === b.benefit.program_id) continue;
+      // One offer listed under two programs does not stack with itself, and a
+      // ceiling has no saving to add. Both reached the top of the list as
+      // "confirmed", which is the most expensive thing a combo can get wrong.
+      if (offerKey(a.benefit) === offerKey(b.benefit)) continue;
+      if (isUpperBound(a.benefit) || isUpperBound(b.benefit)) continue;
 
       const saving = Math.min(
         applyInOrder([a.benefit, b.benefit], basket),
         applyInOrder([b.benefit, a.benefit], basket),
       );
       if (saving <= 0) continue;
+      // Saving the whole sample basket says the basket does not fit the deal (a
+      // ₪1600 appliance offer), not that the purchase comes out free.
+      if (isEstimate && saving >= basket) continue;
 
       const caveats: string[] = [];
       for (const part of [a, b]) {

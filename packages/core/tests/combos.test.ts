@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { findCombos, UNIVERSAL_MERCHANT_ID } from '../src/combos';
-import { evaluateBenefit, expandOwnedPrograms } from '../src/matching';
+import { formatValue } from '../src/format';
+import { evaluateBenefit, expandOwnedPrograms, rankBenefits } from '../src/matching';
 import type { Benefit, Program } from '../src/types';
 
 const NOW = new Date('2026-08-04T10:00:00.000Z');
@@ -26,7 +27,7 @@ function benefit(over: Partial<Benefit> & Pick<Benefit, 'id' | 'program_id'>): B
     },
     valid_from: null,
     valid_until: null,
-    source_url: 'https://example.invalid/x',
+    source_url: `https://example.invalid/${over.id}`,
     last_verified_at: NOW.toISOString(),
     confidence_score: 0.95,
     reviewed_by_human: true,
@@ -42,6 +43,36 @@ const evaluate = (benefits: Benefit[], cartAmount?: number) =>
       cartAmount,
     }),
   );
+
+describe('what must not reach a till', () => {
+  const twin = (id: string, program_id: string, over: Partial<Benefit> = {}) =>
+    benefit({ id, program_id, source_url: 'https://example.invalid/shared', ...over });
+
+  it('does not stack one offer with itself across programs', () => {
+    expect(findCombos(evaluate([twin('a', 'cal'), twin('b', 'diners_club')]))).toEqual([]);
+  });
+
+  it('lists one offer once, whichever programs carry it', () => {
+    const rows = [twin('a', 'cal'), twin('b', 'diners_club')];
+    const ranked = rankBenefits(rows, { now: NOW, ownedProgramIds: ['cal', 'diners_club'] });
+    expect(ranked).toHaveLength(1);
+  });
+
+  it('reads "up to" as a ceiling, not a saving, and does not call it ready', () => {
+    const b = benefit({ id: 'c', program_id: 'cal', value: 85 });
+    b.conditions = { ...b.conditions, raw_text_summary: 'הנחות של עד 85% על מבחר פריטים.' };
+    const [evaluation] = evaluate([b], 200);
+    expect(evaluation!.estimatedSavingIls).toBe(0);
+    expect(evaluation!.actionsRequired.map((g) => g.code)).toContain('rate');
+    expect(formatValue(b).figure).toBe('עד 85%');
+  });
+
+  it('flags terms written for a restricted group', () => {
+    const b = benefit({ id: 'd', program_id: 'mercantile_smile', value: 100 });
+    b.conditions = { ...b.conditions, raw_text_summary: 'לקוחות נפגעי הנאצים פטורים מעמלה' };
+    expect(evaluate([b])[0]!.actionsRequired.map((g) => g.code)).toContain('eligibility');
+  });
+});
 
 describe('expandOwnedPrograms', () => {
   const programs: Program[] = [

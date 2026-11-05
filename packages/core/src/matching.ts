@@ -162,7 +162,9 @@ export type RequirementCode =
   | 'usage_limited'
   | 'max_discount_cap'
   | 'aging_data'
-  | 'ends_soon';
+  | 'ends_soon'
+  | 'upper_bound'
+  | 'eligibility';
 
 export interface Note<T extends string> {
   code: T;
@@ -192,7 +194,9 @@ export type GateCode =
   | 'usage'
   | 'cap'
   | 'freshness'
-  | 'validity';
+  | 'validity'
+  | 'rate'
+  | 'eligibility';
 
 export type GateState =
   /** Stated, checkable, and satisfied right now. */
@@ -476,6 +480,16 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
     gate('usage', 'pending', 'הגבלת שימוש', conditions.usage_limit);
   }
 
+  const upperBound = isUpperBound(benefit);
+  if (upperBound) {
+    requirements.push({ code: 'upper_bound', message: `עד ${benefit.value}% — רק על חלק מהפריטים` });
+    gate('rate', 'pending', 'עד', `עד ${benefit.value}% — ההנחה בפועל תלויה בפריט`, true);
+  }
+  if (RESTRICTED_GROUP.test(conditions.raw_text_summary)) {
+    requirements.push({ code: 'eligibility', message: 'מיועד לקבוצה מוגדרת — בדוק שאתה זכאי' });
+    gate('eligibility', 'pending', 'זכאות', 'ההטבה מיועדת לקבוצה מוגדרת — בדוק שאתה זכאי', true);
+  }
+
   const { value, isEstimate } = estimateSaving(benefit, ctx.cartAmount);
   // Blocked first, then what the user still has to do, then the reassurance.
   const gateOrder: Record<GateState, number> = { blocked: 0, pending: 1, met: 2 };
@@ -487,7 +501,8 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
     requirements,
     gates: gates.sort((a, b) => gateOrder[a.state] - gateOrder[b.state]),
     actionsRequired: gates.filter((g) => g.state === 'pending' && g.actionable),
-    estimatedSavingIls: Math.round(value * 100) / 100,
+    // A ceiling is not a saving: promising it is the error this engine exists to avoid.
+    estimatedSavingIls: upperBound ? 0 : Math.round(value * 100) / 100,
     isEstimate,
     ageDays: Number.isFinite(ageDays) ? Math.floor(ageDays) : -1,
   };
@@ -544,6 +559,29 @@ function savingRate(benefit: Benefit): number | null {
  * Rank benefits for display. Fully eligible beats conditional at equal value,
  * so a "you definitely have this" card never sits below a "maybe" card.
  */
+/**
+ * "עד 85%" read as a flat 85%: the rate is a ceiling on some items, not what the
+ * reader gets. ponytail: reads the summary's own words, because extraction has no
+ * field for this; add one to the schema if a phrasing slips past.
+ */
+export function isUpperBound(benefit: Pick<Benefit, 'value' | 'conditions'>): boolean {
+  const match = /עד\s*(\d+(?:\.\d+)?)\s*(?:%|אחוז)/.exec(benefit.conditions.raw_text_summary);
+  return match != null && Number(match[1]) === benefit.value;
+}
+
+/** Terms written for a group the catalog cannot check the reader against. */
+const RESTRICTED_GROUP =
+  /נפגעי|ניצולי|אזרחים? ותיק|מוגבלות|עד גיל|לגילאי|בני \d|חיילים|מלש"ב|סטודנט|גמלא|פנסיונר/;
+
+/**
+ * One offer, listed under several programs. Cal publishes one page for כאל,
+ * Cash כאל Pro, Carrefour Club and דיינרס, so it is one thing to redeem however
+ * many of those a person holds.
+ */
+export function offerKey(b: Benefit): string {
+  return [b.merchant_id, b.value, b.source_url, b.conditions.raw_text_summary].join('|');
+}
+
 export function rankBenefits(
   benefits: readonly Benefit[],
   ctx: EvalContext,
@@ -571,7 +609,12 @@ export function rankBenefits(
       // Tie-break on freshness so the better-verified row wins deterministically.
       return a.ageDays - b.ageDays;
     });
-  return limit != null ? evaluations.slice(0, limit) : evaluations;
+  const seen = new Set<string>();
+  const distinct = evaluations.filter((e) => {
+    const key = offerKey(e.benefit);
+    return !seen.has(key) && seen.add(key) !== undefined;
+  });
+  return limit != null ? distinct.slice(0, limit) : distinct;
 }
 
 

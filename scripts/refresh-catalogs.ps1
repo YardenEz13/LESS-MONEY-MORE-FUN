@@ -129,7 +129,7 @@ $programs = @(Get-ChildItem collected/catalogs -Filter *.jsonl | ForEach-Object 
 # easy lists too, or their rows age out however often the catalogs refresh. No
 # model and no request: each row takes the date of its last real link check, so
 # while easy is refusing the check these stay stale instead of looking renewed.
-node scripts/extract-easy.mjs 2>&1 | Select-String -Pattern '--collected (S+) --program (S+)' | ForEach-Object {
+node scripts/extract-easy.mjs 2>&1 | Select-String -Pattern '--collected (\S+) --program (\S+)' | ForEach-Object {
     $programs += [pscustomobject]@{ Path = $_.Matches[0].Groups[1].Value; Program = $_.Matches[0].Groups[2].Value }
 }
 foreach ($file in $programs) {

@@ -1,4 +1,4 @@
-import type { Evaluation } from './matching';
+import { isUpperBound, type Evaluation } from './matching';
 import type { Benefit } from './types';
 
 /**
@@ -11,9 +11,9 @@ import type { Benefit } from './types';
 export function formatValue(benefit: Benefit): { figure: string; unit: string } {
   switch (benefit.type) {
     case 'percent':
-      return { figure: `${benefit.value}%`, unit: 'הנחה' };
+      return { figure: `${isUpperBound(benefit) ? 'עד ' : ''}${benefit.value}%`, unit: 'הנחה' };
     case 'cashback':
-      return { figure: `${benefit.value}%`, unit: 'זיכוי' };
+      return { figure: `${isUpperBound(benefit) ? 'עד ' : ''}${benefit.value}%`, unit: 'זיכוי' };
     case 'fixed':
       return { figure: `₪${benefit.value}`, unit: 'הנחה' };
     case 'gift_card':
