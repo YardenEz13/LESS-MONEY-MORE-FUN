@@ -220,7 +220,10 @@ for (const [file, rows] of byFile) {
     if (verdict?.state === 'live') {
       // The verdict's own date: stamping today is what made an old check look new.
       r.verified_at = !r.verified_at || verdict.at > r.verified_at ? verdict.at : r.verified_at;
-      kept += 1;
+      // Old proof is kept on the record but is not coverage: this line once read
+      // 100% while every request was being refused.
+      if (Date.parse(verdict.at) > freshBefore) kept += 1;
+      else unproven += 1;
     } else if (provenAt.has(r.offer_url)) {
       // Proven by an earlier run, on some other copy of this same url. Stamp
       // this copy too rather than merely counting it, or it stays unstamped
