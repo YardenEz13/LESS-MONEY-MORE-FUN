@@ -123,18 +123,10 @@ if ($appKey) {
 # argument after `--` (the test file below) still gets through.
 $pipelineFailures = @()
 $pageFailures = 0
-$programs = @(Get-ChildItem collected/catalogs -Filter *.jsonl | ForEach-Object {
-    [pscustomobject]@{ Path = "collected/catalogs/$($_.Name)"; Program = $_.BaseName }
-})
-# easy lists too, or their rows age out however often the catalogs refresh. No
-# model and no request: each row takes the date of its last real link check, so
-# while easy is refusing the check these stay stale instead of looking renewed.
-node scripts/extract-easy.mjs 2>&1 | Select-String -Pattern '--collected (\S+) --program (\S+)' | ForEach-Object {
-    $programs += [pscustomobject]@{ Path = $_.Matches[0].Groups[1].Value; Program = $_.Matches[0].Groups[2].Value }
-}
+$programs = @(Get-ChildItem collected/catalogs -Filter *.jsonl)
 foreach ($file in $programs) {
-    $program = $file.Program
-    npm.cmd run extract -- --collected $file.Path --program $program --all 2>&1 |
+    $program = $file.BaseName
+    npm.cmd run extract -- --collected "collected/catalogs/$($file.Name)" --program $program --all 2>&1 |
         Select-String -Pattern '^(benefits|published|review|failures):' |
         ForEach-Object {
             Write-Log "  $program  $($_.Line)"
@@ -157,6 +149,19 @@ if ($programs.Count -gt 0 -and $pipelineFailures.Count -eq $programs.Count) {
 # --- publish, then prove it ------------------------------------------------
 npm.cmd run publish:catalog 2>&1 | ForEach-Object { Write-Log $_ }
 if ($LASTEXITCODE -ne 0) { Stop-Run "publish:catalog failed" -Restore }
+
+# easy rows are human-approved, so they take new dates only and never go back
+# through the confidence gate: extracting them once queued all 2714 for review,
+# and publish withdraws what is queued.
+node scripts/sync-easy-proof.mjs 2>&1 | ForEach-Object { Write-Log $_ }
+if ($LASTEXITCODE -ne 0) { Stop-Run "sync-easy-proof failed" -Restore }
+
+# A catalog does not lose a fifth of itself in a few days. Whatever caused this,
+# phones keep what they have until a person has looked.
+$published = Get-CatalogCount
+if ([int]$published -lt [int]$before * 0.8) {
+    Stop-Run "catalog would shrink from $before to $published - nothing published" -Restore
+}
 
 npm.cmd run validate:data 2>&1 | ForEach-Object { Write-Log $_ }
 if ($LASTEXITCODE -ne 0) { Stop-Run "validate:data rejected the catalog - nothing published" -Restore }
