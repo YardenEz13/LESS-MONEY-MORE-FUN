@@ -17,7 +17,7 @@ import {
   type Fence,
   type Venue,
 } from '@sbr/core';
-import { merchants, ownedProgramIds, placeAt, venues } from './catalog';
+import { benefits, merchants, ownedProgramIds, placeAt, venues } from './catalog';
 import { cancelVenueNotification, notifyVenue } from './notifications';
 import { canGeofenceInBackground } from './runtime';
 import { loadProfile } from '../state/profile';
@@ -232,11 +232,15 @@ const SHOP_FENCE_RADIUS_M = 150;
 /**
  * Which regions to arm, from wherever the user last was.
  *
- * Uses the cached position rather than asking for a fresh fix: this runs during
- * app start and must not add a GPS wait to it, and a fence set only has to be
- * right for the neighbourhood, not the doorstep. No cached position at all —
- * a first run before any fix — falls back to the ten malls, which is what this
- * did for every user before branch coordinates existed.
+ * Uses the cached position when there is one, since a fence set only has to be
+ * right for the neighbourhood. A first run usually has none, and falling straight
+ * to the ten malls left a new install watching no shop at all, so that one case
+ * waits briefly for a real fix. Still nothing falls back to the malls.
+ *
+ * Only merchants with something usable for this profile. The nearest twenty of
+ * any kind were mostly shops whose rows had aged out or belong to clubs the user
+ * does not hold: each fired into nothing, while their actual Super-Pharm, a few
+ * streets past the twentieth, was never watched.
  */
 async function fencesToMonitor(): Promise<Fence[]> {
   const mallsOnly = venues.map((venue) => ({
@@ -247,7 +251,7 @@ async function fencesToMonitor(): Promise<Fence[]> {
     radius_m: venue.radius_m,
   }));
   try {
-    const last = await Location.getLastKnownPositionAsync();
+    const last = (await Location.getLastKnownPositionAsync()) ?? (await positionWithin(FIX_TIMEOUT_MS));
     if (!last) {
       await AsyncStorage.removeItem(FENCE_ORIGIN_KEY);
       return mallsOnly;
@@ -256,10 +260,18 @@ async function fencesToMonitor(): Promise<Fence[]> {
     // Remembered so `refreshFencesIfMoved` can tell whether this set still
     // describes where the user is.
     await AsyncStorage.setItem(FENCE_ORIGIN_KEY, JSON.stringify(position));
+    const profile = await loadProfile();
+    const usable = new Set(
+      rankBenefits(benefits, {
+        now: new Date(),
+        ownedProgramIds: ownedProgramIds(profile.program_ids),
+        mutedBenefitIds: hiddenBenefitIds(profile),
+      }).map((e) => e.benefit.merchant_id),
+    );
     return nearestFences({
       position,
       venues,
-      merchants,
+      merchants: merchants.filter((m) => usable.has(m.id)),
       limit: MAX_FENCES,
       shopRadiusM: SHOP_FENCE_RADIUS_M,
     });
