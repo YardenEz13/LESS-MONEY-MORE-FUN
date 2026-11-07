@@ -263,6 +263,15 @@ export function HomeScreen({
     [evaluations],
   );
 
+  /** Same rule for the fold: offers at the venue that are blocked right now. */
+  const notNowAt = useCallback(
+    (venueId: string) => {
+      const ids = new Set(benefitsAtVenue(venueId).map((b) => b.id));
+      return notNow.filter((e) => ids.has(e.benefit.id)).length;
+    },
+    [notNow],
+  );
+
   const renderRow = useCallback(
     ({ item }: { item: Row }) => {
       switch (item.kind) {
@@ -381,6 +390,7 @@ export function HomeScreen({
             {picking && (
               <VenueSheet
                 countAt={countAt}
+                notNowAt={notNowAt}
                 onChoose={(chosen) => {
                   setVenue(chosen);
                   setHere(null);
@@ -557,10 +567,12 @@ function WhereAmI({
 /** The manual fallback: every tracked venue, tap to pin. */
 function VenueSheet({
   countAt,
+  notNowAt,
   onChoose,
   onClose,
 }: {
   countAt: (venueId: string) => number;
+  notNowAt: (venueId: string) => number;
   onChoose: (venue: Venue) => void;
   onClose: () => void;
 }) {
@@ -589,7 +601,9 @@ function VenueSheet({
             style={({ pressed }) => [styles.sheetRow, pressed && styles.sheetRowPressed]}
           >
             <Text style={styles.sheetRowName}>{v.name}</Text>
-            <Text style={styles.sheetClose}>{countAt(v.id)}</Text>
+            <Text style={styles.sheetClose}>
+              {notNowAt(v.id) > 0 ? `${countAt(v.id)} עכשיו, ${notNowAt(v.id)} לא עכשיו` : countAt(v.id)}
+            </Text>
           </Pressable>
         ))}
       </ScrollView>
