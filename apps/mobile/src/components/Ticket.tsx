@@ -18,7 +18,7 @@ import {
 import { Seam } from './Kit';
 import { Text } from './ui';
 import { benefits, merchantLine, programNames } from '../services/catalog';
-import { fonts, space, ticket } from '../theme';
+import { deepOf, fonts, space, stockDeep, ticket } from '../theme';
 
 export type TicketSize = 'big' | 'mid' | 'slim';
 
@@ -66,8 +66,9 @@ export function stockFor(programId: string, ownedIds: readonly string[]): string
 function Hole({ size, seed, glide }: { size: number; seed: number; glide: Animated.AnimatedNode | null }) {
   const a = WALL_NAMES[seed % WALL_NAMES.length] ?? '';
   const b = WALL_NAMES[(seed + 7) % WALL_NAMES.length] ?? '';
-  const one = ticket.stocks[seed % ticket.stocks.length]!;
-  const two = ticket.stocks[(seed + 2) % ticket.stocks.length]!;
+  // Deep tones: the pastel stocks cannot be read as text on a paper-coloured hole.
+  const one = stockDeep[ticket.stocks[seed % ticket.stocks.length]!]!;
+  const two = stockDeep[ticket.stocks[(seed + 2) % ticket.stocks.length]!]!;
   return (
     <View style={[styles.hole, { width: size, height: size, borderRadius: size / 2 }]}>
       <Animated.View style={[styles.wall, glide ? { transform: [{ translateY: glide }] } : null]}>
@@ -130,7 +131,7 @@ export const Ticket = memo(function Ticket({ evaluation, size, stock, onPress, g
   const place = merchantLine(benefit.merchant_id);
   const seed = hashOf(benefit.id);
 
-  const base = size === 'big' ? Math.min(width * 0.27, 112) : size === 'mid' ? 60 : 30;
+  const base = size === 'big' ? Math.min(width * 0.4, 150) : size === 'mid' ? 60 : 30;
   // Display figures run to "עד 3.5%": shrink what is long, since the web build has
   // no `adjustsFontSizeToFit` to fall back on.
   const figureSize = Math.round(base * Math.min(1, 3.5 / [...figure].length));
@@ -153,6 +154,11 @@ export const Ticket = memo(function Ticket({ evaluation, size, stock, onPress, g
 
   const label = `${figure} ${unit} ב${name}, ${face.stamp ? `${face.stamp}, ` : ''}${face.verdict}, בכרטיס ${club}`;
   const background = { backgroundColor: face.state === 'blocked' ? ticket.dead : stock };
+  // The overprint under a live ticket; a blocked one stays flat.
+  const depth =
+    face.state === 'blocked'
+      ? null
+      : { borderBottomColor: deepOf(stock), ...(size === 'big' ? { borderBottomWidth: 8 } : null) };
 
   if (size === 'slim') {
     return (
@@ -212,7 +218,7 @@ export const Ticket = memo(function Ticket({ evaluation, size, stock, onPress, g
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={() => onPress(evaluation)}
-      style={({ pressed }) => [styles.ticket, background, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.ticket, background, depth, pressed && styles.pressedDown]}
     >
       <Seam />
       {size === 'big' ? (
@@ -238,8 +244,10 @@ export const Ticket = memo(function Ticket({ evaluation, size, stock, onPress, g
 });
 
 const styles = StyleSheet.create({
-  ticket: { paddingHorizontal: space.s3, paddingTop: space.s3, paddingBottom: space.s2 + 4 },
+  ticket: { paddingHorizontal: space.s3, paddingTop: space.s3, paddingBottom: space.s2 + 4, borderBottomWidth: 5 },
   pressed: { opacity: 0.86 },
+  /* The ticket drops onto its overprint, as a press does. */
+  pressedDown: { transform: [{ translateY: 3 }] },
   grow: { flex: 1, minWidth: 0 },
   /* flex-start so a Latin or number-only line aligns with a Hebrew one: see ui.tsx. */
   identity: { alignItems: 'flex-start' },

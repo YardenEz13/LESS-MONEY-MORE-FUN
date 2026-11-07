@@ -4,7 +4,7 @@ import type { Gate } from '@sbr/core';
 import { Text } from './ui';
 import {
   colors,
-  gateGlyph,
+  fonts,
   gateTone,
   gateVerdict,
     space,
@@ -53,13 +53,13 @@ export function GateList({ gates }: { gates: readonly Gate[] }) {
 
   return (
     <View>
-      {gates.map((gate) => {
+      {gates.map((gate, index) => {
         const key = toneFor(gate);
         const tone = gateTone[key];
         return (
           <View key={gate.code} style={styles.row}>
             <View style={[styles.marker, { backgroundColor: tone.bg, borderColor: tone.border }]}>
-              <Text style={[type.chip, { color: tone.fg }]}>{gateGlyph[key]}</Text>
+              <Text style={[styles.markerNumber, { color: tone.fg }]}>{index + 1}</Text>
             </View>
             <View style={styles.rowText}>
               <Text style={type.bodyStrong}>{gate.label}</Text>
@@ -107,13 +107,15 @@ const styles = StyleSheet.create({
   },
   /* A round mark, the same shape as the holes on the roll's tickets. */
   marker: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     borderWidth: 1,
+    borderBottomWidth: 3,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  markerNumber: { fontFamily: fonts.display, fontSize: 24, lineHeight: 28 },
   verdict: { ...type.micro, marginTop: 3 },
   /* flex-start so a number-only label ("₪300+") aligns with a Hebrew one — see ui.tsx. */
   rowText: { flex: 1, gap: 2, alignItems: 'flex-start' },

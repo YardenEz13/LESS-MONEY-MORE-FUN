@@ -13,6 +13,7 @@ import { AdvisorScreen } from './src/screens/AdvisorScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
 import { BenefitDetailScreen } from './src/screens/BenefitDetailScreen';
+import { TillScreen } from './src/screens/TillScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { ShareResultScreen } from './src/screens/ShareResultScreen';
 import { StatsScreen } from './src/screens/StatsScreen';
@@ -70,6 +71,7 @@ type RootStackParamList = {
   onboarding: undefined;
   home: undefined;
   detail: { evaluation: Evaluation };
+  till: { evaluation: Evaluation };
   settings: undefined;
   stats: undefined;
   advisor: undefined;
@@ -240,7 +242,7 @@ function AppRoot() {
 
   return (
     <SafeAreaView style={styles.root}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <NavigationContainer ref={navigationRef}>
         <Stack.Navigator
           initialRouteName={profile.onboarded_at ? 'home' : 'onboarding'}
@@ -313,6 +315,7 @@ function AppRoot() {
                   isMuted={profile.muted_benefit_ids.includes(evaluation.benefit.id)}
                   isRejected={profile.rejected_benefit_ids.includes(evaluation.benefit.id)}
                   onBack={() => navigation.goBack()}
+                  onTill={() => navigation.navigate('till', { evaluation })}
                   onRedeemed={async () => {
                     await logEvent({ kind: 'benefit_redeemed', benefitId: evaluation.benefit.id });
                     backToList();
@@ -324,6 +327,23 @@ function AppRoot() {
                   onReport={async () => {
                     await persist(rejectBenefit(profile, evaluation.benefit.id));
                     backToList();
+                  }}
+                />
+              );
+            }}
+          </Stack.Screen>
+
+          <Stack.Screen name="till">
+            {({ navigation, route }) => {
+              const { evaluation } = route.params;
+              return (
+                <TillScreen
+                  evaluation={evaluation}
+                  stock={stockFor(evaluation.benefit.program_id, profile.program_ids)}
+                  onClose={() => navigation.goBack()}
+                  onRedeemed={async () => {
+                    await logEvent({ kind: 'benefit_redeemed', benefitId: evaluation.benefit.id });
+                    navigation.navigate('home');
                   }}
                 />
               );

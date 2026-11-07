@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     marginTop: space.s2,
     flexDirection: 'row',
   },
-  fill: { backgroundColor: ticket.onGround },
+  fill: { backgroundColor: ticket.ground },
   /* The target sits on the bar itself — a percentage without its bar is just a number. */
   targetRow: { ...StyleSheet.absoluteFillObject, top: -3, bottom: -3, flexDirection: 'row' },
   target: { width: 3, backgroundColor: ticket.punch },

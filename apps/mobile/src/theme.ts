@@ -46,13 +46,13 @@ export const stock = {
 } as const;
 
 export const ticket = {
-  ground: '#14101F',
-  ground2: '#201A30',
-  ground3: '#30284A',
-  onGround: '#F4EEE0',
-  onGround2: '#D9D4E0',
-  muted: '#A9A3B8',
-  rule: '#463D63',
+  ground: '#F6F1E7',
+  ground2: '#EAE3D3',
+  ground3: '#DDD4BF',
+  onGround: '#14101F',
+  onGround2: '#4B4560',
+  muted: '#5B5470',
+  rule: '#D5CCB8',
   /** In the order the roll hands them out. */
   stocks: [stock.coral, stock.marigold, stock.mint, stock.sky, stock.orchid, stock.bone],
   dead: '#BDBFB8',
@@ -61,7 +61,23 @@ export const ticket = {
   void: '#79000C',
   /** The step still yours to do. The loudest thing on a ticket. */
   punch: stock.marigold,
+  /** Deep, readable-as-text tones for numbers on paper. */
+  good: '#1F8F60',
+  gold: '#8A6500',
+  blue: '#3A9CC4',
 } as const;
+
+/** The overprint: a flat band under a stock, the same hue one step down. */
+export const stockDeep: Record<string, string> = {
+  [stock.coral]: '#C94A2E',
+  [stock.marigold]: '#B38A00',
+  [stock.mint]: '#2FA877',
+  [stock.sky]: '#3A9CC4',
+  [stock.orchid]: '#B060A8',
+  [stock.bone]: '#A89E85',
+};
+
+export const deepOf = (fill: string): string => stockDeep[fill] ?? ticket.rule;
 
 export const colors = {
   /** Page and cards share one fill: the roll's deep indigo ground. */
@@ -91,7 +107,7 @@ export const colors = {
 
   textPrimary: ticket.onGround,
   textMuted: ticket.muted,
-  textDisabled: '#857E98',
+  textDisabled: '#7A748C',
   /** Ink: any text drawn on a stock, mint or sky fill. */
   textInverse: ticket.ink,
   textMutedInverse: ticket.ink2,
@@ -114,7 +130,7 @@ export const colors = {
    * ground it also reads as text, so the deep twin is the same colour.
    */
   cardYellow: stock.marigold,
-  cardYellowDeep: stock.marigold,
+  cardYellowDeep: ticket.gold,
 
   /**
    * A condition the T&C fails: the dead grey of a blocked ticket with the void
@@ -123,7 +139,7 @@ export const colors = {
    */
   cardRed: ticket.dead,
   cardRedDeep: ticket.void,
-  cardRedText: '#FF9A8A',
+  cardRedText: ticket.void,
 } as const;
 
 /**

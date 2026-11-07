@@ -38,7 +38,7 @@ import {
   venues,
 } from '../services/catalog';
 import { currentVenue, dwellMinutes } from '../services/geofencing';
-import { fonts, space, ticket } from '../theme';
+import { deepOf, fonts, space, stock, ticket } from '../theme';
 
 /**
  * How far "here" reaches when the fix lands outside every mall.
@@ -356,12 +356,13 @@ export function HomeScreen({
             <Text accessibilityRole="header" style={styles.title}>
               {pinned ? 'מה אפשר פה עכשיו' : 'מה אפשר עכשיו'}
             </Text>
-            {/* The count is the page's thesis: not "12 deals!", but how many of
-                them you can actually use right now. */}
-            <Text style={styles.count}>
-              <Text style={styles.countFigure}>{readyCount}</Text>
-              {'  '}מוכנות לשימוש מתוך {evaluations.length} רלוונטיות
-            </Text>
+            {/* The page's thesis in three numbers: how many you can use right now,
+                how many wait on a step from you, and how many clubs this is drawn from. */}
+            <View style={styles.stats}>
+              <Stat figure={readyCount} label="מוכנות" color={ticket.good} />
+              <Stat figure={evaluations.length - readyCount} label="דורשות צעד" color={ticket.gold} />
+              <Stat figure={owned.length} label="מועדונים" color={ticket.blue} />
+            </View>
 
             <WhereAmI
               venue={venue}
@@ -412,8 +413,8 @@ export function HomeScreen({
 
       {/* At the bottom, where a thumb reaches while the other hand holds a wallet. */}
       <View style={styles.actions}>
-        <BarAction label="שאל" onPress={onOpenAdvisor} />
         <BarAction label="מדדים" onPress={onOpenStats} />
+        <BarAction label="שאל" onPress={onOpenAdvisor} primary />
         <BarAction label="הגדרות" onPress={onOpenSettings} />
       </View>
     </View>
@@ -596,15 +597,31 @@ function VenueSheet({
   );
 }
 
-function BarAction({ label, onPress }: { label: string; onPress: () => void }) {
+function Stat({ figure, label, color }: { figure: number; label: string; color: string }) {
+  return (
+    <View style={styles.stat}>
+      <Text style={[styles.statFigure, { color }]}>{figure}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+/** One big mint action among two small bone ones: the thumb's first choice is plain. */
+function BarAction({ label, onPress, primary }: { label: string; onPress: () => void; primary?: boolean }) {
+  const fill = primary ? stock.mint : stock.bone;
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => [styles.barAction, pressed && styles.barActionPressed]}
+      style={({ pressed }) => [
+        styles.barAction,
+        primary && styles.barActionPrimary,
+        { backgroundColor: fill, borderBottomColor: deepOf(fill) },
+        pressed && styles.barActionPressed,
+      ]}
     >
-      <Text style={styles.barLabel}>{label}</Text>
+      <Text style={[styles.barLabel, primary && styles.barLabelPrimary]}>{label}</Text>
     </Pressable>
   );
 }
@@ -669,7 +686,7 @@ const styles = StyleSheet.create({
 
   /* flex-start so a Latin or number-only line aligns with a Hebrew one: see ui.tsx. */
   head: { paddingHorizontal: space.s3, paddingTop: space.s3, gap: space.s2, alignItems: 'flex-start' },
-  title: { fontFamily: fonts.display, fontSize: 31, lineHeight: 36, color: ticket.onGround },
+  title: { fontFamily: fonts.display, fontSize: 40, lineHeight: 42, color: ticket.onGround },
   count: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: ticket.onGround2 },
   countFigure: {
     fontFamily: fonts.display,
@@ -778,13 +795,30 @@ const styles = StyleSheet.create({
   emptyTitle: { fontFamily: fonts.display, fontSize: 26, lineHeight: 30, color: ticket.onGround },
   emptyBody: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: ticket.onGround2 },
 
+  stats: { flexDirection: 'row', alignSelf: 'stretch', columnGap: space.s3, paddingTop: space.s1 },
+  stat: { flexDirection: 'row', alignItems: 'baseline', columnGap: space.s1 + 2 },
+  statFigure: {
+    fontFamily: fonts.display,
+    fontSize: 34,
+    lineHeight: 36,
+    fontVariant: ['tabular-nums', 'lining-nums'],
+  },
+  statLabel: { fontFamily: fonts.latinText, fontSize: 13, lineHeight: 18, color: ticket.onGround2 },
+
   actions: {
     flexDirection: 'row',
+    alignItems: 'flex-end',
+    columnGap: space.s2 + 2,
+    paddingHorizontal: space.s3 - 4,
+    paddingTop: space.s2 + 2,
+    paddingBottom: space.s3 - 4,
     borderTopWidth: 1,
     borderTopColor: ticket.rule,
     backgroundColor: ticket.ground,
   },
-  barAction: { flex: 1, minHeight: 56, alignItems: 'center', justifyContent: 'center' },
-  barActionPressed: { backgroundColor: ticket.ground3 },
-  barLabel: { fontFamily: fonts.latinText, fontSize: 15, color: ticket.onGround },
+  barAction: { flex: 1, minHeight: 52, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 4 },
+  barActionPrimary: { flex: 1.5, minHeight: 62, borderBottomWidth: 5 },
+  barActionPressed: { transform: [{ translateY: 3 }] },
+  barLabel: { fontFamily: fonts.display, fontSize: 21, lineHeight: 26, color: ticket.ink },
+  barLabelPrimary: { fontSize: 28, lineHeight: 32 },
 });

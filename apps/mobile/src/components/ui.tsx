@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { latinRuns } from '@sbr/core';
 import { Crest, Seam } from './Kit';
-import { border, colors, fonts, latinFace, radius, space, ticket, type, useCompact } from '../theme';
+import { border, colors, deepOf, fonts, latinFace, radius, space, ticket, type, useCompact } from '../theme';
 
 /**
  * A note that applies to every control in the app, not just the ones here:
@@ -174,7 +174,6 @@ export function PrimaryButton({
   tone?: 'primary' | 'plate';
 }) {
   const base = tone === 'plate' ? colors.surfacePlate : colors.surfacePrimary;
-  const pressedFill = tone === 'plate' ? colors.surfacePlateSoft : colors.surfacePrimaryDeep;
   return (
     <Pressable
       accessibilityRole="button"
@@ -184,7 +183,8 @@ export function PrimaryButton({
       onPress={onPress}
       style={({ pressed }) => [
         styles.primary,
-        { backgroundColor: pressed ? pressedFill : base },
+        { backgroundColor: base, borderBottomColor: deepOf(base) },
+        pressed && styles.primaryPressed,
         disabled && styles.primaryDisabled,
       ]}
     >
@@ -441,8 +441,10 @@ const styles = StyleSheet.create({
   headerCrestRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2 },
   back: { flexDirection: 'row', alignItems: 'center', gap: space.s1 },
   backGlyph: { fontSize: 22, lineHeight: 24, color: ticket.muted },
-  primary: { flex: 1, minHeight: 56, alignItems: 'center', justifyContent: 'center' },
-  primaryDisabled: { backgroundColor: ticket.ground3 },
+  primary: { flex: 1, minHeight: 56, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 5 },
+  /* The block drops onto its overprint. */
+  primaryPressed: { transform: [{ translateY: 3 }] },
+  primaryDisabled: { backgroundColor: ticket.ground3, borderBottomColor: ticket.rule },
   primaryDisabledLabel: { color: colors.textDisabled },
   ghost: {
     minHeight: 44,
