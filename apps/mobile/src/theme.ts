@@ -27,21 +27,57 @@ export function enforceRtl(): void {
   }
 }
 
+/**
+ * The punch ticket: the one source of colour. Everything else in this file, and
+ * every screen, takes its hex from here, so a re-skin is this block and nothing else.
+ *
+ * Flat stocks on a deep indigo ground. A stock says which card you pay with, so it
+ * is handed out from the clubs this person holds rather than fixed per club. Ink on
+ * every stock clears 4.5:1, and so does `void` on `dead`, the grey of a blocked
+ * ticket, which is why a verdict never relies on colour alone: it is also a word.
+ */
+export const stock = {
+  coral: '#FF7F5F',
+  marigold: '#F5C83E',
+  mint: '#76E5AD',
+  sky: '#79CEEF',
+  orchid: '#E8A8E1',
+  bone: '#E7DDC8',
+} as const;
+
+export const ticket = {
+  ground: '#14101F',
+  ground2: '#201A30',
+  ground3: '#30284A',
+  onGround: '#F4EEE0',
+  onGround2: '#D9D4E0',
+  muted: '#A9A3B8',
+  rule: '#463D63',
+  /** In the order the roll hands them out. */
+  stocks: [stock.coral, stock.marigold, stock.mint, stock.sky, stock.orchid, stock.bone],
+  dead: '#BDBFB8',
+  ink: '#14101F',
+  ink2: '#2A2240',
+  void: '#79000C',
+  /** The step still yours to do. The loudest thing on a ticket. */
+  punch: stock.marigold,
+} as const;
+
 export const colors = {
-  /** Page and cards share one fill: the roll's green-black ground. */
-  surfacePage: '#081711',
+  /** Page and cards share one fill: the roll's deep indigo ground. */
+  surfacePage: ticket.ground,
   /** The one raised tone: table headers, selected rows. */
-  surfaceRaised: '#13261E',
+  surfaceRaised: ticket.ground2,
   /** Inset wells — image placeholders, empty slots. */
-  surfaceInset: '#22352C',
+  surfaceInset: ticket.ground3,
 
   /** Mint: money kept, primary actions, satisfied conditions. Ink sits on it. */
-  surfacePrimary: '#76E5AD',
+  surfacePrimary: stock.mint,
   surfacePrimaryRaised: '#8FEBBD',
   surfacePrimaryDeep: '#4FC48A',
 
   /** Sky: what is yours to choose or do — a selected filter, an errand. */
-  surfaceAccent: '#79CEEF',
+  surfaceAccent: stock.sky,
   surfaceAccentRaised: '#9AD9F2',
   surfaceAccentDeep: '#4FAFD6',
 
@@ -50,26 +86,26 @@ export const colors = {
    * is why `textInverse` below is ink: "inverse" means "on a stock", not "on a
    * dark fill", now that the page itself is the dark one.
    */
-  surfacePlate: '#E7DDC8',
+  surfacePlate: stock.bone,
   surfacePlateSoft: '#CFC4A8',
 
-  textPrimary: '#F4EEE0',
-  textMuted: '#A2AFA4',
-  textDisabled: '#7C897F',
+  textPrimary: ticket.onGround,
+  textMuted: ticket.muted,
+  textDisabled: '#857E98',
   /** Ink: any text drawn on a stock, mint or sky fill. */
-  textInverse: '#081711',
-  textMutedInverse: '#152920',
+  textInverse: ticket.ink,
+  textMutedInverse: ticket.ink2,
   /** Muted text that has to sit on mint. */
-  textMutedOnPrimary: '#152920',
+  textMutedOnPrimary: ticket.ink2,
 
-  borderHairline: '#394D44',
+  borderHairline: ticket.rule,
   /** Interior separators inside an already-bordered block. */
-  borderHairlineSoft: '#22352C',
+  borderHairlineSoft: ticket.ground3,
   /** Separators drawn on the bone plate. */
   borderOnPlate: '#B5AB92',
 
   /** Expiry and the clock. A fill under ink, never text. */
-  accentUrgent: '#FF7F5F',
+  accentUrgent: stock.coral,
   accentUrgentBright: '#FF9A80',
   accentUrgentDeep: '#E5603E',
 
@@ -77,16 +113,16 @@ export const colors = {
    * Marigold: an errand you can still run. A fill under ink, and on the dark
    * ground it also reads as text, so the deep twin is the same colour.
    */
-  cardYellow: '#F5C83E',
-  cardYellowDeep: '#F5C83E',
+  cardYellow: stock.marigold,
+  cardYellowDeep: stock.marigold,
 
   /**
    * A condition the T&C fails: the dead grey of a blocked ticket with the void
    * red on it, as on the roll. `cardRedText` is the one form that has to read
    * as text on the dark ground.
    */
-  cardRed: '#BDBFB8',
-  cardRedDeep: '#79000C',
+  cardRed: ticket.dead,
+  cardRedDeep: ticket.void,
   cardRedText: '#FF9A8A',
 } as const;
 
@@ -105,42 +141,15 @@ export const colors = {
  */
 export const crestColors: Record<string, string> = {
   /** Claret — a credit card. */
-  credit_card: '#E8A8E1',
+  credit_card: stock.orchid,
   /** Violet — a workplace or union club. */
-  employer_club: '#79CEEF',
+  employer_club: stock.sky,
   /** Teal — a retail club. */
-  retail_club: '#E7DDC8',
+  retail_club: stock.bone,
 };
 
 /** A club with no category, or one added after this file was written. */
-export const crestFallback = '#BDBFB8';
-
-/**
- * The punch ticket: the new direction, on the home screen first. The rest of this
- * file is the football system, which the other screens still use until they move.
- *
- * Flat stocks on a green-black ground. A stock says which card you pay with, so it
- * is handed out from the clubs this person holds rather than fixed per club. Ink on
- * every stock clears 4.5:1, and so does `void` on `dead`, the grey of a blocked
- * ticket, which is why a verdict never relies on colour alone: it is also a word.
- */
-export const ticket = {
-  ground: '#081711',
-  ground2: '#13261E',
-  ground3: '#22352C',
-  onGround: '#F4EEE0',
-  onGround2: '#D2D6C8',
-  muted: '#A2AFA4',
-  rule: '#394D44',
-  /** Coral, marigold, mint, sky, orchid, bone. */
-  stocks: ['#FF7F5F', '#F5C83E', '#76E5AD', '#79CEEF', '#E8A8E1', '#E7DDC8'],
-  dead: '#BDBFB8',
-  ink: '#081711',
-  ink2: '#152920',
-  void: '#79000C',
-  /** The step still yours to do. The loudest thing on a ticket. */
-  punch: '#F5C83E',
-} as const;
+export const crestFallback = ticket.dead;
 
 export const fonts = {
   /** EFT_OffSet — headlines and figures */

@@ -31,18 +31,18 @@ export function StatsScreen({ onBack }: { onBack: () => void }) {
       <ScreenHeader eyebrow="30 ימי בדיקה" title="האם זה עובד" onBack={onBack} />
 
       {/* The KPI is a figure that matters, so it is a bone ticket of its own. */}
-      <Panel style={styles.hero}>
+      <Panel style={{ backgroundColor: met ? colors.surfacePrimary : ratio == null ? colors.surfacePlate : ticket.stocks[0] }}>
         <Text style={styles.heroLabel}>יחס השפעה על החלטה</Text>
         {/* A 58px em-dash reads as a broken element, not as "no data". Say it. */}
         {ratio == null ? (
           <Text style={styles.ratioEmpty}>טרם נמדד</Text>
         ) : (
-          <Text style={[styles.ratio, met && styles.ratioMet]}>{Math.round(ratio * 100)}%</Text>
+          <Text style={styles.ratio}>{Math.round(ratio * 100)}%</Text>
         )}
         {/* Both layers are flex rows, so the bar grows from the reading edge in
             either direction — `start`/`left` offsets do not survive RTL on web. */}
         <View style={styles.track}>
-          <View style={[styles.fill, met && styles.fillMet, { width: `${fill * 100}%` }]} />
+          <View style={[styles.fill, { width: `${fill * 100}%` }]} />
           <View style={styles.targetRow} pointerEvents="none">
             <View style={{ width: `${TARGET * 100}%` }} />
             <View style={styles.target} />
@@ -103,26 +103,23 @@ function Row({ label, value }: { label: string; value: number }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: ticket.ground },
   content: { paddingBottom: space.s6, gap: space.s3 },
-  hero: { backgroundColor: colors.surfacePlate },
-  heroLabel: { ...type.meta, color: colors.textMutedInverse },
-  heroCaption: { ...type.caption, color: colors.textMutedInverse },
-  heroBody: { ...type.small, color: colors.textMutedInverse },
-  ratio: { ...type.figureLarge, color: colors.textMutedInverse },
-  ratioMet: { color: '#0B6B45' },
-  ratioEmpty: { ...type.displaySmall, color: colors.textMutedInverse },
+  heroLabel: { ...type.meta, color: colors.textInverse },
+  heroCaption: { ...type.caption, color: colors.textInverse },
+  heroBody: { ...type.small, color: colors.textInverse },
+  ratio: { ...type.figureLarge },
+  ratioEmpty: { ...type.displaySmall, color: colors.textInverse },
+  /* A dark bar on the stock: cream for what was reached, marigold for the target. */
   track: {
-    height: 8,
+    height: 10,
     alignSelf: 'stretch',
-    backgroundColor: colors.surfacePlateSoft,
+    backgroundColor: ticket.ink,
     marginTop: space.s2,
     flexDirection: 'row',
   },
-  /* The plate is bone, so the bar is drawn in the ticket's void red and deep green. */
-  fill: { backgroundColor: ticket.void },
-  fillMet: { backgroundColor: '#0B6B45' },
+  fill: { backgroundColor: ticket.onGround },
   /* The target sits on the bar itself — a percentage without its bar is just a number. */
   targetRow: { ...StyleSheet.absoluteFillObject, top: -3, bottom: -3, flexDirection: 'row' },
-  target: { width: 2, backgroundColor: colors.textInverse },
+  target: { width: 3, backgroundColor: ticket.punch },
   trackLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
