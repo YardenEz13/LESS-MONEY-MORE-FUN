@@ -1,6 +1,66 @@
 import { describe, expect, it } from 'vitest';
-import { formatSaving, latinRuns } from '../src/format';
-import type { Evaluation } from '../src/matching';
+import { displayMerchantName, formatSaving, latinRuns, ticketFace } from '../src/format';
+import type { Evaluation, Gate } from '../src/matching';
+
+const gate = (code: Gate['code'], state: Gate['state'], label: string, actionable = false): Gate => ({
+  code,
+  state,
+  label,
+  detail: `${label} — פירוט`,
+  actionable,
+});
+
+describe('ticketFace', () => {
+  const face = (status: Evaluation['status'], gates: Gate[], maxHoles?: number) =>
+    ticketFace(
+      { status, gates, blockers: [], actionsRequired: gates.filter((g) => g.state === 'pending' && g.actionable) },
+      maxHoles,
+    );
+
+  it('says pay when nothing is left, and gives a caveat no hole', () => {
+    const result = face('conditional', [gate('stacking', 'pending', 'כפל?'), gate('freshness', 'met', 'מאומת')]);
+    expect(result.state).toBe('ready');
+    expect(result.verdict).toBe('אפשר לשלם');
+    expect(result.holes).toEqual([{ code: 'freshness', label: 'מאומת', state: 'punched' }]);
+  });
+
+  it('names the one step left, and counts several', () => {
+    const voucher = gate('voucher', 'pending', 'שובר מראש', true);
+    const spend = gate('min_spend', 'pending', '₪300+', true);
+    expect(face('conditional', [voucher]).verdict).toBe('עוד צעד: שובר מראש');
+    expect(face('conditional', [voucher]).holes[0]!.state).toBe('open');
+    expect(face('conditional', [voucher, spend]).verdict).toBe('עוד 2 צעדים');
+  });
+
+  it('stamps a blocked ticket with the condition that failed', () => {
+    const result = face('blocked', [gate('hours', 'blocked', '13:30-14:45'), gate('day', 'met', 'א׳-ה׳')]);
+    expect(result.state).toBe('blocked');
+    expect(result.stamp).toBe('לא עכשיו');
+    expect(result.verdict).toBe('13:30-14:45, פירוט');
+    expect(result.holes.map((h) => h.state)).toEqual(['bad', 'punched']);
+  });
+
+  it('drops satisfied holes first when the rail is full', () => {
+    const result = face(
+      'conditional',
+      [gate('voucher', 'pending', 'שובר', true), gate('day', 'met', 'יום'), gate('hours', 'met', 'שעה')],
+      2,
+    );
+    expect(result.holes.map((h) => h.code)).toEqual(['voucher', 'day']);
+  });
+});
+
+describe('displayMerchantName', () => {
+  it('drops what follows the source separator', () => {
+    expect(displayMerchantName('הוט סינמה - HOT CINEMA')).toBe('הוט סינמה');
+    expect(displayMerchantName('ספא אקויה אילת | SPA AKOYA')).toBe('ספא אקויה אילת');
+  });
+
+  it('leaves a hyphen inside a name alone', () => {
+    expect(displayMerchantName('סופר-פארם')).toBe('סופר-פארם');
+    expect(displayMerchantName('Terminal-X')).toBe('Terminal-X');
+  });
+});
 
 /** Shorthand: "Hebrew|LATIN|Hebrew" so the expectations stay readable. */
 const shape = (text: string) =>

@@ -157,6 +157,33 @@ export const crestColors: Record<string, string> = {
 /** A club with no category, or one added after this file was written. */
 export const crestFallback = colors.surfacePlate;
 
+/**
+ * The punch ticket: the new direction, on the home screen first. The rest of this
+ * file is the football system, which the other screens still use until they move.
+ *
+ * Flat stocks on a green-black ground. A stock says which card you pay with, so it
+ * is handed out from the clubs this person holds rather than fixed per club. Ink on
+ * every stock clears 4.5:1, and so does `void` on `dead`, the grey of a blocked
+ * ticket, which is why a verdict never relies on colour alone: it is also a word.
+ */
+export const ticket = {
+  ground: '#081711',
+  ground2: '#13261E',
+  ground3: '#22352C',
+  onGround: '#F4EEE0',
+  onGround2: '#D2D6C8',
+  muted: '#A2AFA4',
+  rule: '#394D44',
+  /** Coral, marigold, mint, sky, orchid, bone. */
+  stocks: ['#FF7F5F', '#F5C83E', '#76E5AD', '#79CEEF', '#E8A8E1', '#E7DDC8'],
+  dead: '#BDBFB8',
+  ink: '#081711',
+  ink2: '#152920',
+  void: '#79000C',
+  /** The step still yours to do. The loudest thing on a ticket. */
+  punch: '#F5C83E',
+} as const;
+
 export const fonts = {
   /** EFT_OffSet — headlines and figures */
   displayLight: 'EFT_OffSet',

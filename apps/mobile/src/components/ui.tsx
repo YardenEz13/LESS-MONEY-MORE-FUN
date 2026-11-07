@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { latinRuns } from '@sbr/core';
 import { Crest, PitchStripes, ScarfBand } from './Kit';
-import { border, colors, fonts, kit, latinFace, radius, space, type, useCompact } from '../theme';
+import { border, colors, fonts, kit, latinFace, radius, space, ticket, type, useCompact } from '../theme';
 
 /**
  * A note that applies to every control in the app, not just the ones here:
@@ -336,22 +336,26 @@ export function SearchField({
   onChange,
   placeholder,
   resultCount,
+  tone = 'paper',
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
   /** Shown once something has been typed, so a short list reads as filtered rather than empty. */
   resultCount?: number;
+  /** `ink` for the punch ticket's dark ground. */
+  tone?: 'paper' | 'ink';
 }) {
+  const ink = tone === 'ink';
   return (
     <View style={styles.searchWrap}>
-      <View style={styles.search}>
+      <View style={[styles.search, ink && styles.searchInk]}>
         <TextInput
           value={value}
           onChangeText={onChange}
           placeholder={placeholder}
-          placeholderTextColor={colors.textMuted}
-          style={styles.searchInput}
+          placeholderTextColor={ink ? ticket.onGround2 : colors.textMuted}
+          style={[styles.searchInput, ink && styles.searchInputInk]}
           accessibilityLabel={placeholder}
           autoCorrect={false}
           autoCapitalize="none"
@@ -365,12 +369,12 @@ export function SearchField({
             accessibilityLabel="נקה חיפוש"
             style={styles.searchClear}
           >
-            <Text style={styles.searchClearMark}>×</Text>
+            <Text style={[styles.searchClearMark, ink && styles.searchMutedInk]}>×</Text>
           </Pressable>
         )}
       </View>
       {value.trim().length > 0 && resultCount != null && (
-        <Text style={styles.searchCount}>
+        <Text style={[styles.searchCount, ink && styles.searchMutedInk]}>
           {resultCount === 0 ? 'אין תוצאות' : `${resultCount} תוצאות`}
         </Text>
       )}
@@ -583,6 +587,9 @@ const styles = StyleSheet.create({
   searchClear: { paddingHorizontal: space.s2, paddingVertical: space.s1 },
   searchClearMark: { ...type.body, color: colors.textMuted, fontSize: 20, lineHeight: 22 },
   searchCount: { ...type.caption, paddingHorizontal: space.s1 },
+  searchInk: { backgroundColor: ticket.ground2, borderColor: ticket.muted },
+  searchInputInk: { color: ticket.onGround },
+  searchMutedInk: { color: ticket.onGround2 },
   filterRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',

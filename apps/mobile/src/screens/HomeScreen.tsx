@@ -1,21 +1,31 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  AccessibilityInfo,
+  ActivityIndicator,
+  Animated,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {
   catalogIsStale,
+  displayMerchantName,
   findCombos,
   hiddenBenefitIds,
   matchesQuery,
   rankBenefits,
   REFERENCE_BASKET_ILS,
+  type BlockerCode,
   type Combo,
   type Coordinates,
   type Evaluation,
   type UserProfile,
   type Venue,
 } from '@sbr/core';
-import { BenefitCard } from '../components/BenefitCard';
-import { Crest, PitchStripes, ScarfBand } from '../components/Kit';
-import { FilterRow, GhostButton, Hero, LivePill, SearchField, Text } from '../components/ui';
+import { Seam, stockFor, Ticket, wallOffset, type TicketSize } from '../components/Ticket';
+import { LivePill, SearchField, Text } from '../components/ui';
 import {
   benefits,
   benefitsAtVenue,
@@ -27,9 +37,7 @@ import {
   venues,
 } from '../services/catalog';
 import { currentVenue, dwellMinutes } from '../services/geofencing';
-import { border, colors, radius, space, type, useCompact } from '../theme';
-
-type Filter = 'all' | 'ready' | 'conditional';
+import { fonts, space, ticket } from '../theme';
 
 /**
  * How far "here" reaches when the fix lands outside every mall.
@@ -40,6 +48,23 @@ type Filter = 'all' | 'ready' | 'conditional';
  * driving complains, not before.
  */
 const WALKING_RADIUS_M = 500;
+
+/** Blocked for a reason about this person's list, not about today: never shown. */
+const NEVER_LISTED: ReadonlySet<BlockerCode> = new Set<BlockerCode>([
+  'program_not_owned',
+  'muted',
+  'low_confidence',
+]);
+
+/** Bone: a combo belongs to two clubs, so it takes neither club's stock. */
+const COMBO_STOCK = ticket.stocks[5];
+
+type Row =
+  | { kind: 'head'; key: string; title: string }
+  | { kind: 'ticket'; key: string; evaluation: Evaluation; size: TicketSize }
+  | { kind: 'combo'; key: string; combo: Combo }
+  | { kind: 'empty'; key: string }
+  | { kind: 'fold'; key: string; count: number };
 
 interface Props {
   profile: UserProfile;
@@ -60,8 +85,8 @@ export function HomeScreen({
   onOpenStats,
   onOpenAdvisor,
 }: Props) {
-  const [filter, setFilter] = useState<Filter>('all');
   const [query, setQuery] = useState('');
+  const [foldOpen, setFoldOpen] = useState(false);
 
   /** Where the user is. Null means "everywhere" — the default, not an error. */
   const [venue, setVenue] = useState<Venue | null>(null);
@@ -106,61 +131,119 @@ export function HomeScreen({
     setHere(where.venue ? null : where.here);
   }, []);
 
+  /** The wall behind the holes holds still on screen while the roll scrolls over it. */
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const wall = useMemo(() => wallOffset(scrollY), [scrollY]);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => {
+    void AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
+    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+    return () => subscription.remove();
+  }, []);
+  const glide = reduceMotion ? null : wall;
+
+  const owned = useMemo(() => ownedProgramIds(profile.program_ids), [profile.program_ids]);
+
   // Channel is left unset here: the user isn't at a till or in a checkout yet,
-  // so an in-store-only benefit is a note rather than a blocker.
-  const evaluations = useMemo(
+  // so an in-store-only benefit is a note rather than a blocker. Blocked rows are
+  // kept this time, because "not now" is an answer worth folding, not hiding.
+  const ranked = useMemo(() => {
+    const mine = new Set(owned);
+    return rankBenefits(
+      benefits.filter((b) => mine.has(b.program_id)),
+      { now: new Date(), ownedProgramIds: owned, mutedBenefitIds: hiddenBenefitIds(profile) },
+      { hideBlocked: false },
+    );
+  }, [owned, profile.muted_benefit_ids, profile.rejected_benefit_ids]);
+
+  const evaluations = useMemo(() => ranked.filter((e) => e.status !== 'blocked'), [ranked]);
+  const notNow = useMemo(
     () =>
-      rankBenefits(benefits, {
-        now: new Date(),
-        ownedProgramIds: ownedProgramIds(profile.program_ids),
-        mutedBenefitIds: hiddenBenefitIds(profile),
-      }),
-    [profile.program_ids, profile.muted_benefit_ids],
+      ranked.filter(
+        (e) => e.status === 'blocked' && !e.blockers.some((b) => NEVER_LISTED.has(b.code)),
+      ),
+    [ranked],
   );
 
   // Checked against the whole catalog rather than the filtered list: the answer
   // is about the bundle's age, not about what this user happens to hold.
   const catalogStale = useMemo(() => catalogIsStale(benefits, new Date()), []);
 
-  // Two offers on one purchase. Shown above the list because a combo is the
-  // one thing a user cannot work out by scrolling — it only exists between
-  // two cards, never on either of them.
+  // Two offers on one purchase. Kept high in the roll because a combo is the one
+  // thing a user cannot work out by scrolling — it only exists between two
+  // tickets, never on either of them.
   const combos = useMemo(() => findCombos(evaluations, { limit: 2 }), [evaluations]);
 
   // Readiness is "nothing left to do", not "no caveats at all" — see Gate
   // in @sbr/core. Counting caveats here would make the number permanently 0.
-  const ready = evaluations.filter((e) => e.actionsRequired.length === 0);
-  const conditional = evaluations.filter((e) => e.actionsRequired.length > 0);
-  const byFilter = filter === 'ready' ? ready : filter === 'conditional' ? conditional : evaluations;
+  const readyCount = useMemo(
+    () => evaluations.filter((e) => e.actionsRequired.length === 0).length,
+    [evaluations],
+  );
 
-  // A chosen venue narrows whatever the filter already selected, rather than
-  // replacing it — "ready, here" is the question someone standing in a mall
-  // is actually asking.
   const hereIds = useMemo(() => {
     if (venue) return new Set(benefitsAtVenue(venue.id).map((b) => b.id));
     if (here) return new Set(benefitsNear(here, WALKING_RADIUS_M).map((b) => b.id));
     return null;
   }, [venue, here]);
-  const atPlace = hereIds ? byFilter.filter((e) => hereIds.has(e.benefit.id)) : byFilter;
 
   // Searched over the trade and city as well as the name, because most of the
   // catalog is businesses nobody has heard of: "מכולת" and "גבעתיים" are how you
-  // find one whose name you never knew — the same line the card already shows.
-  const shown = useMemo(
-    () =>
-      query.trim() === ''
-        ? atPlace
-        : atPlace.filter((e) =>
-            matchesQuery(
-              [e.benefit.merchant_name, merchantLine(e.benefit.merchant_id), programNames[e.benefit.program_id]],
-              query,
-            ),
-          ),
-    [atPlace, query],
+  // find one whose name you never knew — the same line the ticket already shows.
+  const visible = useCallback(
+    (e: Evaluation) =>
+      (!hereIds || hereIds.has(e.benefit.id)) &&
+      (query.trim() === '' ||
+        matchesQuery(
+          [e.benefit.merchant_name, merchantLine(e.benefit.merchant_id), programNames[e.benefit.program_id]],
+          query,
+        )),
+    [hereIds, query],
   );
 
-  // Counted off `evaluations`, not `shown`: the plate reports what this place is
-  // worth to the user, and must not drop when they tick a filter above it.
+  const shownLive = useMemo(() => evaluations.filter(visible), [evaluations, visible]);
+  const shownNotNow = useMemo(() => notNow.filter(visible), [notNow, visible]);
+
+  const rows = useMemo<Row[]>(() => {
+    const out: Row[] = [];
+    const toRow = (evaluation: Evaluation, size: TicketSize): Row => ({
+      kind: 'ticket',
+      key: evaluation.benefit.id,
+      evaluation,
+      size,
+    });
+    // A combo answers the same question as the list under it: both halves have to
+    // be here and match the search, or it is an offer for somewhere else.
+    const comboRows = combos
+      .filter((combo) => combo.parts.every(visible))
+      .map((combo): Row => ({ kind: 'combo', key: combo.parts.map((p) => p.benefit.id).join('+'), combo }));
+    const ready = shownLive.filter((e) => e.actionsRequired.length === 0);
+    const steps = shownLive.filter((e) => e.actionsRequired.length > 0);
+
+    // One big ticket: the answer. Then the combos, then everything else mid, so
+    // the first thing that needs doing is not several screens down.
+    if (ready.length > 0) {
+      out.push({ kind: 'head', key: 'head-ready', title: 'תקף עכשיו' });
+      ready.forEach((e, i) => {
+        out.push(toRow(e, i === 0 ? 'big' : 'mid'));
+        if (i === 0) out.push(...comboRows);
+      });
+    }
+    if (steps.length > 0) {
+      out.push({ kind: 'head', key: 'head-steps', title: 'עוד צעד ממך' });
+      if (ready.length === 0) out.push(...comboRows);
+      steps.forEach((e) => out.push(toRow(e, 'mid')));
+    }
+    if (shownLive.length === 0) out.push({ kind: 'empty', key: 'empty' });
+    if (shownNotNow.length > 0) {
+      out.push({ kind: 'fold', key: 'fold', count: shownNotNow.length });
+      if (foldOpen) shownNotNow.forEach((e) => out.push(toRow(e, 'slim')));
+    }
+    return out;
+  }, [combos, foldOpen, shownLive, shownNotNow, visible]);
+
+  // Counted off `evaluations`, not the visible rows: this reports what the place
+  // is worth to the user, and must not drop as they type in the search below it.
   const hereCount = hereIds ? evaluations.filter((e) => hereIds.has(e.benefit.id)).length : 0;
 
   /**
@@ -179,147 +262,173 @@ export function HomeScreen({
     [evaluations],
   );
 
-  return (
-    <View style={styles.screen}>
-      {/* The hero: the one dominant green surface, per the design system. */}
-      <Hero
-        eyebrow="מה שכבר יש לך"
-        title="ההטבות שלך"
-        right={
-          <View style={styles.actions}>
-            <IconAction label="שאל" onPress={onOpenAdvisor} />
-            <IconAction label="מדדים" onPress={onOpenStats} />
-            <IconAction label="הגדרות" onPress={onOpenSettings} />
-          </View>
-        }
-      >
-        {/* The count is the page's thesis: not "12 deals!", but how many of them
-            you can actually use right now. */}
-        <Text style={styles.headerLine}>
-          <Text style={styles.headerFigure}>{ready.length}</Text>
-          {'  '}מוכנות לשימוש מתוך {evaluations.length} רלוונטיות
-        </Text>
-
-        <WhereAmI
-          venue={venue}
-          nearby={here != null}
-          count={hereCount}
-          minute={minute}
-          locating={locating}
-          onLocate={locate}
-          onPick={() => setPicking(true)}
-          onClear={() => {
-            setVenue(null);
-            setHere(null);
-          }}
-        />
-      </Hero>
-
-      {picking && (
-        <VenueSheet
-          countAt={countAt}
-          onChoose={(chosen) => {
-            setVenue(chosen);
-            setHere(null);
-            setPicking(false);
-          }}
-          onClose={() => setPicking(false)}
-        />
-      )}
-
-      <FilterRow<Filter>
-        value={filter}
-        onChange={setFilter}
-        options={[
-          { value: 'all', label: 'הכול', count: evaluations.length },
-          { value: 'ready', label: 'מוכן לקופה', count: ready.length },
-          { value: 'conditional', label: 'דורש פעולה', count: conditional.length },
-        ]}
-      />
-
-      <SearchField
-        value={query}
-        onChange={setQuery}
-        placeholder="חיפוש בית עסק, תחום או עיר"
-        resultCount={shown.length}
-      />
-
-      {/* FlatList, not map-in-a-ScrollView: someone holding a few clubs has
-          thousands of rows, and mounting them all froze the screen on a phone. */}
-      <FlatList
-        data={shown}
-        keyExtractor={(evaluation) => evaluation.benefit.id}
-        renderItem={({ item }) => <BenefitCard evaluation={item} onPress={() => onSelect(item)} />}
-        initialNumToRender={12}
-        windowSize={7}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={
-          <>
-            {/* Geofencing armed is the one genuinely live state in the app, so it
-                gets the system's live marker. Off keeps the quiet square — a pill
-                that is always there stops meaning "now". */}
-            <View style={[styles.geofence, geofenceActive && styles.geofenceOn]}>
-              {geofenceActive && <PitchStripes />}
-              {geofenceActive ? <LivePill /> : <View style={[styles.dot, styles.dotOff]} />}
-              <Text style={[type.caption, geofenceActive && styles.geofenceOnText]}>
-                {geofenceStatus}
-              </Text>
-            </View>
-
-            {filter === 'all' &&
-              combos.map((combo) => (
-                <ComboCard
-                  key={combo.parts.map((p) => p.benefit.id).join('+')}
-                  combo={combo}
-                  onPress={() => onSelect(combo.parts[0])}
-                />
-              ))}
-          </>
-        }
-        ListEmptyComponent={
-          query.trim() !== '' ? (
+  const renderRow = useCallback(
+    ({ item }: { item: Row }) => {
+      switch (item.kind) {
+        case 'head':
+          return (
+            <Text accessibilityRole="header" style={styles.rollHead}>
+              {item.title}
+            </Text>
+          );
+        case 'ticket':
+          return (
+            <Ticket
+              evaluation={item.evaluation}
+              size={item.size}
+              stock={stockFor(item.evaluation.benefit.program_id, owned)}
+              onPress={onSelect}
+              glide={glide}
+            />
+          );
+        case 'combo':
+          return <ComboTicket combo={item.combo} onPress={() => onSelect(item.combo.parts[0])} />;
+        case 'fold':
+          return (
+            <Pressable
+              accessibilityRole="button"
+              aria-expanded={foldOpen}
+              accessibilityLabel={`לא עכשיו, ${item.count} הטבות`}
+              onPress={() => setFoldOpen((open) => !open)}
+              style={styles.fold}
+            >
+              <Text style={styles.foldTitle}>לא עכשיו ({item.count})</Text>
+              <Text style={styles.foldAction}>{foldOpen ? 'סגירה' : 'פתיחה'}</Text>
+            </Pressable>
+          );
+        case 'empty':
+          return query.trim() !== '' ? (
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>אין תוצאות</Text>
               <Text style={styles.emptyBody}>
                 {`לא נמצא בית עסק שמתאים ל״${query.trim()}״ מבין ${evaluations.length} ההטבות שלך.`}
               </Text>
-              <GhostButton label="נקה חיפוש" onPress={() => setQuery('')} />
+              <InkButton label="נקה חיפוש" onPress={() => setQuery('')} />
             </View>
           ) : (
             <EmptyState
-              filter={filter}
               hasPrograms={profile.program_ids.length > 0}
               here={hereIds && !venue ? here : null}
               catalogStale={catalogStale}
               onEditPrograms={onOpenSettings}
             />
-          )
-        }
-        ListFooterComponent={
-          <>
-            {/* Full time. The same band that closes the hero closes the list, so
-                the reader knows the scroll ended rather than stalled. */}
-            <ScarfBand style={styles.listEnd} />
-            <Text style={styles.footnote}>
-              הטבות שתנאי בהן לא מתקיים כרגע — יום, שעה, תוקף או אימות ישן — לא מוצגות כאן בכלל.
+          );
+      }
+    },
+    [
+      catalogStale,
+      evaluations.length,
+      foldOpen,
+      glide,
+      here,
+      hereIds,
+      onOpenSettings,
+      onSelect,
+      owned,
+      profile.program_ids.length,
+      query,
+      venue,
+    ],
+  );
+
+  const pinned = venue != null || here != null;
+
+  return (
+    <View style={styles.screen}>
+      {/* FlatList, not map-in-a-ScrollView: someone holding a few clubs has
+          thousands of rows, and mounting them all froze the screen on a phone. */}
+      <Animated.FlatList
+        data={rows}
+        keyExtractor={(row: Row) => row.key}
+        renderItem={renderRow}
+        initialNumToRender={12}
+        windowSize={7}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.list}
+        scrollEventThrottle={16}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: Platform.OS !== 'web',
+        })}
+        ListHeaderComponent={
+          <View style={styles.head}>
+            <Text accessibilityRole="header" style={styles.title}>
+              {pinned ? 'מה אפשר פה עכשיו' : 'מה אפשר עכשיו'}
             </Text>
-          </>
+            {/* The count is the page's thesis: not "12 deals!", but how many of
+                them you can actually use right now. */}
+            <Text style={styles.count}>
+              <Text style={styles.countFigure}>{readyCount}</Text>
+              {'  '}מוכנות לשימוש מתוך {evaluations.length} רלוונטיות
+            </Text>
+
+            <WhereAmI
+              venue={venue}
+              nearby={here != null}
+              count={hereCount}
+              minute={minute}
+              locating={locating}
+              onLocate={locate}
+              onPick={() => setPicking(true)}
+              onClear={() => {
+                setVenue(null);
+                setHere(null);
+              }}
+            />
+
+            {picking && (
+              <VenueSheet
+                countAt={countAt}
+                onChoose={(chosen) => {
+                  setVenue(chosen);
+                  setHere(null);
+                  setPicking(false);
+                }}
+                onClose={() => setPicking(false)}
+              />
+            )}
+
+            {/* Geofencing armed is the one genuinely live state in the app, so it
+                gets the live marker. Off is plain words: a pill that is always
+                there stops meaning "now". */}
+            <View style={styles.geofence}>
+              {geofenceActive && <LivePill />}
+              <Text style={styles.geofenceText}>{geofenceStatus}</Text>
+            </View>
+
+            <View style={styles.searchRow}>
+              <SearchField
+                tone="ink"
+                value={query}
+                onChange={setQuery}
+                placeholder="חיפוש בית עסק, תחום או עיר"
+                resultCount={shownLive.length}
+              />
+            </View>
+          </View>
         }
       />
+
+      {/* At the bottom, where a thumb reaches while the other hand holds a wallet. */}
+      <View style={styles.actions}>
+        <BarAction label="שאל" onPress={onOpenAdvisor} />
+        <BarAction label="מדדים" onPress={onOpenStats} />
+        <BarAction label="הגדרות" onPress={onOpenSettings} />
+      </View>
     </View>
   );
 }
 
 /**
- * A stackable pair. Deliberately does not look like a BenefitCard: the plate
- * carries a sum that is an *estimate of a combination*, which is a weaker claim
- * than the figure on a single card, and the strip says so rather than hiding it.
+ * A stackable pair. Printed apart from a benefit: the figure is an *estimate of a
+ * combination*, which is a weaker claim than a single ticket's, and the last line
+ * says so rather than hiding it.
  */
-function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
+function ComboTicket({ combo, onPress }: { combo: Combo; onPress: () => void }) {
   const [first, second] = combo.parts;
-  const compact = useCompact();
+  const firstName = displayMerchantName(first.benefit.merchant_name);
+  const secondName = displayMerchantName(second.benefit.merchant_name);
+  const estimate = `₪${Math.round(combo.estimatedSavingIls)}`;
   return (
     <Pressable
       accessibilityRole="button"
@@ -327,71 +436,48 @@ function ComboCard({ combo, onPress }: { combo: Combo; onPress: () => void }) {
         combo.estimatedSavingIls,
       )} שקלים`}
       onPress={onPress}
-      style={({ pressed }) => [styles.combo, pressed && { backgroundColor: colors.surfaceRaised }]}
+      style={({ pressed }) => [styles.combo, pressed && styles.pressed]}
     >
+      <Seam />
       <View style={styles.comboTop}>
         <View style={styles.comboIdentity}>
-          {/* Both crests, because a combo is the one card that belongs to two
-              clubs at once and the pair is the whole point of it. */}
-          <View style={styles.comboCrests}>
-            <Crest programId={first.benefit.program_id} size={20} />
-            <Crest programId={second.benefit.program_id} size={20} />
-            <Text style={styles.comboEyebrow} numberOfLines={1}>
-              אפשר לשלב · {combo.merchantName}
-            </Text>
-          </View>
-          <Text style={type.lead} numberOfLines={2}>
+          <Text style={styles.comboLine} numberOfLines={1}>
+            אפשר לשלב ב{displayMerchantName(combo.merchantName)}
+          </Text>
+          <Text style={styles.comboName} numberOfLines={2}>
             {first.benefit.merchant_name === second.benefit.merchant_name
               ? `${programNames[first.benefit.program_id]} + ${programNames[second.benefit.program_id]}`
-              : `${first.benefit.merchant_name} + ${second.benefit.merchant_name}`}
+              : `${firstName} + ${secondName}`}
           </Text>
         </View>
-        <View style={styles.comboRule} />
-        <View style={[styles.comboPlate, compact && styles.comboPlateCompact]}>
-          <Text
-            style={[styles.comboFigure, compact && styles.comboFigureCompact]}
-            numberOfLines={1}
-            adjustsFontSizeToFit
-          >
-            ₪{Math.round(combo.estimatedSavingIls)}
+        <View style={styles.comboFigureCol}>
+          <Text style={styles.comboFigure} numberOfLines={1}>
+            {estimate}
           </Text>
-          <Text style={styles.comboPlateUnit}>יחד</Text>
+          {/* The figure assumes a cart, since a list screen has none. Printed under
+              the number, where no line clamp can cut it off. */}
+          <Text style={styles.comboLine}>
+            {combo.isEstimate ? `יחד, בסל של ₪${REFERENCE_BASKET_ILS}` : 'יחד'}
+          </Text>
         </View>
       </View>
-
-      <View style={styles.comboBody}>
-        <Text style={type.caption}>
-          {first.benefit.conditions.raw_text_summary}
-        </Text>
-        <Text style={type.caption}>{second.benefit.conditions.raw_text_summary}</Text>
-      </View>
-
-      <View style={styles.comboFooter}>
-        <View
-          style={[
-            styles.marker,
-            { backgroundColor: combo.confirmed ? colors.surfacePrimary : colors.accentUrgent },
-          ]}
-        />
-        <Text style={[type.caption, styles.comboVerdict]} numberOfLines={2}>
-          {[
-            combo.confirmed
-              ? 'שני התקנונים מתירים כפל · ההערכה לפי הסדר הפחות מיטיב'
-              : combo.caveats.join(' · '),
-            // The plate figure assumes a cart, since a list screen has none —
-            // named here rather than left for the number to imply it's real.
-            combo.isEstimate ? `לפי סל לדוגמה של ₪${REFERENCE_BASKET_ILS}` : null,
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-        </Text>
-      </View>
+      <Text style={styles.comboLine} numberOfLines={1}>
+        {first.benefit.conditions.raw_text_summary}
+      </Text>
+      <Text style={styles.comboLine} numberOfLines={1}>
+        {second.benefit.conditions.raw_text_summary}
+      </Text>
+      <Text style={styles.comboVerdict} numberOfLines={2}>
+        {combo.confirmed
+          ? 'שני התקנונים מתירים כפל · ההערכה לפי הסדר הפחות מיטיב'
+          : combo.caveats.join(' · ')}
+      </Text>
     </Pressable>
   );
 }
 
 /**
- * "Where are you" — the foreground half of location, living inside the hero.
+ * "Where are you" — the foreground half of location.
  *
  * Two affordances rather than one because GPS is not reliable indoors, which
  * is exactly where a mall is: the locate button is the fast path, the manual
@@ -422,8 +508,7 @@ function WhereAmI({
     return (
       <View style={styles.whereRow}>
         <View style={styles.whereActive}>
-          {/* Being somewhere is the app's kick-off, so the pinned plate runs the
-              clock. No entry event, no minute — see `dwellMinutes`. */}
+          {/* No entry event, no minute — see `dwellMinutes`. */}
           {minute != null && <LivePill minute={minute} />}
           <Text style={styles.whereActiveText} numberOfLines={1}>
             {venue ? venue.name : 'קרוב אליך'} · {count} הטבות כאן
@@ -433,9 +518,9 @@ function WhereAmI({
           accessibilityRole="button"
           accessibilityLabel="הצג הטבות מכל המיקומים"
           onPress={onClear}
-          style={styles.whereGhost}
+          style={styles.whereButton}
         >
-          <Text style={styles.whereGhostLabel}>הכול</Text>
+          <Text style={styles.whereLabel}>הכול</Text>
         </Pressable>
       </View>
     );
@@ -447,21 +532,21 @@ function WhereAmI({
         accessibilityLabel="אתר את המיקום שלי"
         onPress={onLocate}
         disabled={locating}
-        style={styles.whereGhost}
+        style={styles.whereButton}
       >
         {locating ? (
-          <ActivityIndicator size="small" color={colors.textInverse} />
+          <ActivityIndicator size="small" color={ticket.onGround} />
         ) : (
-          <Text style={styles.whereGhostLabel}>איפה אני?</Text>
+          <Text style={styles.whereLabel}>איפה אני?</Text>
         )}
       </Pressable>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="בחר מיקום מתוך רשימה"
         onPress={onPick}
-        style={styles.whereGhost}
+        style={styles.whereButton}
       >
-        <Text style={styles.whereGhostLabel}>בחר מיקום</Text>
+        <Text style={styles.whereLabel}>בחר מיקום</Text>
       </Pressable>
     </View>
   );
@@ -480,17 +565,17 @@ function VenueSheet({
   return (
     <View style={styles.sheet}>
       <View style={styles.sheetHead}>
-        <Text style={type.bodyStrong}>איפה אתה עכשיו?</Text>
+        <Text style={styles.sheetTitle}>איפה אתה עכשיו?</Text>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="סגור"
           onPress={onClose}
           hitSlop={12}
         >
-          <Text style={type.meta}>סגור</Text>
+          <Text style={styles.sheetClose}>סגור</Text>
         </Pressable>
       </View>
-      <ScrollView style={styles.sheetList} keyboardShouldPersistTaps="handled">
+      <ScrollView style={styles.sheetList} nestedScrollEnabled keyboardShouldPersistTaps="handled">
         {venues.map((v) => (
           <Pressable
             key={v.id}
@@ -499,13 +584,10 @@ function VenueSheet({
             // different malls in this list.
             accessibilityLabel={`${v.name}, ${v.city}`}
             onPress={() => onChoose(v)}
-            style={({ pressed }) => [
-              styles.sheetRow,
-              pressed && { backgroundColor: colors.surfaceRaised },
-            ]}
+            style={({ pressed }) => [styles.sheetRow, pressed && styles.sheetRowPressed]}
           >
-            <Text style={type.body}>{v.name}</Text>
-            <Text style={type.caption}>{countAt(v.id)}</Text>
+            <Text style={styles.sheetRowName}>{v.name}</Text>
+            <Text style={styles.sheetClose}>{countAt(v.id)}</Text>
           </Pressable>
         ))}
       </ScrollView>
@@ -513,27 +595,38 @@ function VenueSheet({
   );
 }
 
-function IconAction({ label, onPress }: { label: string; onPress: () => void }) {
+function BarAction({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={styles.iconAction}
+      style={({ pressed }) => [styles.barAction, pressed && styles.barActionPressed]}
     >
-      <Text style={styles.iconActionLabel}>{label}</Text>
+      <Text style={styles.barLabel}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function InkButton({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => [styles.inkButton, pressed && styles.barActionPressed]}
+    >
+      <Text style={styles.inkButtonLabel}>{label}</Text>
     </Pressable>
   );
 }
 
 function EmptyState({
-  filter,
   hasPrograms,
   here,
   catalogStale,
   onEditPrograms,
 }: {
-  filter: Filter;
   hasPrograms: boolean;
   /** A pinned point that returned nothing — the coverage case, not the no-deals case. */
   here: Coordinates | null;
@@ -548,7 +641,6 @@ function EmptyState({
   // true is how an app reads as broken to everyone outside Gush Dan.
   const nearest = here ? nearestCatalogPlace(here) : null;
 
-
   // Staleness is checked before the user's own choices, because it outranks
   // them: when the catalog has aged out every row is blocked no matter what is
   // ticked, and telling someone to go pick more clubs would send them to fix
@@ -556,7 +648,7 @@ function EmptyState({
   const copy = catalogStale
     ? {
         title: 'הקטלוג לא עודכן מזמן',
-        body: 'כל ההטבות אומתו לפני יותר מ-45 יום, ולכן אינן מוצגות. עדכן את האפליקציה כדי לקבל קטלוג חדש — הרשימה תחזור מיד.',
+        body: 'כל ההטבות אומתו לפני יותר מ-45 יום, ולכן אינן מוצגות כתקפות. עדכן את האפליקציה כדי לקבל קטלוג חדש — הרשימה תחזור מיד.',
       }
     : !hasPrograms
     ? {
@@ -568,202 +660,151 @@ function EmptyState({
           title: 'הקטלוג לא מגיע לכאן',
           body: `אין בקטלוג בית עסק בטווח הליכה מכאן. הקרוב ביותר נמצא ב${nearest.city}, כ-${Math.round(nearest.km)} ק״מ מכאן. הכיסוי כרגע מרוכז בגוש דן.`,
         }
-    : filter === 'ready'
-      ? {
-          title: 'אין הטבה שמוכנה כרגע',
-          body: 'עבור ללשונית ״דורש פעולה״ — שם ההטבות שמחכות למשהו ממך: סכום מינימום, שובר שצריך להנפיק, או קנייה בערוץ אחר.',
-        }
       : {
           title: 'אין הטבות להצגה',
-          body: 'כל ההטבות בקטלוג חסומות כרגע. עדיף רשימה ריקה מהטבה שתגלה בקופה שאינה תקפה.',
+          body: 'כל ההטבות שלך חסומות כרגע. עדיף רשימה ריקה מהטבה שתגלה בקופה שאינה תקפה.',
         };
 
   return (
     <View style={styles.empty}>
-      {/* The mark: a penalty area drawn in the 2px rule — box inside box, spot
-          in the middle. The pitch's own markings are the one football device
-          made entirely of 90° lines, so the empty state gets to be a diagram
-          rather than an icon and still obeys the system. */}
-      <View style={styles.emptyMark}>
-        <View style={styles.emptyMarkInner} />
-        <View style={styles.emptyMarkSpot} />
-      </View>
       <Text style={styles.emptyTitle}>{copy.title}</Text>
       <Text style={styles.emptyBody}>{copy.body}</Text>
-      {!hasPrograms && <GhostButton label="עריכת המועדונים" onPress={onEditPrograms} />}
+      {!hasPrograms && <InkButton label="עריכת המועדונים" onPress={onEditPrograms} />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.surfacePage },
-  headerLine: { ...type.body, color: colors.textMutedOnPrimary },
-  headerFigure: { ...type.figureInline, color: colors.textInverse },
-  /* Wraps for the same reason the hero's top row does: three labelled chips are
-     ~197dp, and once they have taken their own line they fit whole on a 320
-     screen — but a fourth action, or a longer word, should break rather than
-     push one off the edge. */
-  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s2, paddingTop: space.s1 },
-  iconAction: {
-    paddingHorizontal: space.s3 - 2,
-    paddingVertical: space.s2,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.surfacePrimaryRaised,
-  },
-  iconActionLabel: { ...type.caption, color: colors.textInverse },
+  screen: { flex: 1, backgroundColor: ticket.ground },
+  list: { paddingBottom: space.s5 },
+  pressed: { opacity: 0.86 },
 
-  whereRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, marginTop: space.s1 },
-  whereGhost: {
-    paddingHorizontal: space.s3 - 2,
-    paddingVertical: space.s2 - 2,
-    borderWidth: border.hairline,
-    borderColor: colors.textMutedOnPrimary,
-    minHeight: 34,
-    justifyContent: 'center',
+  /* flex-start so a Latin or number-only line aligns with a Hebrew one: see ui.tsx. */
+  head: { paddingHorizontal: space.s3, paddingTop: space.s3, gap: space.s2, alignItems: 'flex-start' },
+  title: { fontFamily: fonts.display, fontSize: 31, lineHeight: 36, color: ticket.onGround },
+  count: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: ticket.onGround2 },
+  countFigure: {
+    fontFamily: fonts.display,
+    fontSize: 22,
+    color: ticket.punch,
+    fontVariant: ['tabular-nums', 'lining-nums'],
   },
-  whereGhostLabel: { ...type.caption, color: colors.textInverse },
-  /* Pinned location is a fact, so it reads as a filled plate rather than an
-     outline — the same move the geofence band makes when it goes live. */
+  geofence: { flexDirection: 'row', alignItems: 'center', gap: space.s2 },
+  geofenceText: { flexShrink: 1, fontFamily: fonts.latinText, fontSize: 13.5, lineHeight: 19, color: ticket.muted },
+  /* SearchField brings its own 24dp gutter for the paper screens; here it lines up
+     with the rest of the header instead. */
+  searchRow: { alignSelf: 'stretch', marginHorizontal: -space.s4 },
+
+  whereRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, alignSelf: 'stretch' },
+  whereButton: {
+    minHeight: 44,
+    paddingHorizontal: space.s3,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: ticket.muted,
+  },
+  whereLabel: { fontFamily: fonts.latinText, fontSize: 14, color: ticket.onGround },
+  /* A pinned place is a fact, so it reads as a filled plate rather than an outline. */
   whereActive: {
     flex: 1,
     minWidth: 0,
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     gap: space.s2,
-    backgroundColor: colors.surfacePlate,
-    paddingHorizontal: space.s3 - 2,
-    paddingVertical: space.s2 - 1,
-    justifyContent: 'flex-start',
+    paddingHorizontal: space.s3 - 4,
+    backgroundColor: ticket.ground3,
   },
-  whereActiveText: { ...type.caption, color: colors.textInverse, flexShrink: 1 },
+  whereActiveText: { flexShrink: 1, fontFamily: fonts.latinText, fontSize: 14, color: ticket.onGround },
 
-  sheet: {
-    marginHorizontal: space.s4,
-    marginTop: space.s3,
-    borderWidth: border.hairline,
-    borderColor: colors.surfaceAccent,
-    backgroundColor: colors.surfacePage,
-  },
+  sheet: { alignSelf: 'stretch', borderWidth: 1, borderColor: ticket.muted, backgroundColor: ticket.ground2 },
   sheetHead: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: space.s3,
     paddingVertical: space.s2 + 2,
-    borderBottomWidth: border.rule,
-    borderBottomColor: colors.surfaceAccent,
+    borderBottomWidth: 1,
+    borderBottomColor: ticket.rule,
   },
+  sheetTitle: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: ticket.onGround },
+  sheetClose: { fontFamily: fonts.latinText, fontSize: 14, color: ticket.onGround2 },
   sheetList: { maxHeight: 260 },
   sheetRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    minHeight: 44,
     paddingHorizontal: space.s3,
-    paddingVertical: space.s3 - 4,
-    borderBottomWidth: border.hairline,
-    borderBottomColor: colors.borderHairlineSoft,
+    borderBottomWidth: 1,
+    borderBottomColor: ticket.rule,
+  },
+  sheetRowPressed: { backgroundColor: ticket.ground3 },
+  sheetRowName: { fontFamily: fonts.latinText, fontSize: 15, color: ticket.onGround },
+
+  rollHead: {
+    fontFamily: fonts.display,
+    fontSize: 22,
+    lineHeight: 27,
+    color: ticket.onGround,
+    paddingHorizontal: space.s3,
+    paddingTop: space.s4,
+    paddingBottom: space.s2 + 2,
+    alignSelf: 'flex-start',
   },
 
-  list: { paddingHorizontal: space.s4, paddingBottom: space.s6, paddingTop: space.s3 },
   combo: {
-    borderWidth: border.hairline,
-    borderColor: colors.surfaceAccent,
-    marginBottom: space.s3,
-  },
-  comboTop: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    borderBottomWidth: border.hairline,
-    borderBottomColor: colors.borderHairline,
-  },
-  comboIdentity: {
-    flex: 1,
-    minWidth: 0,
-    paddingVertical: space.s3 - 2,
+    backgroundColor: COMBO_STOCK,
     paddingHorizontal: space.s3,
+    paddingVertical: space.s3 - 2,
     gap: space.s1,
-    justifyContent: 'center',
     alignItems: 'flex-start',
   },
-  comboCrests: { flexDirection: 'row', alignItems: 'center', gap: space.s1 + 2 },
-  comboEyebrow: { ...type.meta, color: colors.surfaceAccent, flexShrink: 1 },
-  comboRule: { width: border.hairline, backgroundColor: colors.borderHairline },
-  comboPlate: {
-    width: 104,
-    flexShrink: 0,
-    backgroundColor: colors.surfaceAccent,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: space.s2 + 4,
-    paddingHorizontal: space.s2,
+  comboTop: { flexDirection: 'row', alignItems: 'flex-start', columnGap: space.s2 + 4, alignSelf: 'stretch' },
+  comboIdentity: { flex: 1, minWidth: 0, alignItems: 'flex-start' },
+  comboName: { fontFamily: fonts.text, fontSize: 22, lineHeight: 27, color: ticket.ink },
+  comboLine: { fontFamily: fonts.latinText, fontSize: 13.5, lineHeight: 19, color: ticket.ink2 },
+  comboFigureCol: { alignItems: 'flex-end', flexShrink: 0 },
+  comboFigure: {
+    fontFamily: fonts.display,
+    fontSize: 44,
+    lineHeight: 46,
+    color: ticket.ink,
+    writingDirection: 'ltr',
+    fontVariant: ['tabular-nums', 'lining-nums'],
   },
-  /* Matches the benefit card's plate step, so a combo and a card sitting in the
-     same list keep the same end column at both widths. */
-  comboPlateCompact: { width: 84, paddingHorizontal: space.s1 + 2 },
-  comboFigure: { ...type.figure, fontSize: 34, lineHeight: 34 },
-  comboFigureCompact: { fontSize: 28, lineHeight: 28 },
-  comboPlateUnit: { ...type.micro, color: colors.textInverse, marginTop: space.s1 + 2 },
-  comboBody: {
-    paddingVertical: space.s2 + 4,
-    paddingHorizontal: space.s3,
-    gap: space.s1,
-  },
-  comboFooter: {
+  comboVerdict: { fontFamily: fonts.display, fontSize: 14, lineHeight: 19, color: ticket.ink, marginTop: space.s1 },
+
+  fold: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space.s2,
-    paddingVertical: space.s2 + 3,
+    justifyContent: 'space-between',
+    minHeight: 56,
     paddingHorizontal: space.s3,
-    borderTopWidth: border.hairline,
-    borderTopColor: colors.borderHairlineSoft,
+    marginTop: space.s3,
   },
-  marker: { width: 8, height: 8, flexShrink: 0 },
-  comboVerdict: { flex: 1 },
-  geofence: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.s2,
-    paddingVertical: space.s2,
-    paddingHorizontal: space.s3 - 2,
-    marginBottom: space.s3,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-    overflow: 'hidden',
-  },
-  geofenceOn: { backgroundColor: colors.surfacePrimary, borderColor: colors.surfacePrimary },
-  geofenceOnText: { color: colors.textInverse },
-  /* Square, not a circle — the system has one radius and it is zero. */
-  dot: { width: 8, height: 8, borderRadius: radius.sharp },
-  dotOff: { backgroundColor: colors.borderHairline },
-  empty: {
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-    paddingVertical: space.s5,
-    paddingHorizontal: space.s4,
-    gap: space.s3 - 2,
-    alignItems: 'center',
-  },
-  emptyMark: {
-    width: 76,
-    height: 56,
-    borderWidth: border.rule,
-    borderColor: colors.surfacePrimary,
-    alignItems: 'center',
+  foldTitle: { fontFamily: fonts.display, fontSize: 22, lineHeight: 27, color: ticket.onGround },
+  foldAction: { fontFamily: fonts.latinText, fontSize: 14, color: ticket.onGround2, textDecorationLine: 'underline' },
+
+  empty: { paddingHorizontal: space.s3, paddingVertical: space.s5, gap: space.s3 - 2, alignItems: 'flex-start' },
+  emptyTitle: { fontFamily: fonts.display, fontSize: 26, lineHeight: 30, color: ticket.onGround },
+  emptyBody: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: ticket.onGround2 },
+  inkButton: {
+    minHeight: 44,
+    paddingHorizontal: space.s3,
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: ticket.onGround,
   },
-  emptyMarkInner: {
-    position: 'absolute',
-    width: 34,
-    height: 24,
-    borderWidth: border.rule,
-    borderColor: colors.surfacePrimary,
+  inkButtonLabel: { fontFamily: fonts.latinText, fontSize: 15, color: ticket.onGround },
+
+  actions: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: ticket.rule,
+    backgroundColor: ticket.ground,
   },
-  emptyMarkSpot: { width: 6, height: 6, backgroundColor: colors.surfacePrimary },
-  emptyTitle: { ...type.display, textAlign: 'center' },
-  emptyBody: { ...type.small, color: colors.textMuted, textAlign: 'center', maxWidth: 280 },
-  listEnd: { marginTop: space.s2 },
-  footnote: { ...type.caption, marginTop: space.s3, lineHeight: 18 },
+  barAction: { flex: 1, minHeight: 56, alignItems: 'center', justifyContent: 'center' },
+  barActionPressed: { backgroundColor: ticket.ground3 },
+  barLabel: { fontFamily: fonts.latinText, fontSize: 15, color: ticket.onGround },
 });

@@ -1,4 +1,4 @@
-import { isUpperBound, type Evaluation } from './matching';
+import { isUpperBound, type Evaluation, type GateCode } from './matching';
 import type { Benefit } from './types';
 
 /**
@@ -129,4 +129,96 @@ export function formatLastVerified(benefit: Benefit, now: Date = new Date()): st
   if (days <= 0) return 'אומת היום';
   if (days === 1) return 'אומת אתמול';
   return `אומת לפני ${days} ימים`;
+}
+
+/**
+ * The name to print on a ticket: "הוט סינמה - HOT CINEMA" and
+ * "ספא אקויה | SPA AKOYA" carry the source's separator, which reads as a typo at
+ * display size. The full name stays in the catalog and in search.
+ */
+export function displayMerchantName(name: string): string {
+  return name.replace(/\s+[-–—|]\s+.*$/, '') || name;
+}
+
+export type HoleState = 'punched' | 'open' | 'bad';
+
+export interface TicketHole {
+  code: GateCode;
+  label: string;
+  state: HoleState;
+}
+
+export interface TicketFace {
+  state: 'ready' | 'open' | 'blocked';
+  /** The answer in words: pay, what is left, or why not. */
+  verdict: string;
+  /** One or two words for a blocked ticket, null otherwise. */
+  stamp: string | null;
+  holes: TicketHole[];
+}
+
+/**
+ * Only conditions with a yes or a no get a hole. Caveats ("no stacking", "excludes
+ * tobacco") have nothing to punch, and a hole for each would make every ticket
+ * look unfinished; they stay on the detail screen.
+ */
+const HOLE_CODES: ReadonlySet<GateCode> = new Set<GateCode>([
+  'validity',
+  'day',
+  'hours',
+  'channel',
+  'min_spend',
+  'voucher',
+  'eligibility',
+  'rate',
+  'freshness',
+]);
+
+/** The engine's label for `rate` is a bare "עד", which says nothing under a hole. */
+const HOLE_LABEL: Partial<Record<GateCode, string>> = { rate: 'תלוי בפריט' };
+
+const STAMP: Partial<Record<GateCode, string>> = {
+  freshness: 'לא אומת',
+  hours: 'לא עכשיו',
+  day: 'לא היום',
+  validity: 'פג תוקף',
+  channel: 'לא כאן',
+  min_spend: 'חסר בסל',
+};
+
+/**
+ * What a ticket prints, judged by the engine and nothing else. Gates arrive
+ * blocked, then pending, then met, so capping the rail drops satisfied conditions
+ * first and never hides what stands in the way.
+ */
+export function ticketFace(
+  evaluation: Pick<Evaluation, 'status' | 'gates' | 'blockers' | 'actionsRequired'>,
+  maxHoles = 4,
+): TicketFace {
+  const holes = evaluation.gates
+    .filter((g) => HOLE_CODES.has(g.code) && (g.state !== 'pending' || g.actionable))
+    .slice(0, maxHoles)
+    .map((g): TicketHole => ({
+      code: g.code,
+      label: HOLE_LABEL[g.code] ?? g.label,
+      state: g.state === 'met' ? 'punched' : g.state === 'pending' ? 'open' : 'bad',
+    }));
+
+  if (evaluation.status === 'blocked') {
+    const gate = evaluation.gates.find((g) => g.state === 'blocked');
+    return {
+      state: 'blocked',
+      verdict: (gate?.detail ?? evaluation.blockers[0]?.message ?? '').replace(/\s*[—–]\s*/g, ', '),
+      stamp: (gate && STAMP[gate.code]) ?? 'לא חל',
+      holes,
+    };
+  }
+  const steps = evaluation.actionsRequired;
+  if (steps.length === 0) return { state: 'ready', verdict: 'אפשר לשלם', stamp: null, holes };
+  return {
+    state: 'open',
+    verdict: steps.length === 1 ? `עוד צעד: ${steps[0]!.label}` : `עוד ${steps.length} צעדים`,
+    stamp: null,
+    holes,
+  };
 }
