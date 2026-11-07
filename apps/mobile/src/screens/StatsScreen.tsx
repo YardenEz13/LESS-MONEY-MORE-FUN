@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { GhostButton, ScreenHeader, Section, Text } from '../components/ui';
+import { GhostButton, ListRow, Panel, ScreenHeader, Section, Text } from '../components/ui';
 import { clearEvents, computeKpis, loadEvents, type Kpis } from '../state/events';
-import { border, colors, radius, space, type } from '../theme';
+import { colors, space, ticket, type } from '../theme';
 
 const TARGET = 0.3;
 
@@ -30,8 +30,8 @@ export function StatsScreen({ onBack }: { onBack: () => void }) {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <ScreenHeader eyebrow="30 ימי בדיקה" title="האם זה עובד" onBack={onBack} />
 
-      {/* The KPI is a figure that matters, so it goes on the plate. */}
-      <View style={styles.hero}>
+      {/* The KPI is a figure that matters, so it is a bone ticket of its own. */}
+      <Panel style={styles.hero}>
         <Text style={styles.heroLabel}>יחס השפעה על החלטה</Text>
         {/* A 58px em-dash reads as a broken element, not as "no data". Say it. */}
         {ratio == null ? (
@@ -62,15 +62,15 @@ export function StatsScreen({ onBack }: { onBack: () => void }) {
           חלק ההתראות שהובילו לפתיחת פירוט או ללחיצה על ״מימשתי״. מתחת ליעד פירושו שההתראות מגיעות
           ברגע הלא נכון — לא שההטבות גרועות.
         </Text>
-      </View>
+      </Panel>
 
       <Section eyebrow="ספירה גולמית">
-        <View style={styles.table}>
+        <View>
           <Row label="התראות שנשלחו" value={kpis?.notificationsSent ?? 0} />
           <Row label="התראות שנפתחו" value={kpis?.notificationsOpened ?? 0} />
           <Row label="מימושים שדווחו" value={kpis?.redeemed ?? 0} />
           <Row label="שיתופים שזוהו" value={kpis?.shareResolved ?? 0} />
-          <Row label="שיתופים ללא התאמה" value={kpis?.shareUnmatched ?? 0} last />
+          <Row label="שיתופים ללא התאמה" value={kpis?.shareUnmatched ?? 0} />
         </View>
         <Text style={styles.note}>
           ״שיתופים ללא התאמה״ גבוה פירושו שחסרים דומיינים ב-merchants.json — התיקון הזול ביותר
@@ -91,65 +91,46 @@ export function StatsScreen({ onBack }: { onBack: () => void }) {
   );
 }
 
-function Row({ label, value, last }: { label: string; value: number; last?: boolean }) {
+function Row({ label, value }: { label: string; value: number }) {
   return (
-    <View style={[styles.row, last && styles.rowLast]}>
-      <Text style={type.body}>{label}</Text>
+    <ListRow>
+      <Text style={[type.body, styles.rowLabel]}>{label}</Text>
       <Text style={styles.rowValue}>{value}</Text>
-    </View>
+    </ListRow>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.surfacePage },
-  content: { paddingBottom: space.s6, gap: space.s4 },
-  /* The scoreboard strip: a figure on the plate, closed by the green band. */
-  hero: {
-    marginHorizontal: space.s4,
-    backgroundColor: colors.surfacePlate,
-    borderRadius: radius.sharp,
-    borderBottomWidth: border.band,
-    borderBottomColor: colors.surfacePrimary,
-    padding: space.s4,
-    gap: space.s2,
-  },
+  screen: { flex: 1, backgroundColor: ticket.ground },
+  content: { paddingBottom: space.s6, gap: space.s3 },
+  hero: { backgroundColor: colors.surfacePlate },
   heroLabel: { ...type.meta, color: colors.textMutedInverse },
   heroCaption: { ...type.caption, color: colors.textMutedInverse },
   heroBody: { ...type.small, color: colors.textMutedInverse },
   ratio: { ...type.figureLarge, color: colors.textMutedInverse },
-  ratioMet: { color: colors.textInverse },
+  ratioMet: { color: '#0B6B45' },
   ratioEmpty: { ...type.displaySmall, color: colors.textMutedInverse },
   track: {
     height: 8,
-    borderRadius: radius.sharp,
+    alignSelf: 'stretch',
     backgroundColor: colors.surfacePlateSoft,
     marginTop: space.s2,
     flexDirection: 'row',
   },
-  fill: { backgroundColor: colors.accentUrgent },
-  fillMet: { backgroundColor: colors.surfacePrimary },
+  /* The plate is bone, so the bar is drawn in the ticket's void red and deep green. */
+  fill: { backgroundColor: ticket.void },
+  fillMet: { backgroundColor: '#0B6B45' },
   /* The target sits on the bar itself — a percentage without its bar is just a number. */
   targetRow: { ...StyleSheet.absoluteFillObject, top: -3, bottom: -3, flexDirection: 'row' },
-  target: { width: border.rule, backgroundColor: colors.textInverse },
-  trackLabels: { flexDirection: 'row', justifyContent: 'space-between', marginTop: space.s1 },
-  table: {
-    marginHorizontal: space.s4,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-    paddingHorizontal: space.s3,
-  },
-  row: {
+  target: { width: 2, backgroundColor: colors.textInverse },
+  trackLabels: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    gap: space.s3,
-    paddingVertical: space.s3 - 4,
-    borderBottomWidth: border.hairline,
-    borderBottomColor: colors.borderHairlineSoft,
+    alignSelf: 'stretch',
+    marginTop: space.s1,
   },
-  rowLast: { borderBottomWidth: 0 },
+  rowLabel: { flex: 1 },
   rowValue: type.tableValue,
-  note: { ...type.caption, marginHorizontal: space.s4, lineHeight: 18 },
-  reset: { paddingHorizontal: space.s4 },
+  note: { ...type.caption, marginHorizontal: space.s3 },
+  reset: { paddingHorizontal: space.s3 },
 });

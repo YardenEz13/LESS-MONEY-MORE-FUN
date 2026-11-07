@@ -9,8 +9,8 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { latinRuns } from '@sbr/core';
-import { Crest, PitchStripes, ScarfBand } from './Kit';
-import { border, colors, fonts, kit, latinFace, radius, space, ticket, type, useCompact } from '../theme';
+import { Crest, Seam } from './Kit';
+import { border, colors, fonts, latinFace, radius, space, ticket, type, useCompact } from '../theme';
 
 /**
  * A note that applies to every control in the app, not just the ones here:
@@ -103,92 +103,26 @@ export function Text({ style, children, ...rest }: TextProps) {
 }
 
 /**
- * The green plate that opens a screen: the system's one dominant fill, the
- * urgent edge on the reading side, and the band that stops the display type
- * from floating. `right` takes the screen's actions, `children` anything that
- * belongs inside the green — a count line, a location picker.
+ * Back affordance, an optional line above the title, then the title.
  *
- * The edge is a sibling view rather than `borderStartWidth`: RN and web
- * disagree about which side "start" is under forced RTL, and flex order does
- * not.
+ * The same head the roll opens with: display title at 31, a quiet line under it,
+ * a 16dp gutter, left-aligned. A long merchant name runs to fifty characters, so
+ * the title drops a step on the smallest phones.
  *
- * `heroTop` wraps rather than shrinking. The title is 207dp of display type and
- * a screen's action row runs to ~200dp; against a body that is 262dp wide on a
- * 320 phone and 332dp on a 390 one, the two have never fitted side by side on
- * anything we ship to. Shrinking is what the layout used to do, and at 320 it
- * left the title 66dp — five lines of two characters each, and a hero eating
- * two thirds of the screen. Wrapping puts the actions on their own line at the
- * width where they stop fitting and leaves them beside the title above it.
- *
- * Striped and closed by the scarf, because this is the surface the app speaks
- * from and the kit is how it signs what it says. The scarf sits outside the
- * green rather than inside its padding: it is the edge of the block, and an
- * edge that floats above a margin stops reading as one.
- */
-export function Hero({
-  eyebrow,
-  title,
-  right,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  right?: React.ReactNode;
-  children?: React.ReactNode;
-}) {
-  const compact = useCompact();
-  return (
-    <>
-      <View style={styles.hero}>
-        <PitchStripes />
-        <View style={styles.heroEdge} />
-        <View style={styles.heroBody}>
-          <View style={styles.heroTop}>
-            <View style={styles.heroHeadline}>
-              <Text style={styles.heroEyebrow}>{eyebrow}</Text>
-              <Text
-                style={[
-                  styles.heroTitle,
-                  { fontSize: kit.heroSize, lineHeight: kit.heroSize + 2 },
-                  compact && styles.heroTitleCompact,
-                ]}
-              >
-                {title}
-              </Text>
-              <View style={[styles.heroUnderline, compact && styles.heroUnderlineCompact]} />
-            </View>
-            {right}
-          </View>
-          {children}
-        </View>
-      </View>
-      <ScarfBand />
-    </>
-  );
-}
-
-/**
- * Back affordance + title. RTL, so "back" points right.
- *
- * The title is whatever the screen is about, and on the detail screen that is a
- * merchant name — the catalog holds several past fifty characters. At 34dp on a
- * 320 screen that is seven lines before the content starts, so display drops a
- * step when the screen does.
- *
- * `crestProgramId` badges the eyebrow when the screen belongs to one club, so
- * the detail screen opens with the same crest the card the reader tapped was
- * carrying. Omit it and the eyebrow is plain text as before.
+ * `children` take whatever belongs under the title: a count line, a picker.
  */
 export function ScreenHeader({
   title,
   eyebrow,
   crestProgramId,
   onBack,
+  children,
 }: {
   title: string;
   eyebrow?: string;
   crestProgramId?: string;
   onBack?: () => void;
+  children?: React.ReactNode;
 }) {
   const compact = useCompact();
   return (
@@ -202,36 +136,31 @@ export function ScreenHeader({
           style={styles.back}
         >
           <Text style={styles.backGlyph}>›</Text>
-          <Text style={type.meta}>חזרה</Text>
+          <Text style={styles.headerLine}>חזרה</Text>
         </Pressable>
       )}
       {eyebrow &&
         (crestProgramId ? (
           <View style={styles.headerCrestRow}>
             <Crest programId={crestProgramId} size={22} />
-            <Text style={styles.headerEyebrow}>{eyebrow}</Text>
+            <Text style={styles.headerLine}>{eyebrow}</Text>
           </View>
         ) : (
-          <Text style={styles.headerEyebrow}>{eyebrow}</Text>
+          <Text style={styles.headerLine}>{eyebrow}</Text>
         ))}
-      <Text style={compact ? type.displaySmall : type.display}>{title}</Text>
-      {/* The same scarf the hero closes with, at section scale: it ties the
-          inner screens to the green without giving them a second dominant
-          surface. */}
-      <ScarfBand height={border.marker} style={styles.headerScarf} />
+      <Text style={[type.display, compact && styles.titleCompact]}>{title}</Text>
+      {children}
     </View>
   );
 }
 
 /**
- * Primary action. Press is a colour step down the green ramp — the system has
- * no shadow to lift and no radius to squash, so state has to be stated in fill.
+ * Primary action: a full-width mint block, the same as the roll's bar actions in
+ * weight. Press is a step down the mint ramp — no shadow to lift, no radius to
+ * squash, so state is stated in fill.
  *
  * `disabled` alone carries the disabled state: Pressable derives `aria-disabled`
- * from it on web and `accessibilityState.disabled` from it on native, and on web
- * it wins over any `aria-disabled` passed in alongside — so stating the state a
- * second time would be dead weight. Coerced, so native gets a definite `false`
- * rather than falling through to whatever `accessibilityState` holds.
+ * from it on web and `accessibilityState.disabled` on native.
  */
 export function PrimaryButton({
   label,
@@ -250,8 +179,6 @@ export function PrimaryButton({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
-      // Announced as well as painted: a greyed button that still reports itself
-      // as available is a tap a screen-reader user makes and gets nothing from.
       accessibilityState={{ disabled: !!disabled }}
       disabled={!!disabled}
       onPress={onPress}
@@ -261,15 +188,12 @@ export function PrimaryButton({
         disabled && styles.primaryDisabled,
       ]}
     >
-      {/* The one button that commits gets the shirt. Disabled drops it: a
-          striped button that does nothing is the worst of both. */}
-      {!disabled && <PitchStripes />}
       <Text style={[type.button, disabled && styles.primaryDisabledLabel]}>{label}</Text>
     </Pressable>
   );
 }
 
-/** Secondary action: hairline in the primary green, filling in on press. */
+/** Secondary action: the roll's outlined button, filling in on press. */
 export function GhostButton({
   label,
   onPress,
@@ -284,22 +208,9 @@ export function GhostButton({
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.ghost,
-        pressed && { backgroundColor: colors.surfacePrimary },
-        style,
-      ]}
+      style={({ pressed }) => [styles.ghost, pressed && { backgroundColor: ticket.ground3 }, style]}
     >
-      {({ pressed }) => (
-        <Text
-          style={[
-            type.button,
-            { color: pressed ? colors.textInverse : colors.surfacePrimary },
-          ]}
-        >
-          {label}
-        </Text>
-      )}
+      <Text style={styles.ghostLabel}>{label}</Text>
     </Pressable>
   );
 }
@@ -427,18 +338,8 @@ export function FilterRow<T extends string>({
 }
 
 /**
- * A titled block. The heavy band under the label is the section device — the
- * same one the design-system page uses to head 01 COLOUR, 02 TYPE.
- *
- * It reads as green rather than ink, and at `band` rather than `rule`: the page
- * turned its section heads into structural edges, and a 2px ink line under a
- * small label was reading as another hairline in a layout already full of them.
- * Green at 6px states that a new part of the screen starts here.
- *
- * Woven rather than solid now, so the device that heads a section is the same
- * object that closes the hero. At 6px the scarf's blocks read as a texture in
- * the band rather than as eight separate rectangles, which is the difference
- * between a section head and a second hero.
+ * A titled block: the roll's own block head, then what belongs under it. No rule
+ * and no small caps — the head is display type, like "תקף עכשיו".
  */
 export function Section({
   eyebrow,
@@ -449,12 +350,49 @@ export function Section({
 }) {
   return (
     <View style={styles.section}>
-      <View style={styles.sectionHead}>
-        <Text style={styles.sectionLabel}>{eyebrow}</Text>
-        <ScarfBand height={border.band} style={styles.sectionScarf} />
-      </View>
+      <Text style={styles.sectionLabel}>{eyebrow}</Text>
       {children}
     </View>
+  );
+}
+
+/**
+ * A quiet ticket: the dark stock, edge to edge, with the tear line along its top.
+ * Everything that is a statement rather than a benefit sits on one, so a screen
+ * is a roll of them the way the home screen is — no outlined boxes anywhere.
+ */
+export function Panel({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {
+  return (
+    <View style={[styles.panel, style]}>
+      <Seam />
+      {children}
+    </View>
+  );
+}
+
+/**
+ * One line of a list: the roll's sheet row. Edge to edge on the ground, a rule
+ * under it, a 48dp target. Pass `onPress` to make it a control; `selected` fills it.
+ */
+export function ListRow({
+  children,
+  onPress,
+  selected,
+  ...rest
+}: {
+  children: React.ReactNode;
+  onPress?: () => void;
+  selected?: boolean;
+} & Omit<React.ComponentProps<typeof Pressable>, 'style' | 'children' | 'onPress'>) {
+  if (!onPress) return <View style={[styles.listRow, selected && styles.listRowOn]}>{children}</View>;
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.listRow, (selected || pressed) && styles.listRowOn]}
+      {...rest}
+    >
+      {children}
+    </Pressable>
   );
 }
 
@@ -492,81 +430,56 @@ const styles = StyleSheet.create({
    * `direction: rtl` instead would reorder "₪300+" into "+₪300".
    */
   header: {
-    paddingHorizontal: space.s4,
+    paddingHorizontal: space.s3,
     paddingTop: space.s3,
     paddingBottom: space.s2,
-    gap: space.s1,
-    alignItems: 'flex-start',
-  },
-  hero: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    backgroundColor: colors.surfacePrimary,
-    /* The stripes are wider than any phone; without the clip they run on. */
-    overflow: 'hidden',
-  },
-  heroEdge: { width: 10, backgroundColor: colors.accentUrgent },
-  heroBody: {
-    flex: 1,
-    minWidth: 0,
-    paddingHorizontal: space.s4,
-    paddingVertical: space.s3,
     gap: space.s2,
-  },
-  heroTop: {
-    flexDirection: 'row',
     alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    columnGap: space.s3,
-    rowGap: space.s2,
   },
-  heroHeadline: { gap: space.s1, flexShrink: 1 },
-  heroEyebrow: { ...type.meta, color: colors.textMutedOnPrimary },
-  /* Size and leading are set at the call site — this is
-     everything about the headline that does not change between the two. */
-  heroTitle: { ...type.display, color: colors.textInverse },
-  /* One step down the display ramp, so the title still clears the gutters on a
-     320 screen once the actions have taken their own line. */
-  heroTitleCompact: { fontSize: 34, lineHeight: 36 },
-  heroUnderline: {
-    height: border.band,
-    width: 132,
-    backgroundColor: colors.textInverse,
-    marginTop: space.s1,
-  },
-  /* The band is a proportion of the title, not a fixed length. */
-  heroUnderlineCompact: { width: 112 },
-  headerEyebrow: { ...type.meta, color: colors.surfacePrimary },
-  headerCrestRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2 - 2 },
-  headerScarf: { width: 96, marginTop: space.s1 },
-  back: { flexDirection: 'row', alignItems: 'center', gap: space.s1, marginBottom: space.s2 },
-  backGlyph: { fontSize: 22, lineHeight: 24, color: colors.textDisabled },
-  primary: {
-    flex: 1,
-    borderRadius: radius.sharp,
-    paddingVertical: space.s3,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  primaryDisabled: {
-    backgroundColor: colors.surfaceRaised,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-  },
+  headerLine: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: ticket.onGround2 },
+  titleCompact: { fontSize: 26, lineHeight: 30 },
+  headerCrestRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2 },
+  back: { flexDirection: 'row', alignItems: 'center', gap: space.s1 },
+  backGlyph: { fontSize: 22, lineHeight: 24, color: ticket.muted },
+  primary: { flex: 1, minHeight: 56, alignItems: 'center', justifyContent: 'center' },
+  primaryDisabled: { backgroundColor: ticket.ground3 },
   primaryDisabledLabel: { color: colors.textDisabled },
   ghost: {
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.surfacePrimary,
-    paddingHorizontal: space.s4,
-    paddingVertical: space.s2 + 4,
+    minHeight: 44,
+    paddingHorizontal: space.s3,
     alignSelf: 'flex-start',
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: ticket.onGround,
   },
-  searchWrap: { paddingHorizontal: space.s4, paddingBottom: space.s2, gap: space.s1 },
+  ghostLabel: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 20, color: ticket.onGround },
+  section: { gap: space.s2 },
+  sectionLabel: {
+    ...type.displaySmall,
+    paddingHorizontal: space.s3,
+    paddingTop: space.s2,
+    alignSelf: 'flex-start',
+  },
+  panel: {
+    backgroundColor: ticket.ground2,
+    paddingHorizontal: space.s3,
+    paddingVertical: space.s3,
+    gap: space.s2,
+    alignItems: 'flex-start',
+  },
+  listRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space.s3 - 2,
+    minHeight: 48,
+    paddingHorizontal: space.s3,
+    paddingVertical: space.s2,
+    borderBottomWidth: 1,
+    borderBottomColor: ticket.rule,
+  },
+  listRowOn: { backgroundColor: ticket.ground2 },
+  searchWrap: { paddingHorizontal: space.s3, paddingBottom: space.s2, gap: space.s1 },
   /* Flat fill, 90 degrees, one hairline — the same three rules as every other
      surface in the system. No focus glow: the caret already says where you are. */
   search: {
@@ -595,7 +508,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     columnGap: space.s2,
     rowGap: space.s2,
-    paddingHorizontal: space.s4,
+    paddingHorizontal: space.s3,
     paddingBottom: space.s2,
   },
   filter: {
@@ -606,10 +519,6 @@ const styles = StyleSheet.create({
     borderColor: colors.borderHairline,
   },
   filterActive: { backgroundColor: colors.surfaceAccent, borderColor: colors.surfaceAccent },
-  section: { gap: space.s3 },
-  sectionHead: { marginHorizontal: space.s4 },
-  sectionLabel: { ...type.meta, color: colors.textPrimary, paddingBottom: space.s2 },
-  sectionScarf: { alignSelf: 'stretch' },
   livePill: {
     backgroundColor: colors.accentUrgent,
     borderRadius: radius.sharp,
@@ -619,7 +528,7 @@ const styles = StyleSheet.create({
   },
   livePillLabel: {
     ...type.micro,
-    color: colors.textPrimary,
+    color: colors.textInverse,
     fontFamily: fonts.latinDisplay,
     letterSpacing: 1.6,
     /* A Latin word, so it keeps its own order inside a Hebrew row. */

@@ -1,29 +1,14 @@
 import { I18nManager, Platform, TextStyle, useWindowDimensions } from 'react-native';
 
 /**
- * Design system — "מערכת ההנחות" (Deals).
+ * Design system — the punch ticket.
  *
- * A scoreboard meeting port signage. Numbers carry full authority, fills are
- * flat, rules are one pixel. Three laws the rest of this file just enforces:
- *
- *   1. Flat fill only — no gradient, glass, glow or soft shadow.
- *   2. 90° corners. Elevation comes from lines, never from shadows.
- *   3. Hierarchy from weight, size and rule — never from letter-spacing.
- *
- * Colour carries meaning instead of decoration, and the metaphor that assigns
- * the meanings is football. The pitch is green and green is money kept. The
- * referee's yellow is an errand you can still run; his red is a condition the
- * T&C says you fail. Orange is the clock — live now, running out. Blue is the
- * choice in your hands: a filter, a tab, a combination.
- *
- * Two families never mix. **Verdict** hues (green, yellow, red, orange) judge;
- * **crest** hues (claret, violet, teal) only identify which club a benefit came
- * from and appear nowhere except inside a crest. So a violet square is never
- * mistaken for a ruling, and a yellow one always is.
- *
- * Token names are semantic, never source or brand names: a re-skin is three
- * swaps — the urgent accent, the display face, the kit stripe. The palette's
- * division of labour, the 8-grid and the figures on the plate are the system.
+ * One dark ground, flat stocks, ink on every stock, one-pixel rules and no
+ * shadows. The `colors` tokens below keep their old names so screens did not
+ * have to change, but their meaning is the ticket's: `surfacePage` is the
+ * ground, `textInverse` is ink (text drawn on a stock, mint or sky fill), mint
+ * is money kept, marigold an errand you can still run, dead grey with the void
+ * red a condition the terms fail. `ticket` holds the stocks themselves.
  */
 
 export function enforceRtl(): void {
@@ -43,93 +28,66 @@ export function enforceRtl(): void {
 }
 
 export const colors = {
-  /** Page and cards share one fill. A hairline separates them, not a tint. */
-  surfacePage: '#F5F3EE',
-  /** The one raised paper tone: table headers, selected rows. */
-  surfaceRaised: '#EFECE4',
+  /** Page and cards share one fill: the roll's green-black ground. */
+  surfacePage: '#081711',
+  /** The one raised tone: table headers, selected rows. */
+  surfaceRaised: '#13261E',
   /** Inset wells — image placeholders, empty slots. */
-  surfaceInset: '#E4E0D6',
+  surfaceInset: '#22352C',
 
-  /** The pitch. Money kept, primary actions, satisfied conditions. */
-  surfacePrimary: '#0B6B45',
-  surfacePrimaryRaised: '#0E7A4E',
-  surfacePrimaryDeep: '#074A30',
+  /** Mint: money kept, primary actions, satisfied conditions. Ink sits on it. */
+  surfacePrimary: '#76E5AD',
+  surfacePrimaryRaised: '#8FEBBD',
+  surfacePrimaryDeep: '#4FC48A',
 
-  /**
-   * The second voice. Green states what you keep; blue states what is yours to
-   * do — selected filters, errands, anything the reader acts on rather than
-   * banks. Two hues carry twice the meaning one hue plus grey ever could.
-   *
-   * Deeper and less cyan than it was: against the warm paper the old mid-blue
-   * sat at the same visual weight as the green and the two competed. At 7.9:1
-   * on paper it now reads as the second voice rather than a rival first.
-   */
-  surfaceAccent: '#0A4A8F',
-  surfaceAccentRaised: '#0E5CAE',
-  surfaceAccentDeep: '#063463',
+  /** Sky: what is yours to choose or do — a selected filter, an errand. */
+  surfaceAccent: '#79CEEF',
+  surfaceAccentRaised: '#9AD9F2',
+  surfaceAccentDeep: '#4FAFD6',
 
   /**
-   * The number plate. Near-black with a green cast rather than navy: the blue
-   * became a surface family of its own above, and a navy plate behind a blue
-   * chip read as two blues disagreeing. Ink is nobody's hue, so the figure on
-   * it belongs to whatever colour the card assigns.
+   * The bone stock, for a figure that has to be held up. Ink sits on it, which
+   * is why `textInverse` below is ink: "inverse" means "on a stock", not "on a
+   * dark fill", now that the page itself is the dark one.
    */
-  surfacePlate: '#111310',
-  surfacePlateSoft: '#1C1F1A',
+  surfacePlate: '#E7DDC8',
+  surfacePlateSoft: '#CFC4A8',
 
-  textPrimary: '#111310',
-  textMuted: '#5C6157',
-  textDisabled: '#8A8C82',
-  textInverse: '#F5F3EE',
-  textMutedInverse: '#A8B2A4',
-  /** Muted text that has to sit on the green. */
-  textMutedOnPrimary: '#A8CFBB',
+  textPrimary: '#F4EEE0',
+  textMuted: '#A2AFA4',
+  textDisabled: '#7C897F',
+  /** Ink: any text drawn on a stock, mint or sky fill. */
+  textInverse: '#081711',
+  textMutedInverse: '#152920',
+  /** Muted text that has to sit on mint. */
+  textMutedOnPrimary: '#152920',
 
-  borderHairline: '#D9D5CB',
+  borderHairline: '#394D44',
   /** Interior separators inside an already-bordered block. */
-  borderHairlineSoft: '#E6E2D9',
-  /** Separators drawn on the dark plate. */
-  borderOnPlate: '#2A2E27',
+  borderHairlineSoft: '#22352C',
+  /** Separators drawn on the bone plate. */
+  borderOnPlate: '#B5AB92',
+
+  /** Expiry and the clock. A fill under ink, never text. */
+  accentUrgent: '#FF7F5F',
+  accentUrgentBright: '#FF9A80',
+  accentUrgentDeep: '#E5603E',
 
   /**
-   * Expiry and violation. Never set as text directly on the green — that pair
-   * is 1.9:1. On green or plate it appears as a full fill with near-black text.
-   *
-   * Warmer and lighter than the old brick: at 5.4:1 under near-black it now
-   * clears 4.5 as a fill at any size, so urgency no longer needs the bright
-   * variant to stay legible on paper.
+   * Marigold: an errand you can still run. A fill under ink, and on the dark
+   * ground it also reads as text, so the deep twin is the same colour.
    */
-  accentUrgent: '#E1651B',
-  /** Pressed-into and dark-background states. */
-  accentUrgentBright: '#FF7A29',
-  accentUrgentDeep: '#B34A0E',
+  cardYellow: '#F5C83E',
+  cardYellowDeep: '#F5C83E',
 
   /**
-   * The referee's yellow: a caution, not a sending-off. Every condition the
-   * reader can still do something about — top up the basket, issue the voucher,
-   * switch channel — is booked in this colour.
-   *
-   * Only ever a fill under near-black (10.3:1). Yellow text on paper is 1.7:1
-   * and there is no size at which that becomes readable, so the token has no
-   * text role at all.
+   * A condition the T&C fails: the dead grey of a blocked ticket with the void
+   * red on it, as on the roll. `cardRedText` is the one form that has to read
+   * as text on the dark ground.
    */
-  cardYellow: '#F2B705',
-  /**
-   * The yellow's ink-side twin: the card's own border, and the one form the
-   * booking may take as *text* on paper (4.9:1). Deep enough to be olive rather
-   * than gold, because anything brighter fails at 13px and the whole point of
-   * having it is that the detail screen can name the verdict in words.
-   */
-  cardYellowDeep: '#8A6500',
-
-  /**
-   * The referee's red: the T&C itself says no. Not "hurry" — orange already
-   * carries hurry — but "this one is off the pitch for now".
-   *
-   * Carries paper at 5.1:1, so unlike the yellow it is a fill with light text.
-   */
-  cardRed: '#C81E2B',
-  cardRedDeep: '#8E121C',
+  cardRed: '#BDBFB8',
+  cardRedDeep: '#79000C',
+  cardRedText: '#FF9A8A',
 } as const;
 
 /**
@@ -147,15 +105,15 @@ export const colors = {
  */
 export const crestColors: Record<string, string> = {
   /** Claret — a credit card. */
-  credit_card: '#8A1538',
+  credit_card: '#E8A8E1',
   /** Violet — a workplace or union club. */
-  employer_club: '#4B2E83',
+  employer_club: '#79CEEF',
   /** Teal — a retail club. */
-  retail_club: '#0E6E6E',
+  retail_club: '#E7DDC8',
 };
 
 /** A club with no category, or one added after this file was written. */
-export const crestFallback = colors.surfacePlate;
+export const crestFallback = '#BDBFB8';
 
 /**
  * The punch ticket: the new direction, on the home screen first. The rest of this
@@ -240,68 +198,72 @@ const numeric = {
  * the box is being squeezed past what the text engine will draw.
  */
 export const type = {
+  /** A screen title: the same 31 the roll's own title uses. */
   display: {
     fontFamily: fonts.displayBold,
-    fontSize: 34,
+    fontSize: 31,
     lineHeight: 36,
     color: colors.textPrimary,
   },
+  /** A block head: "תקף עכשיו" on the roll, a section name elsewhere. */
   displaySmall: {
     fontFamily: fonts.displayBold,
-    fontSize: 26,
-    lineHeight: 29,
+    fontSize: 22,
+    lineHeight: 27,
     color: colors.textPrimary,
   },
 
-  /** Card headline — a merchant name, a benefit title. */
+  /** A name: a merchant, a club, a setting. */
   lead: {
     fontFamily: fonts.textSemibold,
     fontSize: 20,
     lineHeight: 27,
     color: colors.textPrimary,
   },
-  body: { fontFamily: fonts.text, fontSize: 16, lineHeight: 24, color: colors.textPrimary },
+  /* Running text is the Latin-capable Hebrew face, as on the roll: the EFT faces
+     are for names and figures, and read badly at paragraph length. */
+  body: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: colors.textPrimary },
   bodyStrong: {
     fontFamily: fonts.textSemibold,
     fontSize: 16,
     lineHeight: 24,
     color: colors.textPrimary,
   },
-  small: { fontFamily: fonts.text, fontSize: 14, lineHeight: 21, color: colors.textPrimary },
-  caption: { fontFamily: fonts.text, fontSize: 13, lineHeight: 19, color: colors.textMuted },
-  /** Section markers and labels. Hebrew has no uppercase — weight does the work. */
-  meta: { fontFamily: fonts.textMedium, fontSize: 13, lineHeight: 19, color: colors.textMuted },
-  micro: { fontFamily: fonts.textMedium, fontSize: 11, lineHeight: 15, color: colors.textMuted },
+  small: { fontFamily: fonts.latinText, fontSize: 14, lineHeight: 20, color: colors.textPrimary },
+  caption: { fontFamily: fonts.latinText, fontSize: 13.5, lineHeight: 19, color: colors.textMuted },
+  meta: { fontFamily: fonts.latinText, fontSize: 14, lineHeight: 20, color: colors.textMuted },
+  micro: { fontFamily: fonts.latinText, fontSize: 12.5, lineHeight: 16, color: colors.textMuted },
 
-  chip: { fontFamily: fonts.textMedium, fontSize: 13.5, lineHeight: 18 },
-  button: { fontFamily: fonts.textSemibold, fontSize: 15, color: colors.textInverse },
+  chip: { fontFamily: fonts.latinText, fontSize: 14, lineHeight: 19 },
+  button: { fontFamily: fonts.displayBold, fontSize: 17, lineHeight: 22, color: colors.textInverse },
 
   /** The plate figure — the thing you read first. */
   figure: {
     ...numeric,
     fontFamily: fonts.displayBold,
     fontSize: 44,
-    lineHeight: 44,
+    lineHeight: 46,
     color: colors.textInverse,
   },
   figureLarge: {
     ...numeric,
     fontFamily: fonts.displayBold,
     fontSize: 58,
-    lineHeight: 58,
+    lineHeight: 60,
     color: colors.textInverse,
   },
   figureInline: {
     ...numeric,
     fontFamily: fonts.displayBold,
-    fontSize: 24,
+    fontSize: 22,
     lineHeight: 26,
-    color: colors.surfacePrimary,
+    color: colors.cardYellow,
   },
   tableValue: {
     ...numeric,
-    fontFamily: fonts.textSemibold,
-    fontSize: 17,
+    fontFamily: fonts.displayBold,
+    fontSize: 28,
+    lineHeight: 30,
     color: colors.textPrimary,
   },
 } satisfies Record<string, TextStyle>;
@@ -364,11 +326,11 @@ export const border = { hairline: 1, rule: 2, marker: 4, band: 6 } as const;
  */
 export const gateTone = {
   met: { bg: colors.surfacePrimary, border: colors.surfacePrimary, fg: colors.textInverse, card: false },
-  /** Booked — yellow under near-black. An errand is not a foul. */
-  action: { bg: colors.cardYellow, border: colors.cardYellowDeep, fg: colors.textPrimary, card: true },
+  /** Marigold under ink. An errand is not a foul. */
+  action: { bg: colors.cardYellow, border: colors.cardYellowDeep, fg: colors.textInverse, card: true },
   note: { bg: 'transparent', border: colors.borderHairline, fg: colors.textMuted, card: false },
-  /** Sent off — red under paper. The T&C, not the clock, is what says no. */
-  blocked: { bg: colors.cardRed, border: colors.cardRedDeep, fg: colors.textInverse, card: true },
+  /** Dead grey with the void red: the T&C, not the clock, says no. */
+  blocked: { bg: colors.cardRed, border: colors.cardRedDeep, fg: colors.cardRedDeep, card: true },
 } as const;
 
 export type GateTone = keyof typeof gateTone;
@@ -394,31 +356,3 @@ export const gateVerdict: Record<GateTone, string> = {
   note: 'לתשומת לב',
   blocked: 'לא מתקיים',
 };
-
-/**
- * The kit — the football half of the system, and the only part of this file
- * that draws texture rather than states a value.
- *
- * One intensity. There used to be two — a `quiet` mode at a quarter strength,
- * chosen from settings — and it was removed along with its control: a second
- * set of values nobody could pick is a fork in every kit call site paying for
- * itself with nothing. Stripes at full strength, the scarf at full depth,
- * display type at scoreboard size.
- *
- * A stripe is drawn as a row of fixed-width views, not as a gradient: React
- * Native has no repeating background, and a row of flat fills is what the
- * design system asks for anyway.
- */
-export const kit = {
-  /** One stripe plus one gap is the period. Roughly a shirt panel at phone width. */
-  stripeWidth: 26,
-  stripeGap: 26,
-  /** Enough stripes to cross a tablet in landscape; the parent clips the rest. */
-  stripeCount: 40,
-  stripeAlpha: 0.17,
-  /** The scarf: the band that closes a green surface. */
-  scarfHeight: 16,
-  /** Display type is the scoreboard. */
-  heroSize: 46,
-  figureSize: 48,
-} as const;

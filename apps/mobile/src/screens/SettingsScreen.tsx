@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import type { UserProfile } from '@sbr/core';
-import { GhostButton, ScreenHeader, Section, Text } from '../components/ui';
+import { GhostButton, ListRow, Panel, ScreenHeader, Section, Text } from '../components/ui';
 import { programsById, venues } from '../services/catalog';
 import { handleVenueEnter } from '../services/geofencing';
-import { border, colors, radius, space, type } from '../theme';
+import { colors, space, ticket, type } from '../theme';
 
 interface Props {
   profile: UserProfile;
@@ -18,7 +18,10 @@ interface Props {
   onBack: () => void;
 }
 
-
+/**
+ * Every block here is a `Panel` or a run of `ListRow`s, the same pieces the roll
+ * is built from: no outlined boxes, a 16dp gutter, display heads.
+ */
 export function SettingsScreen({
   profile,
   geofenceStatus,
@@ -36,14 +39,14 @@ export function SettingsScreen({
       <ScreenHeader title="הגדרות" onBack={onBack} />
 
       <Section eyebrow="המועדונים שלי">
-        <View style={styles.card}>
+        <Panel>
           <Text style={type.body}>
             {profile.program_ids.length === 0
               ? 'לא סומן אף מועדון.'
               : profile.program_ids.map((id) => programsById.get(id)?.name ?? id).join(' · ')}
           </Text>
           <GhostButton label="ערוך רשימה" onPress={onEditPrograms} />
-        </View>
+        </Panel>
       </Section>
 
       {/* The report loop's other half. A tap in the app cannot reach the
@@ -54,7 +57,7 @@ export function SettingsScreen({
           name. Hidden entirely until something has been reported. */}
       {profile.rejected_benefit_ids.length > 0 && (
         <Section eyebrow="הטבות שדיווחת עליהן">
-          <View style={styles.card}>
+          <Panel>
             <Text style={type.body}>
               {`${profile.rejected_benefit_ids.length} הטבות סומנו כשגויות והוסתרו. כדי להוציא אותן מהקטלוג, הריצו:`}
             </Text>
@@ -62,12 +65,12 @@ export function SettingsScreen({
               {`npm run unpublish -- ${profile.rejected_benefit_ids.join(' ')}`}
             </Text>
             <GhostButton label="נקה את הרשימה" onPress={onClearRejections} />
-          </View>
+          </Panel>
         </Section>
       )}
 
       <Section eyebrow="תזכורת בקניון">
-        <View style={styles.card}>
+        <Panel>
           <View style={styles.switchRow}>
             <View style={styles.switchText}>
               <Text style={type.bodyStrong}>התראות מיקום</Text>
@@ -76,7 +79,7 @@ export function SettingsScreen({
             <Switch
               accessibilityLabel="התראות מיקום"
               value={profile.notifications_enabled}
-              trackColor={{ true: colors.surfacePrimary, false: colors.borderHairline }}
+              trackColor={{ true: colors.surfacePrimary, false: ticket.rule }}
               onValueChange={(value) => onChange({ ...profile, notifications_enabled: value })}
             />
           </View>
@@ -96,18 +99,18 @@ export function SettingsScreen({
           ) : (
             <GhostButton label="הפעל מחדש" onPress={onEnableGeofencing} />
           )}
-        </View>
+        </Panel>
       </Section>
 
       <Section eyebrow="בדיקה ידנית">
-        <View style={styles.card}>
+        <Panel>
           <Text style={type.small}>
             הרצת זרימת ההתראה בלי לנסוע לקניון. עוברת דרך אותו קוד החלטה — שהייה, צינון, שעות שקט.
           </Text>
-        </View>
-        <View style={styles.venues}>
+        </Panel>
+        <View>
           {venues.map((venue) => (
-            <Pressable
+            <ListRow
               key={venue.id}
               accessibilityRole="button"
               accessibilityLabel={`הרצת בדיקה: ${venue.name}, ${venue.city}`}
@@ -115,27 +118,25 @@ export function SettingsScreen({
                 await handleVenueEnter(venue.id);
                 setSimulated(venue.name);
               }}
-              style={styles.venueRow}
             >
-              <Text style={type.body}>{venue.name}</Text>
+              <Text style={[type.body, styles.venueName]}>{venue.name}</Text>
               <Text style={type.caption}>{venue.city}</Text>
-            </Pressable>
+            </ListRow>
           ))}
         </View>
         {simulated && (
-          <View style={styles.hint}>
-            <View style={styles.hintBar} />
-            <Text style={styles.hintText}>
+          <Panel style={styles.hint}>
+            <Text style={type.small}>
               הופעלה כניסה ל{simulated}. ההתראה נשלחת בעוד 3 דקות — זהו סף השהייה, והוא נמדד
               על ידי מערכת ההפעלה. אם לא הגיעה גם אחריהן, הצינון של 12 שעות או שעות השקט חסמו
               אותה, וזו התנהגות תקינה.
             </Text>
-          </View>
+          </Panel>
         )}
       </Section>
 
       <Section eyebrow="פרטיות">
-        <View style={styles.card}>
+        <Panel>
           <Text style={type.small}>
             אין חשבון, אין שרת, אין ת״ז. הפרופיל, יומן האינטראקציות והקטלוג יושבים על המכשיר.
             מחיקת האפליקציה מוחקת הכול.
@@ -147,62 +148,33 @@ export function SettingsScreen({
             ״חבר״ מעיד על שירות קבע, ״הייטקזון״ על מקום העבודה. שום דבר לא נשלח עד שתשאלו,
             ואפשר להשתמש באפליקציה כרגיל בלי המסך הזה.
           </Text>
-        </View>
+        </Panel>
       </Section>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.surfacePage },
-  content: { paddingBottom: space.s6, gap: space.s4 },
+  screen: { flex: 1, backgroundColor: ticket.ground },
+  content: { paddingBottom: space.s6, gap: space.s3 },
   /* Monospace and selectable: this exists to be copied out of the app, and a
      benefit id in the body face is a line nobody can transcribe correctly. */
   command: {
     ...type.small,
     fontFamily: 'monospace',
-    backgroundColor: colors.surfaceInset,
+    backgroundColor: ticket.ground3,
     padding: space.s2,
-    borderRadius: radius.sharp,
-  },
-  card: {
-    marginHorizontal: space.s4,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-    padding: space.s3,
-    gap: space.s3 - 4,
+    alignSelf: 'stretch',
   },
   switchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: space.s3 - 4,
+    alignSelf: 'stretch',
   },
-  switchText: { flex: 1, gap: 2 },
-  venues: {
-    marginHorizontal: space.s4,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-  },
-  venueRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    gap: space.s3,
-    paddingVertical: space.s3 - 4,
-    paddingHorizontal: space.s3,
-    borderBottomWidth: border.hairline,
-    borderBottomColor: colors.borderHairlineSoft,
-  },
-  /* A note, not an alarm: the marker bar carries it, no coloured field. */
-  hint: {
-    marginHorizontal: space.s4,
-    flexDirection: 'row',
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: radius.sharp,
-  },
-  hintBar: { width: border.marker, backgroundColor: colors.accentUrgent },
-  hintText: { ...type.small, flex: 1, padding: space.s3 },
+  switchText: { flex: 1, gap: 2, alignItems: 'flex-start' },
+  venueName: { flex: 1 },
+  /* A note, not an alarm: one step lighter than the other panels, nothing coloured. */
+  hint: { backgroundColor: ticket.ground3 },
 });

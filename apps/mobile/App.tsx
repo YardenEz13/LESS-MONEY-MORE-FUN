@@ -27,7 +27,8 @@ import { runtimeLimitation } from './src/services/runtime';
 import { resolveShare, subscribeToShares, type ShareResult } from './src/services/shareIntent';
 import { clearRejections, loadProfile, rejectBenefit, saveProfile, toggleMuted } from './src/state/profile';
 import { logEvent } from './src/state/events';
-import { colors, enforceRtl, ticket } from './src/theme';
+import { colors, enforceRtl } from './src/theme';
+import { stockFor } from './src/components/Ticket';
 
 enforceRtl();
 
@@ -114,12 +115,6 @@ function AppRoot() {
   const [geofenceActive, setGeofenceActive] = useState(false);
   /** Whether the current failure is one only the OS settings page can clear. */
   const [geofenceFixable, setGeofenceFixable] = useState(false);
-  /**
-   * Home is the one screen on the dark ground so far, and the safe area and status
-   * bar belong to this root rather than to the screen. Null until the navigator is
-   * up, when the route is the initial one chosen below.
-   */
-  const [routeName, setRouteName] = useState<string | null>(null);
   // The EFT pair carries the Hebrew; the two Google faces carry Latin runs
   // inside it — see the `latinFace` note in theme.ts.
   const [fontsLoaded] = useFonts({
@@ -243,15 +238,10 @@ function AppRoot() {
     );
   }
 
-  const onDarkGround = (routeName ?? (profile.onboarded_at ? 'home' : 'onboarding')) === 'home';
-
   return (
-    <SafeAreaView style={[styles.root, onDarkGround && styles.rootDark]}>
-      <StatusBar style={onDarkGround ? 'light' : 'dark'} />
-      <NavigationContainer
-        ref={navigationRef}
-        onStateChange={() => setRouteName(navigationRef.getCurrentRoute()?.name ?? null)}
-      >
+    <SafeAreaView style={styles.root}>
+      <StatusBar style="light" />
+      <NavigationContainer ref={navigationRef}>
         <Stack.Navigator
           initialRouteName={profile.onboarded_at ? 'home' : 'onboarding'}
           screenOptions={{
@@ -279,7 +269,7 @@ function AppRoot() {
             )}
           </Stack.Screen>
 
-          <Stack.Screen name="home" options={{ contentStyle: { backgroundColor: ticket.ground } }}>
+          <Stack.Screen name="home">
             {({ navigation }) => (
               <HomeScreen
                 profile={profile}
@@ -319,6 +309,7 @@ function AppRoot() {
               return (
                 <BenefitDetailScreen
                   evaluation={evaluation}
+                  stock={stockFor(evaluation.benefit.program_id, profile.program_ids)}
                   isMuted={profile.muted_benefit_ids.includes(evaluation.benefit.id)}
                   isRejected={profile.rejected_benefit_ids.includes(evaluation.benefit.id)}
                   onBack={() => navigation.goBack()}
@@ -378,6 +369,5 @@ function AppRoot() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.surfacePage },
-  rootDark: { backgroundColor: ticket.ground },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfacePage },
 });

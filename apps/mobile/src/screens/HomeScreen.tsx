@@ -24,8 +24,9 @@ import {
   type UserProfile,
   type Venue,
 } from '@sbr/core';
-import { Seam, stockFor, Ticket, wallOffset, type TicketSize } from '../components/Ticket';
-import { LivePill, SearchField, Text } from '../components/ui';
+import { Seam } from '../components/Kit';
+import { stockFor, Ticket, wallOffset, type TicketSize } from '../components/Ticket';
+import { GhostButton, LivePill, SearchField, Text } from '../components/ui';
 import {
   benefits,
   benefitsAtVenue,
@@ -303,7 +304,7 @@ export function HomeScreen({
               <Text style={styles.emptyBody}>
                 {`לא נמצא בית עסק שמתאים ל״${query.trim()}״ מבין ${evaluations.length} ההטבות שלך.`}
               </Text>
-              <InkButton label="נקה חיפוש" onPress={() => setQuery('')} />
+              <GhostButton label="נקה חיפוש" onPress={() => setQuery('')} />
             </View>
           ) : (
             <EmptyState
@@ -608,19 +609,6 @@ function BarAction({ label, onPress }: { label: string; onPress: () => void }) {
   );
 }
 
-function InkButton({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={({ pressed }) => [styles.inkButton, pressed && styles.barActionPressed]}
-    >
-      <Text style={styles.inkButtonLabel}>{label}</Text>
-    </Pressable>
-  );
-}
-
 function EmptyState({
   hasPrograms,
   here,
@@ -669,7 +657,7 @@ function EmptyState({
     <View style={styles.empty}>
       <Text style={styles.emptyTitle}>{copy.title}</Text>
       <Text style={styles.emptyBody}>{copy.body}</Text>
-      {!hasPrograms && <InkButton label="עריכת המועדונים" onPress={onEditPrograms} />}
+      {!hasPrograms && <GhostButton label="עריכת המועדונים" onPress={onEditPrograms} />}
     </View>
   );
 }
@@ -789,14 +777,6 @@ const styles = StyleSheet.create({
   empty: { paddingHorizontal: space.s3, paddingVertical: space.s5, gap: space.s3 - 2, alignItems: 'flex-start' },
   emptyTitle: { fontFamily: fonts.display, fontSize: 26, lineHeight: 30, color: ticket.onGround },
   emptyBody: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: ticket.onGround2 },
-  inkButton: {
-    minHeight: 44,
-    paddingHorizontal: space.s3,
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: ticket.onGround,
-  },
-  inkButtonLabel: { fontFamily: fonts.latinText, fontSize: 15, color: ticket.onGround },
 
   actions: {
     flexDirection: 'row',

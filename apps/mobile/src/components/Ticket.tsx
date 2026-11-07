@@ -15,6 +15,7 @@ import {
   type Evaluation,
   type HoleState,
 } from '@sbr/core';
+import { Seam } from './Kit';
 import { Text } from './ui';
 import { benefits, merchantLine, programNames } from '../services/catalog';
 import { fonts, space, ticket } from '../theme';
@@ -98,17 +99,6 @@ function Mark({
   return (
     <View style={[shape, styles.bad]}>
       <View style={[styles.badBar, { width: size * 0.72 }]} />
-    </View>
-  );
-}
-
-/** The tear line between two tickets. One Text, not thirty views: there is one per row. */
-export function Seam() {
-  return (
-    <View style={styles.seam} pointerEvents="none">
-      <RNText style={styles.seamDots} numberOfLines={1} allowFontScaling={false}>
-        {'●'.repeat(80)}
-      </RNText>
     </View>
   );
 }
@@ -297,17 +287,6 @@ const styles = StyleSheet.create({
   open: { backgroundColor: ticket.punch, borderWidth: 3, borderColor: ticket.ink },
   bad: { borderWidth: 3, borderColor: ticket.void, alignItems: 'center', justifyContent: 'center' },
   badBar: { height: 3, backgroundColor: ticket.void, transform: [{ rotate: '45deg' }] },
-
-  /* Half above the ticket: the next row paints over the one before it, so the dots
-     sit on the seam and no ticket clips them. */
-  seam: { position: 'absolute', top: -4, left: 0, right: 0, height: 8, overflow: 'hidden', alignItems: 'center' },
-  seamDots: {
-    fontSize: 7,
-    lineHeight: 8,
-    letterSpacing: 8,
-    color: ticket.ground,
-    includeFontPadding: false,
-  },
 
   slim: {
     flexDirection: 'row',

@@ -2,10 +2,10 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { matchesQuery, type Program, type UserProfile } from '@sbr/core';
 import { Crest } from '../components/Kit';
-import { Hero, PrimaryButton, SearchField, Section, Text } from '../components/ui';
+import { ListRow, PrimaryButton, ScreenHeader, SearchField, Section, Text } from '../components/ui';
 import { benefits, programs } from '../services/catalog';
 import { toggleProgram } from '../state/profile';
-import { border, colors, radius, space, type } from '../theme';
+import { colors, fonts, space, ticket, type } from '../theme';
 
 /**
  * `public` is deliberately absent. It is granted to everyone rather than
@@ -70,15 +70,13 @@ export function OnboardingScreen({ profile, onChange, onDone }: Props) {
 
   return (
     <View style={styles.screen}>
-      {/* The first thing anyone sees. It used to be this form on bare paper —
-          no colour, no statement, straight into checkboxes. */}
-      <Hero eyebrow="הגדרה חד-פעמית" title="מה יש לך בארנק?">
-        <Text style={styles.heroLine}>
-          <Text style={styles.heroFigure}>{selected}</Text>
+      <ScreenHeader eyebrow="הגדרה חד-פעמית" title="מה יש לך בארנק?">
+        <Text style={styles.count}>
+          <Text style={styles.countFigure}>{selected}</Text>
           {'  '}
           {selected === 1 ? 'מועדון נבחר' : 'מועדונים נבחרו'}
         </Text>
-      </Hero>
+      </ScreenHeader>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.intro}>
@@ -105,7 +103,7 @@ export function OnboardingScreen({ profile, onChange, onDone }: Props) {
 
         {shownSections.map((section) => (
           <Section key={section.category} eyebrow={SECTION_TITLES[section.category] ?? ''}>
-            <View style={styles.group}>
+            <View>
               {section.items.map((program) => (
                 <ProgramRow
                   key={program.id}
@@ -140,69 +138,46 @@ function ProgramRow({
   onPress: () => void;
 }) {
   return (
-    <Pressable
+    <ListRow
       accessibilityRole="checkbox"
       /* aria-checked, not accessibilityState — see the note in components/ui. */
       aria-checked={selected}
       accessibilityLabel={program.name}
       onPress={onPress}
-      style={[styles.row, selected && styles.rowSelected]}
+      selected={selected}
     >
       <View style={[styles.box, selected && styles.boxOn]}>
         {selected && <Text style={styles.check}>✓</Text>}
       </View>
-      {/* The crest the benefit cards will carry, shown at the moment the reader
-          picks the club — so the badge on a card two screens later is already
-          something they have seen and chosen. */}
+      {/* The crest the club carries elsewhere, shown at the moment the reader
+          picks it — so the badge two screens later is already one they chose. */}
       <Crest programId={program.id} size={24} />
       <View style={styles.rowText}>
         <Text style={type.bodyStrong}>{program.name}</Text>
         {program.hint && <Text style={type.caption}>{program.hint}</Text>}
       </View>
-    </Pressable>
+    </ListRow>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.surfacePage },
-  content: { paddingTop: space.s4, paddingBottom: space.s5, gap: space.s4 },
-  intro: { paddingHorizontal: space.s4, gap: space.s2 },
-  heroLine: { ...type.body, color: colors.textMutedOnPrimary },
-  heroFigure: { ...type.figureInline, color: colors.textInverse },
-  group: {
-    marginHorizontal: space.s4,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.s3 - 2,
-    paddingVertical: space.s3 - 2,
-    paddingHorizontal: space.s3,
-    borderBottomWidth: border.hairline,
-    borderBottomColor: colors.borderHairlineSoft,
-  },
-  rowSelected: { backgroundColor: colors.surfaceRaised },
+  screen: { flex: 1, backgroundColor: ticket.ground },
+  content: { paddingTop: space.s2, paddingBottom: space.s5, gap: space.s3 },
+  intro: { paddingHorizontal: space.s3, gap: space.s2 },
+  /* The roll's count line: a quiet sentence with the number in marigold display. */
+  count: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: ticket.onGround2 },
+  countFigure: { ...type.figureInline },
   /* flex-start so Latin club names ("Max") align with Hebrew ones — see ui.tsx. */
   rowText: { flex: 1, gap: 1, alignItems: 'flex-start' },
   box: {
     width: 22,
     height: 22,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
+    borderWidth: 1,
+    borderColor: ticket.muted,
     alignItems: 'center',
     justifyContent: 'center',
   },
   boxOn: { backgroundColor: colors.surfacePrimary, borderColor: colors.surfacePrimary },
   check: { color: colors.textInverse, fontSize: 13, lineHeight: 16 },
-  footer: {
-    flexDirection: 'row',
-    paddingVertical: space.s3 - 4,
-    paddingHorizontal: space.s4,
-    borderTopWidth: border.hairline,
-    borderTopColor: colors.borderHairline,
-  },
+  footer: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: ticket.rule },
 });

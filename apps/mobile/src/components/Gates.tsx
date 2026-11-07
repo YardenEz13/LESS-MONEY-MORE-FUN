@@ -3,13 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import type { Gate } from '@sbr/core';
 import { Text } from './ui';
 import {
-  border,
   colors,
   gateGlyph,
   gateTone,
   gateVerdict,
-  radius,
-  space,
+    space,
+  ticket,
   type,
   type GateTone,
 } from '../theme';
@@ -30,99 +29,21 @@ const VERDICT_INK: Record<GateTone, string> = {
   met: colors.surfacePrimary,
   action: colors.cardYellowDeep,
   note: colors.textMuted,
-  blocked: colors.cardRed,
+  blocked: colors.cardRedText,
 };
-
-/**
- * The condition strip — the one device this app is built around.
- *
- * Every other benefits app puts a huge percentage on the card and buries the
- * terms in grey small print. Here the terms are the product, so each stated
- * condition gets its own chip carrying the engine's verdict: satisfied,
- * up-to-you, or violated. "15% — 4 gates, 3 already clear, 1 on you" is
- * readable in the three seconds you have at a till, which a paragraph of
- * caveats is not.
- *
- * The verdicts are the referee's, which is the point of the whole kit: a
- * booking and a sending-off are already distinct in everyone's head, and they
- * happen to be exactly the distinction this engine computes. Yellow means the
- * benefit is still on if you do something; red means the T&C has ruled.
- */
-export function ConditionStrip({ gates, max = 4 }: { gates: readonly Gate[]; max?: number }) {
-  if (gates.length === 0) {
-    return (
-      <View style={styles.strip}>
-        <View style={[styles.chip, styles.chipPlain]}>
-          <Text style={[type.chip, { color: gateTone.note.fg }]}>ללא תנאים בתקנון</Text>
-        </View>
-      </View>
-    );
-  }
-
-  const shown = gates.slice(0, max);
-  const hidden = gates.slice(max);
-  // Gates are ordered blocked → pending → met, so the overflow is usually the
-  // satisfied ones. Saying so turns "+3" from a truncation mark into the
-  // reassurance it actually represents.
-  const allHiddenMet = hidden.length > 0 && hidden.every((g) => g.state === 'met');
-
-  return (
-    <View style={styles.strip}>
-      {shown.map((gate) => (
-        <GateChip key={gate.code} gate={gate} />
-      ))}
-      {hidden.length > 0 && (
-        <View
-          style={[
-            styles.chip,
-            allHiddenMet
-              ? { backgroundColor: gateTone.met.bg, borderColor: gateTone.met.border }
-              : styles.chipPlain,
-          ]}
-        >
-          <Text style={[type.chip, { color: allHiddenMet ? gateTone.met.fg : gateTone.note.fg }]}>
-            {allHiddenMet ? `✓ ${hidden.length} מתקיימים` : `+${hidden.length}`}
-          </Text>
-        </View>
-      )}
-    </View>
-  );
-}
-
-export function GateChip({ gate }: { gate: Gate }) {
-  const key = toneFor(gate);
-  const tone = gateTone[key];
-  return (
-    <View style={[styles.chip, { backgroundColor: tone.bg, borderColor: tone.border }]}>
-      <Text style={[type.chip, styles.glyph, { color: tone.fg }]}>{gateGlyph[key]}</Text>
-      <Text
-        style={[
-          type.chip,
-          { color: tone.fg },
-          gate.state === 'blocked' && styles.struck,
-        ]}
-        numberOfLines={1}
-      >
-        {gate.label}
-      </Text>
-    </View>
-  );
-}
 
 /**
  * The expanded form on the detail screen: one row per gate, ordered so the
  * thing standing between you and the discount is the first thing you read.
  *
- * The marker is a card rather than a square here — portrait, the referee's
- * proportions — because this is the screen with room to be read rather than
- * scanned, and a held-up card names the verdict before the words do. The glyph
- * stays on it: colour is the fast channel, not the only one, and roughly one
- * reader in twelve cannot separate the yellow from the red.
+ * The marker is a round mark, the shape the roll's holes have; the glyph stays on
+ * it because colour is the fast channel, not the only one — roughly one reader in
+ * twelve cannot separate the marigold from the grey.
  */
 export function GateList({ gates }: { gates: readonly Gate[] }) {
   if (gates.length === 0) {
     return (
-      <View style={[styles.row, { backgroundColor: colors.surfacePrimary }]}>
+      <View style={[styles.row, { backgroundColor: colors.surfacePrimary, borderBottomWidth: 0 }]}>
         <Text style={[type.body, { color: colors.textInverse }]}>
           התקנון לא מציב תנאים נוספים על ההטבה הזו.
         </Text>
@@ -131,7 +52,7 @@ export function GateList({ gates }: { gates: readonly Gate[] }) {
   }
 
   return (
-    <View style={styles.list}>
+    <View>
       {gates.map((gate) => {
         const key = toneFor(gate);
         const tone = gateTone[key];
@@ -175,44 +96,23 @@ export function gateSummary(gates: readonly Gate[]): string {
 }
 
 const styles = StyleSheet.create({
-  strip: { flexDirection: 'row', flexWrap: 'wrap', gap: space.s1 + 2 },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: space.s2 + 2,
-    paddingVertical: 5,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    maxWidth: 170,
-  },
-  chipPlain: { backgroundColor: gateTone.note.bg, borderColor: gateTone.note.border },
-  glyph: { fontSize: 11 },
-  struck: { textDecorationLine: 'line-through' },
-  list: {
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: space.s3 - 4,
-    backgroundColor: colors.surfacePage,
     paddingVertical: space.s3 - 4,
     paddingHorizontal: space.s3,
-    borderBottomWidth: border.hairline,
-    borderBottomColor: colors.borderHairlineSoft,
+    borderBottomWidth: 1,
+    borderBottomColor: ticket.rule,
   },
-  /* A referee's card: portrait, 3:4, 90° like everything else in the system. */
+  /* A round mark, the same shape as the holes on the roll's tickets. */
   marker: {
-    width: 20,
-    height: 27,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 2,
   },
   verdict: { ...type.micro, marginTop: 3 },
   /* flex-start so a number-only label ("₪300+") aligns with a Hebrew one — see ui.tsx. */

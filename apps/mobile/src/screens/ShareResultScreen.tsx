@@ -1,10 +1,10 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import type { Evaluation } from '@sbr/core';
-import { BenefitCard } from '../components/BenefitCard';
-import { PrimaryButton, ScreenHeader, Text } from '../components/ui';
+import { Ticket, stockFor } from '../components/Ticket';
+import { Panel, PrimaryButton, ScreenHeader, Text } from '../components/ui';
 import type { ShareResult } from '../services/shareIntent';
-import { border, colors, radius, space, type } from '../theme';
+import { space, ticket, type } from '../theme';
 
 interface Props {
   result: ShareResult;
@@ -34,37 +34,39 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
                 </>
               )}
             </Text>
-            <View style={styles.list}>
-              {result.match.evaluations.map((evaluation) => (
-                <BenefitCard
-                  key={evaluation.benefit.id}
-                  evaluation={evaluation}
-                  onPress={() => onSelect(evaluation)}
-                />
-              ))}
-            </View>
+            {result.match.evaluations.map((evaluation, i) => (
+              <Ticket
+                key={evaluation.benefit.id}
+                evaluation={evaluation}
+                size={i === 0 ? 'big' : 'mid'}
+                // No wallet here, so the stock follows the club alone.
+                stock={stockFor(evaluation.benefit.program_id, [])}
+                onPress={onSelect}
+                glide={null}
+              />
+            ))}
           </>
         ) : result.kind === 'no_benefits' ? (
           <>
             <ScreenHeader eyebrow={result.hostname} title={result.merchantName} />
-            <View style={styles.notice}>
+            <Panel>
               <Text style={type.displaySmall}>אין כאן הטבה תקפה</Text>
               <Text style={type.small}>
                 מזהים את האתר, אבל אף מועדון שסימנת לא נותן בו הטבה שתקפה לקנייה אונליין כרגע.
               </Text>
-            </View>
+            </Panel>
           </>
         ) : (
           <>
             <ScreenHeader eyebrow="שיתוף" title="האתר לא בקטלוג" />
-            <View style={styles.notice}>
+            <Panel>
               <Text style={type.displaySmall}>{result.hostname ?? 'לא זוהתה כתובת'}</Text>
               <Text style={type.small}>
                 {result.hostname
                   ? 'הדומיין הזה עדיין לא ממופה לבית עסק. הוספה שלו לקטלוג היא התיקון הזול ביותר שאפשר לעשות כאן.'
                   : 'לא נמצאה כתובת אינטרנט בתוכן ששותף.'}
               </Text>
-            </View>
+            </Panel>
           </>
         )}
       </ScrollView>
@@ -77,24 +79,9 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.surfacePage },
-  content: { paddingBottom: space.s5 },
-  lede: { ...type.body, paddingHorizontal: space.s4, paddingBottom: space.s3 },
+  screen: { flex: 1, backgroundColor: ticket.ground },
+  content: { paddingBottom: space.s5, gap: space.s3 },
+  lede: { ...type.body, paddingHorizontal: space.s3 },
   figureInline: type.figureInline,
-  list: { paddingHorizontal: space.s4 },
-  notice: {
-    marginHorizontal: space.s4,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-    padding: space.s4,
-    gap: space.s2,
-  },
-  footer: {
-    flexDirection: 'row',
-    paddingVertical: space.s3 - 4,
-    paddingHorizontal: space.s4,
-    borderTopWidth: border.hairline,
-    borderTopColor: colors.borderHairline,
-  },
+  footer: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: ticket.rule },
 });

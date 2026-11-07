@@ -1,93 +1,7 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, Text as RNText, View, type ViewStyle } from 'react-native';
+import React from 'react';
+import { StyleSheet, Text as RNText, View } from 'react-native';
 import { programsById } from '../services/catalog';
-import { colors, crestColors, crestFallback, fonts, kit } from '../theme';
-
-/**
- * The kit: pitch stripes, the scarf, and the club crest.
- *
- * These three are the whole football vocabulary, and they are deliberately
- * decoration-with-a-job rather than decoration. The stripes mark which surfaces
- * are *ours* — the green ones the app speaks from, never the reader's paper.
- * The scarf closes a green surface, so it always means "this block ended here".
- * The crest says which club a benefit came from, which is the fastest thing to
- * scan for in a list of nine.
- *
- * Nothing here imports from `ui.tsx`: `ui.tsx` builds its Hero out of these, and
- * a cycle between the two would resolve to `undefined` at module-eval time under
- * Metro long before anyone saw a stripe.
- */
-
-/**
- * Vertical shirt stripes across whatever they are dropped into.
- *
- * Absolutely filled and non-interactive, so it goes *inside* a coloured surface
- * as the first child and costs that surface nothing but `overflow: 'hidden'` —
- * without the clip the stripes run past the block's edge.
- *
- * `tone` picks which way the stripe leans: `light` on a green or ink surface,
- * `dark` on a bright one like the yellow card.
- */
-export function PitchStripes({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
-  const alpha = kit.stripeAlpha;
-  const backgroundColor =
-    tone === 'light' ? `rgba(245, 243, 238, ${alpha})` : `rgba(17, 19, 16, ${alpha})`;
-
-  // Static: the stripe count never depends on measured width, so this never
-  // needs a layout pass — the parent's clip does the fitting.
-  const stripes = useMemo(
-    () => Array.from({ length: kit.stripeCount }, (_, i) => i),
-    [],
-  );
-
-  return (
-    <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.stripes]}>
-      {stripes.map((i) => (
-        <View key={i} style={[styles.stripe, { backgroundColor }]} />
-      ))}
-    </View>
-  );
-}
-
-/**
- * The scarf: the band that ends a green surface.
- *
- * Blocks rather than a rule, because a rule is already the system's quietest
- * device and this is the loudest. It closes the hero, heads a section, and
- * finishes a list — and the orange block at the end is the only place the kit
- * spends the urgent hue on something that is not urgent, which is what makes it
- * read as a scarf rather than as a warning.
- *
- * Flex weights, not widths: the same band fits a 320px phone and a browser.
- */
-const SCARF: ReadonlyArray<readonly [number, 'pitch' | 'gap' | 'flare']> = [
-  [6, 'pitch'],
-  [3, 'gap'],
-  [6, 'pitch'],
-  [3, 'gap'],
-  [6, 'pitch'],
-  [3, 'gap'],
-  [6, 'pitch'],
-  [2, 'flare'],
-];
-
-const SCARF_FILL = {
-  pitch: colors.surfacePrimary,
-  /* Not the page tone: on paper an identical gap would erase the band into a
-     dashed line. One step down is enough to read as a woven block. */
-  gap: colors.surfaceInset,
-  flare: colors.accentUrgent,
-} as const;
-
-export function ScarfBand({ height, style }: { height?: number; style?: ViewStyle }) {
-  return (
-    <View style={[styles.scarf, { height: height ?? kit.scarfHeight }, style]}>
-      {SCARF.map(([weight, role], i) => (
-        <View key={i} style={{ flex: weight, backgroundColor: SCARF_FILL[role] }} />
-      ))}
-    </View>
-  );
-}
+import { colors, crestColors, crestFallback, fonts, ticket } from '../theme';
 
 /**
  * The club badge: one letter on the league's colour.
@@ -142,18 +56,37 @@ function initial(name: string): string {
   return (match?.[0] ?? name.charAt(0)).toUpperCase();
 }
 
+/**
+ * The tear line along a ticket's top edge. One Text, not thirty views: there is
+ * one per row. Half of it sits over the row above, and the dots are the ground
+ * colour, so they read as holes punched through both.
+ */
+export function Seam() {
+  return (
+    <View style={styles.seam} pointerEvents="none">
+      <RNText style={styles.seamDots} numberOfLines={1} allowFontScaling={false}>
+        {'●'.repeat(80)}
+      </RNText>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  stripes: { flexDirection: 'row', gap: kit.stripeGap },
-  stripe: { width: kit.stripeWidth, flexShrink: 0 },
-  scarf: { flexDirection: 'row', alignItems: 'stretch' },
+  seam: { position: 'absolute', top: -4, left: 0, right: 0, height: 8, overflow: 'hidden', alignItems: 'center' },
+  seamDots: {
+    fontSize: 7,
+    lineHeight: 8,
+    letterSpacing: 8,
+    color: ticket.ground,
+    includeFontPadding: false,
+  },
   crest: {
     flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    /* 90° like everything else — a crest in this system is a shield only in
-       the sense that it carries a colour and a letter. */
     paddingBottom: 1,
   },
+  /* Ink: every crest hue is a light stock. */
   crestLetter: {
     color: colors.textInverse,
     textAlign: 'center',

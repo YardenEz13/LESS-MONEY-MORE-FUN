@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   StyleSheet,
   TextInput,
   View,
 } from 'react-native';
 import type { Evaluation, UserProfile } from '@sbr/core';
-import { BenefitCard } from '../components/BenefitCard';
-import { PrimaryButton, ScreenHeader, Section, Text } from '../components/ui';
+import { Ticket, stockFor } from '../components/Ticket';
+import { GhostButton, Panel, PrimaryButton, ScreenHeader, Section, Text } from '../components/ui';
 import { askAdvisor, isAdvisorConfigured, type AdvisorAnswer } from '../services/advisor';
-import { border, colors, radius, space, type } from '../theme';
+import { colors, space, ticket, type } from '../theme';
 
 const EXAMPLES = [
   'איפה הכי משתלם לתדלק?',
@@ -28,7 +27,7 @@ interface Props {
 /**
  * Ask in Hebrew, get an answer drawn from benefits you already hold.
  *
- * The card under the answer is the same `BenefitCard` the list uses, on purpose:
+ * The ticket under the answer is the same `Ticket` the roll uses, on purpose:
  * the advisor is a way *into* the catalog, not a second source of truth with its
  * own idea of what a benefit says.
  */
@@ -82,27 +81,18 @@ export function AdvisorScreen({ profile, onSelect, onBack }: Props) {
         </View>
 
         {!configured && (
-          <View style={styles.notice}>
-            <View style={styles.noticeBar} />
-            <Text style={styles.noticeText}>
+          <Panel>
+            <Text style={type.small}>
               העוזר כבוי — לא הוגדר שרת ולא מפתח. הגדירו EXPO_PUBLIC_ADVISOR_URL (מומלץ) או
               EXPO_PUBLIC_GEMINI_API_KEY והפעילו מחדש.
             </Text>
-          </View>
+          </Panel>
         )}
 
         {configured && !result && !pending && (
           <View style={styles.examples}>
             {EXAMPLES.map((example) => (
-              <Pressable
-                key={example}
-                accessibilityRole="button"
-                accessibilityLabel={example}
-                onPress={() => void ask(example)}
-                style={({ pressed }) => [styles.example, pressed && styles.examplePressed]}
-              >
-                <Text style={type.chip}>{example}</Text>
-              </Pressable>
+              <GhostButton key={example} label={example} onPress={() => void ask(example)} />
             ))}
           </View>
         )}
@@ -114,38 +104,39 @@ export function AdvisorScreen({ profile, onSelect, onBack }: Props) {
         )}
 
         {error && (
-          <View style={styles.notice}>
-            <View style={[styles.noticeBar, { backgroundColor: colors.accentUrgent }]} />
-            <Text style={styles.noticeText}>{error}</Text>
-          </View>
+          <Panel>
+            <Text style={type.small}>{error}</Text>
+          </Panel>
         )}
 
         {result && (
           <>
-            <View style={styles.answer}>
+            <Panel style={styles.answer}>
               <Text style={styles.answerText}>{result.answer}</Text>
               {result.caveat && <Text style={styles.caveat}>שים לב · {result.caveat}</Text>}
-            </View>
+            </Panel>
 
             {result.best && (
               <Section eyebrow="ההמלצה">
-                <View style={styles.cards}>
-                  <BenefitCard
-                    evaluation={result.best}
-                    onPress={() => onSelect(result.best!)}
-                  />
-                </View>
+                <Ticket
+                  evaluation={result.best}
+                  size="big"
+                  stock={stockFor(result.best.benefit.program_id, profile.program_ids)}
+                  onPress={onSelect}
+                  glide={null}
+                />
               </Section>
             )}
 
             {result.runnerUp && (
               <Section eyebrow="חלופה">
-                <View style={styles.cards}>
-                  <BenefitCard
-                    evaluation={result.runnerUp}
-                    onPress={() => onSelect(result.runnerUp!)}
-                  />
-                </View>
+                <Ticket
+                  evaluation={result.runnerUp}
+                  size="mid"
+                  stock={stockFor(result.runnerUp.benefit.program_id, profile.program_ids)}
+                  onPress={onSelect}
+                  glide={null}
+                />
               </Section>
             )}
 
@@ -161,39 +152,22 @@ export function AdvisorScreen({ profile, onSelect, onBack }: Props) {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.surfacePage },
-  content: { paddingBottom: space.s6, gap: space.s4 },
-  ask: { paddingHorizontal: space.s4, gap: space.s2 },
+  screen: { flex: 1, backgroundColor: ticket.ground },
+  content: { paddingBottom: space.s6, gap: space.s3 },
+  ask: { paddingHorizontal: space.s3, gap: space.s2 },
   input: {
     ...type.body,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-    borderRadius: radius.sharp,
+    borderWidth: 1,
+    borderColor: ticket.muted,
     paddingHorizontal: space.s3,
     paddingVertical: space.s3 - 4,
     minHeight: 56,
   },
-  examples: { paddingHorizontal: space.s4, gap: space.s2, alignItems: 'flex-start' },
-  example: {
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-    borderRadius: radius.sharp,
-    paddingHorizontal: space.s3 - 2,
-    paddingVertical: space.s2,
-  },
-  examplePressed: { backgroundColor: colors.surfaceRaised },
+  examples: { paddingHorizontal: space.s3, gap: space.s2, alignItems: 'flex-start' },
   pending: { paddingVertical: space.s4, alignItems: 'center' },
-  notice: { marginHorizontal: space.s4, flexDirection: 'row', backgroundColor: colors.surfaceRaised },
-  noticeBar: { width: border.marker, backgroundColor: colors.surfaceAccent },
-  noticeText: { ...type.small, flex: 1, padding: space.s3 },
-  answer: {
-    marginHorizontal: space.s4,
-    backgroundColor: colors.surfacePlate,
-    padding: space.s4,
-    gap: space.s2,
-  },
+  /* The answer is the one bone ticket on the screen: ink on a stock, like a benefit. */
+  answer: { backgroundColor: colors.surfacePlate },
   answerText: { ...type.lead, color: colors.textInverse },
   caveat: { ...type.small, color: colors.textMutedInverse },
-  cards: { paddingHorizontal: space.s4 },
-  footnote: { ...type.caption, marginHorizontal: space.s4, lineHeight: 18 },
+  footnote: { ...type.caption, marginHorizontal: space.s3 },
 });

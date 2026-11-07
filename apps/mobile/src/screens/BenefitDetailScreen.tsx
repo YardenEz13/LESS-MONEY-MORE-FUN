@@ -8,13 +8,15 @@ import {
   type Evaluation,
 } from '@sbr/core';
 import { GateList, gateSummary } from '../components/Gates';
-import { PitchStripes, ScarfBand } from '../components/Kit';
-import { GhostButton, PrimaryButton, ScreenHeader, Section, Text } from '../components/ui';
+import { Seam } from '../components/Kit';
+import { GhostButton, ListRow, Panel, PrimaryButton, ScreenHeader, Section, Text } from '../components/ui';
 import { programNames, programsById } from '../services/catalog';
-import { border, colors, radius, space, type } from '../theme';
+import { space, ticket, type } from '../theme';
 
 interface Props {
   evaluation: Evaluation;
+  /** The stock the ticket had on the roll, so the colour carries across the tap. */
+  stock: string;
   isMuted: boolean;
   isRejected: boolean;
   onReport: () => void;
@@ -25,6 +27,7 @@ interface Props {
 
 export function BenefitDetailScreen({
   evaluation,
+  stock,
   isMuted,
   isRejected,
   onReport,
@@ -56,14 +59,12 @@ export function BenefitDetailScreen({
           onBack={onBack}
         />
 
-        {/* The plate, full width: deliberately the loudest thing on the screen,
-            because this is what you hold up at the counter. It states the
-            benefit and the one thing still standing in the way.
-            The scoreboard, in other words — striped, closed by the scarf, with
-            the club that issued the figure named on it. */}
-        <View style={styles.tillWrap}>
-          <View style={styles.till}>
-            <PitchStripes />
+        {/* The ticket, full width in the stock it had on the roll: deliberately
+            the loudest thing on the screen, because this is what you hold up
+            at the counter. It states the benefit and the one thing still
+            standing in the way, and ends on the tear line. */}
+        <View>
+          <View style={[styles.till, { backgroundColor: stock }]}>
             <View style={styles.tillValue}>
               <Text style={styles.tillFigure}>{figure}</Text>
               <Text style={styles.tillUnit}>{unit}</Text>
@@ -78,7 +79,9 @@ export function BenefitDetailScreen({
                   : `להכין מראש: ${actionsRequired.map((g) => g.label).join(' · ')}`}
             </Text>
           </View>
-          <ScarfBand />
+          <View>
+            <Seam />
+          </View>
         </View>
 
         <Section eyebrow={gateSummary(gates)}>
@@ -86,14 +89,13 @@ export function BenefitDetailScreen({
         </Section>
 
         <Section eyebrow="לשון התקנון">
-          <View style={styles.quote}>
-            <View style={styles.quoteBar} />
-            <Text style={styles.quoteText}>{benefit.conditions.raw_text_summary}</Text>
-          </View>
+          <Panel>
+            <Text style={type.body}>{benefit.conditions.raw_text_summary}</Text>
+          </Panel>
         </Section>
 
         <Section eyebrow="מקור ואמינות">
-          <View style={styles.trust}>
+          <View>
             <TrustRow label="אימות אחרון" value={formatLastVerified(benefit)} />
             <TrustRow
               label="ציון חילוץ"
@@ -102,18 +104,18 @@ export function BenefitDetailScreen({
               }`}
             />
             <TrustRow label="נקרא מתוך" value={listing} />
-            <View style={styles.trustAction}>
+          </View>
+          <View style={styles.actions}>
+            <GhostButton
+              label={`פתח את הדף ב${listing}`}
+              onPress={() => void Linking.openURL(benefit.source_url)}
+            />
+            {club?.catalog_url && (
               <GhostButton
-                label={`פתח את הדף ב${listing}`}
-                onPress={() => void Linking.openURL(benefit.source_url)}
+                label={`התקנון אצל ${club.name}`}
+                onPress={() => void Linking.openURL(club.catalog_url!)}
               />
-              {club?.catalog_url && (
-                <GhostButton
-                  label={`התקנון אצל ${club.name}`}
-                  onPress={() => void Linking.openURL(club.catalog_url!)}
-                />
-              )}
-            </View>
+            )}
           </View>
           <Text style={styles.disclaimer}>
             אנחנו לא מנחשים תנאים. מה שלא כתוב בתקנון מסומן כ״לא צוין״ ולא כ״אין הגבלה״.
@@ -123,9 +125,9 @@ export function BenefitDetailScreen({
           {/* Placed with the source links rather than beside "I redeemed this":
               reporting is a claim that the catalog disagrees with the page above,
               so the two belong next to each other. */}
-          <View style={styles.report}>
+          <View style={styles.actions}>
             {isRejected ? (
-              <Text style={styles.reportDone}>
+              <Text style={type.small}>
                 דווח כשגוי. ההטבה הוסתרה ותוחזר לבדיקה בעדכון הקטלוג הבא.
               </Text>
             ) : (
@@ -149,54 +151,23 @@ export function BenefitDetailScreen({
 
 function TrustRow({ label, value }: { label: string; value: string }) {
   return (
-    <View style={styles.trustRow}>
+    <ListRow>
       <Text style={[type.small, styles.trustLabel]}>{label}</Text>
       <Text style={[type.bodyStrong, styles.trustValue]}>{value}</Text>
-    </View>
+    </ListRow>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.surfacePage },
-  content: { paddingBottom: space.s5, gap: space.s4 },
-  tillWrap: { marginHorizontal: space.s4 },
-  till: {
-    backgroundColor: colors.surfacePlate,
-    borderRadius: radius.sharp,
-    padding: space.s4,
-    gap: space.s1,
-    overflow: 'hidden',
-  },
+  screen: { flex: 1, backgroundColor: ticket.ground },
+  content: { paddingBottom: space.s5, gap: space.s3 },
+  till: { paddingHorizontal: space.s3, paddingVertical: space.s3, gap: space.s1, alignItems: 'flex-start' },
   tillValue: { flexDirection: 'row', alignItems: 'baseline', gap: space.s2 },
   tillFigure: type.figureLarge,
-  tillUnit: { ...type.bodyStrong, fontSize: 17, color: colors.textMutedInverse },
-  tillSaving: { ...type.small, color: colors.textMutedInverse },
-  tillRule: {
-    height: border.hairline,
-    backgroundColor: colors.borderOnPlate,
-    marginVertical: space.s3 - 2,
-  },
-  tillNote: { ...type.bodyStrong, color: colors.textInverse },
-  /* The marker bar is a sibling view, not `borderStartWidth` — see BenefitCard. */
-  quote: { marginHorizontal: space.s4, flexDirection: 'row', gap: space.s3 - 2 },
-  quoteBar: { width: border.marker, backgroundColor: colors.surfacePrimary },
-  quoteText: { ...type.body, flex: 1, paddingVertical: space.s1 },
-  trust: {
-    marginHorizontal: space.s4,
-    borderRadius: radius.sharp,
-    borderWidth: border.hairline,
-    borderColor: colors.borderHairline,
-    paddingHorizontal: space.s3,
-  },
-  trustRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: space.s3,
-    paddingVertical: space.s3 - 4,
-    borderBottomWidth: border.hairline,
-    borderBottomColor: colors.borderHairlineSoft,
-  },
+  tillUnit: { ...type.bodyStrong, fontSize: 17, color: ticket.ink2 },
+  tillSaving: { ...type.small, color: ticket.ink2 },
+  tillRule: { height: 1, alignSelf: 'stretch', backgroundColor: ticket.ink2, marginVertical: space.s3 - 2 },
+  tillNote: { ...type.bodyStrong, color: ticket.ink },
   /**
    * The label is two fixed words and never earns a break; the value is the
    * variable half, so it is the one that gives. `minWidth: 0` is the part that
@@ -205,18 +176,9 @@ const styles = StyleSheet.create({
    * wrapping inside it.
    */
   trustLabel: { flexShrink: 0 },
-  trustValue: { flexShrink: 1, minWidth: 0 },
-  trustAction: { paddingVertical: space.s3 - 4, gap: space.s2 },
-  report: { paddingTop: space.s3, borderTopWidth: border.hairline, borderTopColor: colors.borderHairlineSoft },
-  reportDone: { ...type.small, color: colors.textMuted },
-  disclaimer: { ...type.caption, marginHorizontal: space.s4, lineHeight: 18 },
-  footer: {
-    flexDirection: 'row',
-    gap: space.s2,
-    paddingVertical: space.s3 - 4,
-    paddingHorizontal: space.s4,
-    borderTopWidth: border.hairline,
-    borderTopColor: colors.borderHairline,
-  },
-  mute: { alignSelf: 'stretch', justifyContent: 'center' },
+  trustValue: { flex: 1, minWidth: 0, textAlign: 'left' },
+  actions: { paddingHorizontal: space.s3, gap: space.s2, alignItems: 'flex-start' },
+  disclaimer: { ...type.caption, marginHorizontal: space.s3 },
+  footer: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: ticket.rule },
+  mute: { alignSelf: 'stretch', justifyContent: 'center', borderWidth: 0, minHeight: 56 },
 });
