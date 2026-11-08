@@ -64,3 +64,18 @@ extraction pipeline, with a `source_url` you can open and re-read yourself.
 first guesses. Before relying on geofencing, walk each site or check the
 coordinates against Google Maps and tune `radius_m`: too small and the fence
 never fires indoors, too large and it fires from the highway next door.
+
+## Checking offers with Gemini (local)
+
+`scripts/gemini-verify.mjs` re-reads each stale offer's source page with Gemini and
+moves `last_verified_at` forward only when Gemini quotes the page word for word
+(the script checks the quote and the offer's number itself). It deletes nothing.
+
+1. Get a key at https://aistudio.google.com/apikey and put `GEMINI_API_KEY=...` in a
+   git-ignored `.env` at the repo root (`apps/mobile/.env` also works).
+2. Dry run, one mall first:  `npm run verify:gemini -- --venue azrieli_tlv --max 20`
+3. Happy with `data/generated/verify-report.json`? Add `--write`, then
+   `npm run validate:data && npm test`, and commit `data/benefits.json`.
+
+easy.co.il answers 403 and the script respects that: those offers stay stale.
+`npm run branches:osm` (dry run) adds chain branches from OpenStreetMap the same way.

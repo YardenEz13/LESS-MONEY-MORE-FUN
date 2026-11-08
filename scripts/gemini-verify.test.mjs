@@ -1,6 +1,6 @@
 /** Gemini may read a page; it may not make up proof. Every guard the script relies on. */
 import assert from 'node:assert/strict';
-import { applyVerdicts, checkVerdict, normalize, pageToText, run, selectRows, venueBenefitIds } from './gemini-verify.mjs';
+import { applyVerdicts, findKey, checkVerdict, normalize, pageToText, run, selectRows, venueBenefitIds } from './gemini-verify.mjs';
 
 const OLD = '2026-08-01T00:00:00.000Z';
 const row = (over = {}) => ({
@@ -55,6 +55,15 @@ const ok = async () => ({ status: 200, ok: true, text: async () => `<p>${page}</
 const gem = async () => ({ status: 200, ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify({ verdict: 'still_offered', evidence: '18% הנחה על השכרת רכב' }) }] } }] }) });
 const done = await run({ rows: [row()], key: 'k', opts: { minAgeDays: 1, max: 9 }, fetchImpl: ok, geminiFetch: gem, log: () => {} });
 assert.equal(done[0].verdict, 'still_offered');
+
+const files = { '.env': 'A=1\nGEMINI_API_KEY="k-root"\n', 'apps/mobile/.env': 'EXPO_PUBLIC_GEMINI_API_KEY=k-app' };
+const rd = async (p) => { if (!(p in files)) throw new Error('ENOENT'); return files[p]; };
+assert.equal(await findKey({ GEMINI_API_KEY: 'k-env' }, rd), 'k-env');
+assert.equal(await findKey({}, rd), 'k-root');
+delete files['.env'];
+assert.equal(await findKey({}, rd), 'k-app');
+delete files['apps/mobile/.env'];
+assert.equal(await findKey({}, rd), undefined);
 
 assert.equal(typeof venueBenefitIds, 'function');
 console.log('gemini-verify: ok');

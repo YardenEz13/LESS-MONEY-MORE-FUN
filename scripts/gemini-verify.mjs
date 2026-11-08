@@ -211,12 +211,30 @@ export async function venueBenefitIds(venueId, rows) {
   return new Set(rows.filter((r) => inside.has(r.merchant_id)).map((r) => r.id));
 }
 
+/**
+ * The key for local runs: the environment first, then `.env` at the repo root,
+ * then `apps/mobile/.env` (where the refresh script already keeps it, as
+ * EXPO_PUBLIC_GEMINI_API_KEY). Never printed, never written anywhere.
+ */
+export async function findKey(env = process.env, read = (p) => readFile(p, 'utf8')) {
+  if (env.GEMINI_API_KEY) return env.GEMINI_API_KEY;
+  for (const file of ['.env', 'apps/mobile/.env']) {
+    const text = await read(file).catch(() => '');
+    const hit = text.match(/^(?:EXPO_PUBLIC_)?GEMINI_API_KEY\s*=\s*["']?([^"'\r\n]+)/m);
+    if (hit) return hit[1].trim();
+  }
+  return undefined;
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const opt = (n) => (args.includes(`--${n}`) ? args[args.indexOf(`--${n}`) + 1] : undefined);
-  const key = process.env.GEMINI_API_KEY;
+  const key = await findKey();
   if (!key) {
-    console.error('GEMINI_API_KEY is not set');
+    console.error(
+      'No Gemini key. Create one at https://aistudio.google.com/apikey, then put\n' +
+        'GEMINI_API_KEY=... in a file named .env at the repo root (it is git-ignored).',
+    );
     process.exit(2);
   }
   const rows = JSON.parse(await readFile('data/benefits.json', 'utf8'));
