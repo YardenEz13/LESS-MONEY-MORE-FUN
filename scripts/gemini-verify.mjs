@@ -32,7 +32,7 @@ const MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.1-flash-lite';
 const UA = 'LessMoneyMoreFun-verifier/1.0 (+https://github.com/YardenEz13/LESS-MONEY-MORE-FUN)';
 const GIVE_UP_AFTER = 10;
 const PAGE_CHARS = 14_000;
-const REPORT = 'data/generated/verify-report.json';
+export const REPORT = 'data/generated/verify-report.json';
 
 /** Whitespace, punctuation-width and case differences must not defeat a quote check. */
 export const normalize = (s) =>
@@ -99,7 +99,7 @@ export function selectRows(rows, { minAgeDays, programs, ids, max, now = Date.no
     .slice(0, max);
 }
 
-const SYSTEM = `You verify whether a web page still states one specific discount.
+export const SYSTEM = `You verify whether a web page still states one specific discount.
 You are given the offer (merchant, club, kind, value) and the page text.
 Answer JSON {verdict, evidence}.
 - "still_offered": the page states this merchant's offer for this club and it is current.

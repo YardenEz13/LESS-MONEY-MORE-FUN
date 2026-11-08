@@ -79,3 +79,17 @@ moves `last_verified_at` forward only when Gemini quotes the page word for word
 
 easy.co.il answers 403 and the script respects that: those offers stay stale.
 `npm run branches:osm` (dry run) adds chain branches from OpenStreetMap the same way.
+
+### With your Gemini account in your own Chrome (no API key)
+
+`scripts/gemini-chrome-verify.mjs` does the same check through the Gemini web app, in
+a Chrome you control, and also reads JavaScript-rendered pages.
+
+1. `npm install`
+2. `powershell -File scripts/start-chrome-gemini.ps1` — opens Chrome with its own
+   profile; log in to Google once (kept in `%LOCALAPPDATA%\lmmf-gemini-chrome`).
+3. `node scripts/gemini-chrome-verify.mjs --probe` — shows which Gemini page
+   selectors match today. If one says `-`, fix it in `SELECTORS` at the top of the script.
+4. `npm run verify:chrome -- --venue azrieli_tlv --max 10`, read the report, then add `--write`.
+
+It never solves captchas or blocks, and stops using a site after 3 refusals.
