@@ -8,7 +8,7 @@ import * as Notifications from 'expo-notifications';
 import { useFonts } from 'expo-font';
 import { Karantina_700Bold } from '@expo-google-fonts/karantina';
 import { NotoSansHebrew_400Regular } from '@expo-google-fonts/noto-sans-hebrew';
-import type { Evaluation, UserProfile } from '@sbr/core';
+import { applyPunches, pruneExpired, punchedCodes, togglePunch, type Evaluation, type Punches, type UserProfile } from '@sbr/core';
 import { AdvisorScreen } from './src/screens/AdvisorScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
@@ -26,6 +26,7 @@ import {
 import { requestNotificationPermission } from './src/services/notifications';
 import { runtimeLimitation } from './src/services/runtime';
 import { resolveShare, subscribeToShares, type ShareResult } from './src/services/shareIntent';
+import { loadPunches, savePunches } from './src/state/punches';
 import { clearRejections, loadProfile, rejectBenefit, saveProfile, toggleMuted } from './src/state/profile';
 import { logEvent } from './src/state/events';
 import { colors, enforceRtl } from './src/theme';
@@ -125,6 +126,23 @@ function AppRoot() {
     Karantina_700Bold,
     NotoSansHebrew_400Regular,
   });
+
+  const [punches, setPunches] = useState<Punches>({});
+  useEffect(() => {
+    void loadPunches().then(setPunches);
+    // Midnight passes while the app sleeps: re-read on return so yesterday's marks are gone.
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') setPunches((p) => pruneExpired(p, new Date()));
+    });
+    return () => sub.remove();
+  }, []);
+  const punch = useCallback((benefitId: string, code: string) => {
+    setPunches((prev) => {
+      const next = togglePunch(pruneExpired(prev, new Date()), benefitId, code, new Date());
+      void savePunches(next);
+      return next;
+    });
+  }, []);
 
   const persist = useCallback(async (next: UserProfile) => {
     setProfile(next);
@@ -275,6 +293,7 @@ function AppRoot() {
             {({ navigation }) => (
               <HomeScreen
                 profile={profile}
+                punches={punches}
                 geofenceStatus={geofenceStatus}
                 geofenceActive={geofenceActive}
                 onSelect={(evaluation) => {
@@ -303,7 +322,9 @@ function AppRoot() {
 
           <Stack.Screen name="detail">
             {({ navigation, route }) => {
-              const { evaluation } = route.params;
+              const { evaluation: raw } = route.params;
+              const codes = punchedCodes(punches, raw.benefit.id, new Date());
+              const evaluation = applyPunches(raw, codes);
               // These three change what the list contains, so they return to it
               // rather than to whichever screen opened the card — `navigate`
               // pops back to the existing `home` instead of stacking a second.
@@ -315,6 +336,8 @@ function AppRoot() {
                   isMuted={profile.muted_benefit_ids.includes(evaluation.benefit.id)}
                   isRejected={profile.rejected_benefit_ids.includes(evaluation.benefit.id)}
                   onBack={() => navigation.goBack()}
+                  punched={codes}
+                  onPunch={(gate) => punch(evaluation.benefit.id, gate.code)}
                   onTill={() => navigation.navigate('till', { evaluation })}
                   onRedeemed={async () => {
                     await logEvent({ kind: 'benefit_redeemed', benefitId: evaluation.benefit.id });

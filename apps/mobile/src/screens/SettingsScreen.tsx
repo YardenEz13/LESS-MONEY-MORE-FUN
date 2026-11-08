@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Linking, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import type { UserProfile } from '@sbr/core';
 import { GhostButton, ListRow, Panel, ScreenHeader, Section, Text } from '../components/ui';
 import { programsById, venues } from '../services/catalog';
-import { handleVenueEnter } from '../services/geofencing';
+import { handleVenueEnter, lastGeoEvent, type LastGeoEvent } from '../services/geofencing';
 import { colors, space, ticket, type } from '../theme';
 
 interface Props {
@@ -17,6 +17,19 @@ interface Props {
   onClearRejections: () => void;
   onBack: () => void;
 }
+
+const OUTCOME_HE: Record<LastGeoEvent['outcome'], string> = {
+  armed: 'תזכורת תוזמנה',
+  already_armed: 'כבר תוזמנה לביקור הזה',
+  unknown_place: 'מקום לא מוכר',
+  notifications_off: 'התראות כבויות באפליקציה',
+  no_clubs: 'לא סומנו מועדונים',
+  nothing_to_show: 'אין הטבות תקפות במקום (ייתכן שהנתונים ישנים)',
+  cooldown: 'צינון: כבר התרענו בשעות האחרונות',
+  quiet_hours: 'שעות שקט (22:00–08:00)',
+  dwell_too_short: 'שהייה קצרה מדי',
+  empty_message: 'אין מה לכתוב בהתראה',
+};
 
 /**
  * Every block here is a `Panel` or a run of `ListRow`s, the same pieces the roll
@@ -33,6 +46,10 @@ export function SettingsScreen({
   onBack,
 }: Props) {
   const [simulated, setSimulated] = useState<string | null>(null);
+  const [last, setLast] = useState<LastGeoEvent | null>(null);
+  useEffect(() => {
+    void lastGeoEvent().then(setLast);
+  }, [simulated]);
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
@@ -91,6 +108,11 @@ export function SettingsScreen({
             עד 20 המקומות הקרובים אליך במעקב — קניונים והסניפים שבהם יש לך הטבה. הבחירה נעשית
             על המכשיר לפי המיקום האחרון שלו, ומערכת ההפעלה מודיעה לנו רק על כניסה לאחד מהם.
             אנחנו לא עוקבים אחרי המיקום שלך, ושום דבר לא נשלח החוצה.
+          </Text>
+          <Text style={type.caption}>
+            {last
+              ? `אירוע אחרון: ${new Date(last.at).toLocaleString('he-IL')} · ${OUTCOME_HE[last.outcome]}`
+              : 'עוד לא נרשמה כניסה למקום מנוטר. אם הגעת למקום והתראה לא הגיעה, מערכת ההפעלה לא הפעילה את האפליקציה.'}
           </Text>
           {/* Retrying in-app cannot clear these two — the grant they need only
               exists on the OS settings page, so that is where the button goes. */}

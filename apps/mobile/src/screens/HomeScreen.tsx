@@ -10,7 +10,9 @@ import {
   View,
 } from 'react-native';
 import {
+  applyPunches,
   catalogIsStale,
+  punchedCodes,
   displayMerchantName,
   findCombos,
   hiddenBenefitIds,
@@ -21,6 +23,7 @@ import {
   type Combo,
   type Coordinates,
   type Evaluation,
+  type Punches,
   type UserProfile,
   type Venue,
 } from '@sbr/core';
@@ -69,6 +72,8 @@ type Row =
 
 interface Props {
   profile: UserProfile;
+  /** Steps punched today; see `@sbr/core` punches. */
+  punches: Punches;
   geofenceStatus: string;
   geofenceActive: boolean;
   onSelect: (evaluation: Evaluation) => void;
@@ -78,6 +83,7 @@ interface Props {
 }
 
 export function HomeScreen({
+  punches,
   profile,
   geofenceStatus,
   geofenceActive,
@@ -157,13 +163,19 @@ export function HomeScreen({
     );
   }, [owned, profile.muted_benefit_ids, profile.rejected_benefit_ids]);
 
-  const evaluations = useMemo(() => ranked.filter((e) => e.status !== 'blocked'), [ranked]);
+  // A punched step reads as done today, so the ticket moves from "needs a step" to "ready".
+  const punchedRanked = useMemo(() => {
+    const now = new Date();
+    return ranked.map((e) => applyPunches(e, punchedCodes(punches, e.benefit.id, now)));
+  }, [ranked, punches]);
+
+  const evaluations = useMemo(() => punchedRanked.filter((e) => e.status !== 'blocked'), [ranked]);
   const notNow = useMemo(
     () =>
-      ranked.filter(
+      punchedRanked.filter(
         (e) => e.status === 'blocked' && !e.blockers.some((b) => NEVER_LISTED.has(b.code)),
       ),
-    [ranked],
+    [punchedRanked],
   );
 
   // Checked against the whole catalog rather than the filtered list: the answer
@@ -261,6 +273,15 @@ export function HomeScreen({
       return evaluations.filter((e) => ids.has(e.benefit.id)).length;
     },
     [evaluations],
+  );
+
+  /** Same rule for the fold: offers at the venue that are blocked right now. */
+  const notNowAt = useCallback(
+    (venueId: string) => {
+      const ids = new Set(benefitsAtVenue(venueId).map((b) => b.id));
+      return notNow.filter((e) => ids.has(e.benefit.id)).length;
+    },
+    [notNow],
   );
 
   const renderRow = useCallback(
@@ -381,6 +402,7 @@ export function HomeScreen({
             {picking && (
               <VenueSheet
                 countAt={countAt}
+                notNowAt={notNowAt}
                 onChoose={(chosen) => {
                   setVenue(chosen);
                   setHere(null);
@@ -557,10 +579,12 @@ function WhereAmI({
 /** The manual fallback: every tracked venue, tap to pin. */
 function VenueSheet({
   countAt,
+  notNowAt,
   onChoose,
   onClose,
 }: {
   countAt: (venueId: string) => number;
+  notNowAt: (venueId: string) => number;
   onChoose: (venue: Venue) => void;
   onClose: () => void;
 }) {
@@ -589,7 +613,9 @@ function VenueSheet({
             style={({ pressed }) => [styles.sheetRow, pressed && styles.sheetRowPressed]}
           >
             <Text style={styles.sheetRowName}>{v.name}</Text>
-            <Text style={styles.sheetClose}>{countAt(v.id)}</Text>
+            <Text style={styles.sheetClose}>
+              {notNowAt(v.id) > 0 ? `${countAt(v.id)} עכשיו, ${notNowAt(v.id)} לא עכשיו` : countAt(v.id)}
+            </Text>
           </Pressable>
         ))}
       </ScrollView>

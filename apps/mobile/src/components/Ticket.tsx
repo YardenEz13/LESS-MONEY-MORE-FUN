@@ -131,7 +131,7 @@ export const Ticket = memo(function Ticket({ evaluation, size, stock, onPress, g
   const place = merchantLine(benefit.merchant_id);
   const seed = hashOf(benefit.id);
 
-  const base = size === 'big' ? Math.min(width * 0.4, 150) : size === 'mid' ? 60 : 30;
+  const base = size === 'big' ? Math.min(width * 0.34, 128) : size === 'mid' ? 60 : 30;
   // Display figures run to "עד 3.5%": shrink what is long, since the web build has
   // no `adjustsFontSizeToFit` to fall back on.
   const figureSize = Math.round(base * Math.min(1, 3.5 / [...figure].length));
