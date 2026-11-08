@@ -75,7 +75,7 @@ export function BenefitDetailScreen({
             standing in the way, and ends on the tear line. */}
         <View>
           <View style={[styles.till, { backgroundColor: stock }]}>
-            <View style={styles.bigBox}>
+            <View style={[styles.bigBox, { height: Math.round(bigSize * 0.86) }]}>
               <Text
                 style={[styles.bigFigure, { fontSize: bigSize, lineHeight: bigSize, top: -bigSize * 0.1, width: bigSize * 4 }]}
               >
