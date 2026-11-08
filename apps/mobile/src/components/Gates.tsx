@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import type { Gate } from '@sbr/core';
 import { Text } from './ui';
 import {
@@ -40,7 +40,17 @@ const VERDICT_INK: Record<GateTone, string> = {
  * it because colour is the fast channel, not the only one — roughly one reader in
  * twelve cannot separate the marigold from the grey.
  */
-export function GateList({ gates }: { gates: readonly Gate[] }) {
+export function GateList({
+  gates,
+  punched,
+  onPunch,
+}: {
+  gates: readonly Gate[];
+  /** Codes the user marked done today; shown met and tappable to undo. */
+  punched?: ReadonlySet<string>;
+  /** Present on screens where a step can be punched by hand. */
+  onPunch?: (gate: Gate) => void;
+}) {
   if (gates.length === 0) {
     return (
       <View style={[styles.row, { backgroundColor: colors.surfacePrimary, borderBottomWidth: 0 }]}>
@@ -58,15 +68,35 @@ export function GateList({ gates }: { gates: readonly Gate[] }) {
         const tone = gateTone[key];
         return (
           <View key={gate.code} style={styles.row}>
-            <View style={[styles.marker, { backgroundColor: tone.bg, borderColor: tone.border }]}>
-              <Text style={[styles.markerNumber, { color: tone.fg }]}>{index + 1}</Text>
-            </View>
+            {(() => {
+              const isPunched = punched?.has(gate.code) ?? false;
+              const canPunch = onPunch != null && (isPunched || (gate.state === 'pending' && gate.actionable));
+              const mark = (
+                <View style={[styles.marker, { backgroundColor: tone.bg, borderColor: tone.border }]}>
+                  <Text style={[styles.markerNumber, { color: tone.fg }]}>{isPunched ? '✓' : index + 1}</Text>
+                </View>
+              );
+              if (!canPunch) return mark;
+              return (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={isPunched ? `בטל סימון: ${gate.label}` : `סמן כבוצע: ${gate.label}`}
+                  accessibilityHint="הסימון נמחק בחצות"
+                  hitSlop={8}
+                  onPress={() => onPunch(gate)}
+                >
+                  {mark}
+                </Pressable>
+              );
+            })()}
             <View style={styles.rowText}>
               <Text style={type.bodyStrong}>{gate.label}</Text>
               <Text style={type.small}>{gate.detail}</Text>
               {/* The ruling, in the ruling's colour. `note` is grey by design:
                   "worth knowing" is not a verdict and should not look like one. */}
-              <Text style={[styles.verdict, { color: VERDICT_INK[key] }]}>{gateVerdict[key]}</Text>
+              <Text style={[styles.verdict, { color: VERDICT_INK[key] }]}>
+                {punched?.has(gate.code) ? 'סימנת — עד חצות' : onPunch && key === 'action' ? `${gateVerdict[key]} · הקש על העיגול כשבוצע` : gateVerdict[key]}
+              </Text>
             </View>
           </View>
         );

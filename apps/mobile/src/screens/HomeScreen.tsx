@@ -10,7 +10,9 @@ import {
   View,
 } from 'react-native';
 import {
+  applyPunches,
   catalogIsStale,
+  punchedCodes,
   displayMerchantName,
   findCombos,
   hiddenBenefitIds,
@@ -21,6 +23,7 @@ import {
   type Combo,
   type Coordinates,
   type Evaluation,
+  type Punches,
   type UserProfile,
   type Venue,
 } from '@sbr/core';
@@ -69,6 +72,8 @@ type Row =
 
 interface Props {
   profile: UserProfile;
+  /** Steps punched today; see `@sbr/core` punches. */
+  punches: Punches;
   geofenceStatus: string;
   geofenceActive: boolean;
   onSelect: (evaluation: Evaluation) => void;
@@ -78,6 +83,7 @@ interface Props {
 }
 
 export function HomeScreen({
+  punches,
   profile,
   geofenceStatus,
   geofenceActive,
@@ -157,13 +163,19 @@ export function HomeScreen({
     );
   }, [owned, profile.muted_benefit_ids, profile.rejected_benefit_ids]);
 
-  const evaluations = useMemo(() => ranked.filter((e) => e.status !== 'blocked'), [ranked]);
+  // A punched step reads as done today, so the ticket moves from "needs a step" to "ready".
+  const punchedRanked = useMemo(() => {
+    const now = new Date();
+    return ranked.map((e) => applyPunches(e, punchedCodes(punches, e.benefit.id, now)));
+  }, [ranked, punches]);
+
+  const evaluations = useMemo(() => punchedRanked.filter((e) => e.status !== 'blocked'), [ranked]);
   const notNow = useMemo(
     () =>
-      ranked.filter(
+      punchedRanked.filter(
         (e) => e.status === 'blocked' && !e.blockers.some((b) => NEVER_LISTED.has(b.code)),
       ),
-    [ranked],
+    [punchedRanked],
   );
 
   // Checked against the whole catalog rather than the filtered list: the answer

@@ -6,6 +6,7 @@ import {
   formatSaving,
   formatValue,
   type Evaluation,
+  type Gate,
 } from '@sbr/core';
 import { GateList, gateSummary } from '../components/Gates';
 import { Seam } from '../components/Kit';
@@ -23,6 +24,8 @@ interface Props {
   onBack: () => void;
   onRedeemed: () => void;
   onTill: () => void;
+  punched: ReadonlySet<string>;
+  onPunch: (gate: Gate) => void;
   onToggleMute: () => void;
 }
 
@@ -35,6 +38,8 @@ export function BenefitDetailScreen({
   onBack,
   onRedeemed,
   onTill,
+  punched,
+  onPunch,
   onToggleMute,
 }: Props) {
   const { width } = useWindowDimensions();
@@ -103,7 +108,7 @@ export function BenefitDetailScreen({
 
         <Section eyebrow={gateSummary(gates)}>
           <Text style={styles.dateLine}>{formatLastVerified(benefit)}</Text>
-          <GateList gates={gates} />
+          <GateList gates={gates} punched={punched} onPunch={onPunch} />
         </Section>
 
         <Section eyebrow="לשון התקנון">
