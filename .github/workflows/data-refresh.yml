@@ -1,0 +1,81 @@
+name: data refresh (Gemini check + OSM branches)
+
+# Opens a pull request; never pushes to main. A person reads the diff.
+# Needs the repository secret GEMINI_API_KEY (Settings > Secrets > Actions).
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'verify = Gemini re-checks stale offers; branches = add OSM branches for chains'
+        type: choice
+        options: [verify, branches]
+        default: verify
+      max:
+        description: 'verify: how many offers to check'
+        default: '60'
+      venue:
+        description: 'verify: only offers at this venue id (e.g. azrieli_tlv), or empty'
+        default: ''
+  schedule:
+    - cron: '30 5 * * 3'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+      - run: npm install
+      - name: script tests
+        run: node scripts/gemini-verify.test.mjs && node scripts/osm-branches.test.mjs
+
+      - name: verify stale offers with Gemini
+        if: github.event_name == 'schedule' || inputs.task == 'verify'
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          MAX: ${{ inputs.max || '60' }}
+          VENUE: ${{ inputs.venue }}
+        run: |
+          test -n "$GEMINI_API_KEY" || { echo "::error::secret GEMINI_API_KEY is not set"; exit 1; }
+          args="--write --max $MAX"
+          if [ -n "$VENUE" ]; then args="$args --venue $VENUE"; fi
+          node scripts/gemini-verify.mjs $args
+
+      - name: add OSM branches
+        if: github.event_name == 'workflow_dispatch' && inputs.task == 'branches'
+        run: node scripts/osm-branches.mjs --write
+
+      - name: keep the verify report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-report
+          path: data/generated/verify-report.json
+          if-no-files-found: ignore
+
+      - name: gates (same as CI)
+        run: |
+          npm run validate:data
+          npm test
+
+      - name: open a pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- data; then echo "nothing changed"; exit 0; fi
+          branch="auto/data-refresh-$(date +%Y%m%d-%H%M)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add data
+          git commit -m "data refresh: ${{ github.event_name == 'schedule' && 'verify' || inputs.task }}"
+          git push -u origin "$branch"
+          gh pr create --draft --base main --head "$branch" \
+            --title "Data refresh ($(date +%F))" \
+            --body "Automated run. Dates only move forward for offers whose quote was found verbatim on the source page; nothing is deleted. Offers Gemini found withdrawn are listed in data/generated/verify-report.json in the run artifact. Branch additions are © OpenStreetMap contributors (ODbL)."
