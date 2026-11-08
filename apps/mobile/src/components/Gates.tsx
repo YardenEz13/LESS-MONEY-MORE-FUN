@@ -1,5 +1,5 @@
-import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Easing, Pressable, StyleSheet, View } from 'react-native';
 import type { Gate } from '@sbr/core';
 import { Text } from './ui';
 import {
@@ -31,6 +31,67 @@ const VERDICT_INK: Record<GateTone, string> = {
   note: colors.textMuted,
   blocked: colors.cardRedText,
 };
+
+/**
+ * The round mark. When `punched` flips on it stamps: the mark is pressed in,
+ * springs back over its size, and a ring spreads off it and fades. Flat shapes
+ * only, no blur, like the rest of the ticket. Skipped when the first render
+ * is already punched (no stamp on a screen you just opened) and under
+ * reduce-motion.
+ */
+function Mark({
+  tone,
+  label,
+  punched,
+}: {
+  tone: { bg: string; border: string; fg: string };
+  label: string;
+  punched: boolean;
+}) {
+  const press = useRef(new Animated.Value(1)).current;
+  const ring = useRef(new Animated.Value(0)).current;
+  const was = useRef(punched);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => {
+    void AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
+  }, []);
+
+  useEffect(() => {
+    if (punched && !was.current && !reduceMotion) {
+      press.setValue(1);
+      ring.setValue(0);
+      Animated.parallel([
+        Animated.sequence([
+          Animated.timing(press, { toValue: 0.78, duration: 70, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+          Animated.spring(press, { toValue: 1, friction: 4, tension: 220, useNativeDriver: true }),
+        ]),
+        Animated.timing(ring, { toValue: 1, duration: 420, delay: 70, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      ]).start();
+    }
+    was.current = punched;
+  }, [punched, reduceMotion, press, ring]);
+
+  return (
+    <View style={styles.markWrap}>
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.ring,
+          {
+            borderColor: tone.border,
+            opacity: ring.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 0.9, 0] }),
+            transform: [{ scale: ring.interpolate({ inputRange: [0, 1], outputRange: [1, 1.9] }) }],
+          },
+        ]}
+      />
+      <Animated.View
+        style={[styles.marker, { backgroundColor: tone.bg, borderColor: tone.border, transform: [{ scale: press }] }]}
+      >
+        <Text style={[styles.markerNumber, { color: tone.fg }]}>{label}</Text>
+      </Animated.View>
+    </View>
+  );
+}
 
 /**
  * The expanded form on the detail screen: one row per gate, ordered so the
@@ -71,11 +132,7 @@ export function GateList({
             {(() => {
               const isPunched = punched?.has(gate.code) ?? false;
               const canPunch = onPunch != null && (isPunched || (gate.state === 'pending' && gate.actionable));
-              const mark = (
-                <View style={[styles.marker, { backgroundColor: tone.bg, borderColor: tone.border }]}>
-                  <Text style={[styles.markerNumber, { color: tone.fg }]}>{isPunched ? '✓' : index + 1}</Text>
-                </View>
-              );
+              const mark = <Mark tone={tone} label={isPunched ? '✓' : String(index + 1)} punched={isPunched} />;
               if (!canPunch) return mark;
               return (
                 <Pressable
@@ -135,6 +192,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: ticket.rule,
   },
+  markWrap: { width: 38, height: 38 },
+  ring: { position: 'absolute', width: 38, height: 38, borderRadius: 19, borderWidth: 3 },
   /* A round mark, the same shape as the holes on the roll's tickets. */
   marker: {
     width: 38,
