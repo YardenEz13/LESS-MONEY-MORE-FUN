@@ -31,6 +31,21 @@ Work through these, in this order. Propose before you build.
 5. **Dedupe and conflict.** The same offer arrives from several sources (official catalog, easy, mall sale). Merge by `offerKey`, keep the strongest source for conditions, keep every source URL, and surface a disagreement ("source A says 10%, source B says 15%") instead of silently picking one.
 6. **Evaluation harness.** Build a small fixture set of realistic situations (big mall with six clubs held, street Adidas with one club, a shop with a stale offer, a shop with only an online coupon) and assert the expected top result and expected silence. Every ranking change must be justified by a fixture, not by a feeling.
 
+## Job 1b: the algorithm confirms discounts by itself, with no human in the loop
+
+Today a low-confidence extraction lands in `review-queue.json` and waits for a person (`reviewed_by_human`, `npm run -w @sbr/extraction review`). The owner wants the pipeline to **confirm and publish discounts on its own**, and to retire them on its own. A human must not be on the critical path.
+
+Replace the human gate with a machine gate that is at least as strict. Design and build:
+
+1. **Evidence-based confirmation.** A discount becomes `confirmed` only when independent machine checks agree. Examples: the source page still loads and still states the same value and conditions on a fresh fetch; a second source (official catalog, the merchant's own site, a mall page) agrees on value and merchant; the terms parse into structured conditions with no contradiction; the price on the product page actually dropped versus our recorded history. Define the checks, the weight of each source tier, and the threshold in code and in `docs/DATA_SOURCES.md`.
+2. **Three states, never a silent guess.** `confirmed` (published, shown as usable), `unverified` (shown only with a plain "not verified" label, and never ranked above a confirmed offer), `rejected` (not shown). Nothing is promoted by default. When the checks cannot reach a verdict, the offer stays `unverified`, it does not become `confirmed`.
+3. **Automatic re-verification and expiry.** Re-check every published offer on a schedule that matches its freshness window (`PUBLIC_FRESHNESS`, `DEFAULT_FRESHNESS`). A failed re-check demotes the offer automatically. `last_verified_at` is written only by a real successful check, never by hand or by a script that did not fetch the source.
+4. **Use the people who use the app as a sensor, not a reviewer.** `rejected_benefit_ids` already records "the discount was not there". Feed anonymised, aggregated rejections back as a signal that triggers an immediate re-verification and, past a threshold, an automatic demotion. Respect the privacy principle: send nothing without a clear reason and an opt-in.
+5. **Guardrails that replace the human eye.** Cap how many offers can be auto-published or auto-changed per run; if a run would change more than that cap, or if the value of a chain-wide offer jumps by an implausible amount, stop the run and keep the previous catalog. Write an audit log for every decision (offer id, checks run, result, timestamps). Add a one-command kill switch that reverts to the last known-good catalog. Include a sampled self-audit report the owner *may* read, but nothing waits on it.
+6. **Prove it with tests.** Fixtures for: a real offer that passes, a page that changed value, a page that disappeared, two sources that disagree, a source that blocks us (result: `unverified`, never `confirmed`, and no bypass), and a run that would exceed the change cap. Report measured precision on a labelled sample. If you cannot measure it, say that instead of claiming it.
+
+"Without a human" means no manual approval step. It does **not** mean looser honesty: principles 1 and 5 in `PRODUCT.md` still hold, and an unproven offer is labelled as unproven.
+
 ## Job 2: tell the app what I want to buy, get alerted on a discount
 
 Feature: the person adds an item they want ("Adidas Samba OG, black, size 42", or "a white shirt from Zara"), and the app notifies them when it goes on sale, at a shop near them or online.
@@ -48,6 +63,7 @@ Then build it: a `WatchItem` and `PricePoint` schema in `packages/core` (zod, st
 
 ## Non-negotiable rules
 
+- Automatic confirmation (Job 1b) must never raise an offer to `confirmed` on a guess. No verdict means `unverified`.
 - Never promise a saving the terms do not support. Say how old every fact is. Older rows are shown as older, never renewed by hand. Do not fake `last_verified_at`.
 - No AI key may ship in the app. Any model call goes through a server (see `api/advisor.ts`).
 - No invented customers, testimonials, savings totals or store listings. Use only measured numbers.
@@ -59,7 +75,7 @@ Then build it: a `WatchItem` and `PricePoint` schema in `packages/core` (zod, st
 
 ## How to work
 
-1. Read the files above. Write the audit (Job 1 step 1) and the design note (Job 2 questions) first, and stop to show me both, with your recommended choice for each open question and the one decision only I can make (the privacy tradeoff in Job 2 question 3).
+1. Read the files above. Write the audit (Job 1 step 1) and the design note (Job 2 questions) first, and stop to show me both, with your recommended choice for each open question and the decisions only I can make: the privacy tradeoff in Job 2 question 3, and the confirmation threshold and change cap in Job 1b.
 2. After I answer, build in small commits on the branch you are given: schema, core logic with tests, data and feed, app wiring, screen. Commit when a slice is green, not before.
 3. For each slice, show the failing test first, then the passing run. For UI, run the web build at 375px width and look at it before you say it works.
 4. End with a report: what changed, what you measured, what is proven, what is not (real-phone location, real push delivery), and what I should decide next.
