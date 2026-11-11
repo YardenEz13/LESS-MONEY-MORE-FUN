@@ -323,6 +323,18 @@ describe('listing pages', () => {
     expect(a.verification?.checks.find((c) => c.code === 'page_states_value')?.outcome).toBe('unknown');
   });
 
+  it('a shared page that does not name the merchant demotes nothing', async () => {
+    const shared = 'https://club.example.org/home';
+    const rows = [
+      benefit('a', { source_url: shared }),
+      benefit('b', { source_url: shared, merchant_name: 'נייקי' }),
+    ];
+    const root = await tree(rows);
+    const home = { kind: 'page' as const, text: 'כל ההטבות של המועדון במקום אחד. '.repeat(20) };
+    const report = await run(root, fakeNetwork({ [shared]: home }));
+    expect(report.takenDown).toBe(0);
+  });
+
   it('confirms a computed saving by its own pair of prices', async () => {
     const row = benefit('a', {
       type: 'fixed',

@@ -164,7 +164,11 @@ if ($LASTEXITCODE -ne 0) { Stop-Run "sync-easy-proof failed" -Restore }
 # demotes or retires the rest. It exits non-zero when its change guard trips —
 # a run that would take down an implausible share of offers is far likelier
 # to be a broken check than a real event — and then nothing is published.
-npm.cmd run verify:auto -- --queue --limit 200 2>&1 | ForEach-Object { Write-Log $_ }
+#
+# --offline: judged on the snapshots this run just collected, no page fetches.
+# The live-fetch path has not yet been measured against real pages; drop the
+# flag (and pass --limit) once a live --dry-run has been sampled.
+npm.cmd run verify:auto -- --queue --offline 2>&1 | ForEach-Object { Write-Log $_ }
 if ($LASTEXITCODE -ne 0) { Stop-Run "verify:auto refused this run (change guard) - nothing published" -Restore }
 
 # A catalog does not lose a fifth of itself in a few days. Whatever caused this,

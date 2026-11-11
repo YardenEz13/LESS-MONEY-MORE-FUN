@@ -1,5 +1,5 @@
 import { AppState, Platform } from 'react-native';
-import * as BackgroundTask from 'expo-background-task';
+import type * as BackgroundTaskModule from 'expo-background-task';
 import * as TaskManager from 'expo-task-manager';
 import {
   DEFAULT_WATCH_POLICY,
@@ -279,8 +279,29 @@ export const WATCH_TASK = 'sbr-watch-check';
  * when it wakes the app headless, so it is at the bottom of this file and this
  * module is imported by App.tsx at the top level.
  */
+/**
+ * The native module, or null on a build that does not contain it.
+ *
+ * Loaded lazily, never by a top-level import: `expo-background-task` calls
+ * `requireNativeModule` at import time, which *throws* when the native side is
+ * missing. Catalog refreshes ship as over-the-air updates to builds made before
+ * this module existed, and a top-level import would crash every one of them on
+ * launch. Here it fails into "foreground checks only" instead.
+ */
+function backgroundTask(): typeof BackgroundTaskModule | null {
+  if (Platform.OS === 'web') return null;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require('expo-background-task') as typeof BackgroundTaskModule;
+  } catch {
+    return null;
+  }
+}
+
 export async function registerWatchBackgroundTask(): Promise<boolean> {
   if (Platform.OS === 'web' || !canGeofenceInBackground) return false;
+  const BackgroundTask = backgroundTask();
+  if (!BackgroundTask) return false;
   try {
     const status = await BackgroundTask.getStatusAsync();
     if (status !== BackgroundTask.BackgroundTaskStatus.Available) return false;
@@ -292,7 +313,8 @@ export async function registerWatchBackgroundTask(): Promise<boolean> {
 }
 
 try {
-  if (Platform.OS !== 'web') {
+  const BackgroundTask = backgroundTask();
+  if (BackgroundTask) {
     TaskManager.defineTask(WATCH_TASK, async () => {
       try {
         await checkWatches();

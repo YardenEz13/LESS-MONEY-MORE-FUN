@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Benefit, type VerificationCheck } from '../src/types';
 import { evaluateBenefit, expectedRate, rankBenefits, type EvalContext } from '../src/matching';
+import { formatVenueNotification, ticketFace } from '../src/format';
 import {
   changeGuard,
   decideVerification,
@@ -376,5 +377,24 @@ describe('ranking by expected rate', () => {
       conditions: { raw_text_summary: '₪50 הנחה' },
     });
     expect(expectedRate({ benefit: noRate, ageDays: 0 })).toBeNull();
+  });
+});
+
+describe('an unverified offer says so on the ticket and stays out of the push', () => {
+  const unverified = makeBenefit({
+    conditions: { raw_text_summary: '15% הנחה', stacks_with_club: true },
+    verification: { state: 'unverified', checked_at: '2026-08-01T10:00:00Z', score: 0.2, checks: [] },
+  });
+
+  it('never reads "pay now"', () => {
+    const face = ticketFace(evaluateBenefit(unverified, ctx));
+    expect(face.verdict).not.toBe('אפשר לשלם');
+    expect(face.holes.map((h) => h.label)).toContain('לא מאומת');
+  });
+
+  it('is not what a venue reminder announces', () => {
+    const confirmed = makeBenefit({ id: 'ok', merchant_id: 'm2', merchant_name: 'נייקי' });
+    const ranked = rankBenefits([unverified, confirmed], ctx);
+    expect(formatVenueNotification('קניון', ranked, {})?.body).not.toContain('אדידס');
   });
 });

@@ -545,7 +545,12 @@ export async function runVerify(options: VerifyOptions): Promise<VerifyReport> {
             { code: 'source_reachable', outcome: 'pass' },
             {
               code: 'page_names_merchant',
-              outcome: merchantOnPage(page.text, candidate.benefit.merchant_name),
+              // A listing or home page shared by many rows not naming one of
+              // them says nothing about that one: same rule as the value.
+              outcome: ((outcome) =>
+                outcome === 'fail' && (sharedUrls.get(candidate.benefit.source_url) ?? 0) > 1
+                  ? 'unknown'
+                  : outcome)(merchantOnPage(page.text, candidate.benefit.merchant_name)),
             },
             {
               code: 'page_states_value',
