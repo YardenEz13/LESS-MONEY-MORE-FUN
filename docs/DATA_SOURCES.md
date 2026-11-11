@@ -136,6 +136,52 @@ Known limits of the scraper (deliberate):
 - Merchant sites themselves ("10% למועדון X" banners): unbounded crawl, poor
   yield. Only via targeted requests, never a broad crawl.
 
+## Automatic confirmation (`npm run verify:auto`)
+
+No step waits for a person any more. The review queue still exists — it is
+where the 0.85 confidence gate parks what the extractor was unsure of — but a
+row leaves it on evidence, not on someone pressing `a`.
+
+```bash
+npm run verify:auto -- --offline --dry-run --queue   # judge on snapshots, write nothing
+npm run verify:auto -- --queue --limit 200           # the real run (refresh-catalogs.ps1 does this)
+npm run verify:auto -- --revert                      # kill switch: put back the last catalog
+```
+
+Every row ends in one of three states, stored on the row as `verification`:
+
+| State | Meaning | In the app |
+|---|---|---|
+| `confirmed` | a check read the offer itself and found it | shown normally; clears the confidence gate the way a human approval did |
+| `unverified` | no check could read the offer, or two checks disagree | shown with "לא מאומת — כדאי לשאול בקופה", never ranked above a confirmed offer |
+| `rejected` | page gone (404/410), terms contradict themselves, or ≥3 till reports with nothing fresh against them | never shown |
+
+**Evidence.** Rules: `packages/core/src/verification.ts` (pure, tested). Runner: `packages/extraction/src/verify.ts`.
+
+- *Dated snapshot.* The collector's own saved text for this program's listing of this URL. Keyed by program + URL, because easy.co.il lists one business page under many clubs with a different headline in each (1023 URLs). Its date is the evidence's date, so an old snapshot confirms "as of then" and freshness ages it out. easy records carry only a link-check date (`verified_at`). That proves the page opened, not that its text was re-read, and the audit log marks it `(link check)`.
+- *Live fetch.* One GET per URL, honest user-agent, robots.txt respected, paced per host. A host that refuses 3 in a row is left alone for the run. 403, 429, captcha or 5xx means "could not check", never "rejected", and is never worked around.
+- *Listing pages.* 3556 of 4499 rows share their URL with other rows. On a shared page the figure has to sit beside the merchant's name to confirm, and a miss is "could not tell". A listing page can confirm an offer but never demote one.
+- *Computed savings.* "₪200 voucher for ₪140" stored as ₪60 confirms only by its own price pair, and a page cannot contradict a figure the source never printed.
+- *Never on reachability alone.* An open link proves the business exists, not the discount. `page_states_value` or `seen_in_recrawl` must pass.
+
+**What replaces the human eye.**
+- *Change guard.* A run that would conclusively take down more than 30% of what it judged stops and writes nothing. A redesign that hides every price looks exactly like "a third of the catalog ended today", and the first is far likelier.
+- *Dates.* `last_verified_at` moves only on a confirmation, only forward, and only to the evidence's own date.
+- *"Could not check" never undoes a confirmation.* The row keeps its verdict and ages out by date.
+- *Audit trail.* Every decision is appended to `data/generated/verify-audit.jsonl` (checks, score, reasons). The CLI prints a sample of confirmations. Reading it is optional and nothing waits on it.
+- *Refreshes keep verdicts.* `publish:catalog` keeps a verdict while type, value and conditions are unchanged. A rejected row cannot come back on the next refresh, and changed terms are judged afresh.
+
+**Till reports.** `npm run unpublish` queues a reported row with a `דווח` reason, and the verifier counts that as one report. It then re-admits the row only on fresh page evidence. `data/generated/rejections.json` (`{ "<benefit id>": <count> }`) is read if present, but nothing collects reports from phones yet. The app has no backend, so the loop is still fed by hand through `unpublish`.
+
+**Measured, 2026-11-11, offline dry run on the shipped catalog (no network):**
+3525 confirmed, 724 unverified (718 "could not check", 6 demoted on evidence), 250 rejected. Taken down: 256 of 3781 conclusive verdicts (7%, under the cap).
+
+The 250 rejections are 245 rows stored as ₪0 or 0% (perks like "free card fee" that the catalog was showing as "₪0 הנחה") and 5 misreads ("₪175 off a ₪2 minimum").
+
+Labelled sample: 30 random confirmations were 30 of 30 correct. The figure sat beside the right merchant on the right club's listing, or the computed pair was present. One caveat: an easy.co.il confirmation is the crawler's latest copy of the same headline the row was extracted from. It proves the club still lists it, and that is all it proves.
+
+The first sample of 20 demotions was mostly wrong ("16.00%" read as a different figure; computed savings). Those rules were fixed before these numbers, and the remaining 6 demotions plus 4 two-source disagreements were each checked by hand. **This has not been written to `data/benefits.json`.** The first real run is the owner's call: threshold (`confirmThreshold` 0.6) and cap (30%) live in `DEFAULT_VERIFICATION_POLICY` / `DEFAULT_CHANGE_GUARD`.
+
 ## Freshness plan
 
 Each benefit already carries `last_verified_at`, `valid_until`, `source_url`,

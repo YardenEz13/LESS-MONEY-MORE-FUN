@@ -359,8 +359,11 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
     blockers.push({ code: 'low_confidence', message: 'ההטבה ממתינה לאימות' });
   }
   if (verdict === 'rejected') {
-    blockers.push({ code: 'rejected', message: 'ההטבה לא נמצאה במקור בבדיקה האחרונה' });
-    gate('verification', 'blocked', 'נפסל', 'ההטבה לא נמצאה במקור בבדיקה האחרונה');
+    // Generic on purpose: a rejection is a vanished page, terms that
+    // contradict themselves, or repeated reports from the till, and "not found
+    // at the source" would be false for two of the three.
+    blockers.push({ code: 'rejected', message: 'ההטבה נפסלה בבדיקה האוטומטית מול המקור' });
+    gate('verification', 'blocked', 'נפסל', 'ההטבה נפסלה בבדיקה האוטומטית מול המקור');
   } else if (verdict === 'unverified') {
     // Shown, and said plainly. Not actionable: there is nothing to do about it
     // before paying except ask, which the sentence already says.
