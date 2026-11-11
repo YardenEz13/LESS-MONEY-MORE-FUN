@@ -58,6 +58,7 @@ async function main(): Promise<void> {
   console.log(`judged:      ${report.total}`);
   console.log(`confirmed:   ${report.confirmed}${report.promoted ? ` (${report.promoted} out of the review queue)` : ''}`);
   console.log(`unverified:  ${report.unverified}`);
+  console.log(`taken down:  ${report.takenDown} of ${report.conclusive} conclusive verdicts (demoted or rejected on evidence; the rest of "unverified" is "could not check")`);
   console.log(`rejected:    ${report.rejected}`);
   console.log(`kept as-is:  ${report.kept}  (confirmed earlier, could not be re-checked this run)`);
   console.log(`fetched:     ${report.fetched} pages`);

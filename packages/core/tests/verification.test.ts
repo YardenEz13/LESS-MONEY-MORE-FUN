@@ -5,6 +5,7 @@ import {
   changeGuard,
   decideVerification,
   merchantOnPage,
+  offerOnPage,
   secondSource,
   termsContradiction,
   valueOnPage,
@@ -147,6 +148,13 @@ describe('valueOnPage', () => {
     expect(valueOnPage('ריבית 1.15% בלבד', { type: 'percent', value: 15 })).toBe('fail');
   });
 
+  it('reads "16.00%" and "19.90 ₪" as the catalog\'s 16 and 19.9', () => {
+    expect(valueOnPage('16.00% החזר בכרטיס הנטען', { type: 'cashback', value: 16 })).toBe('pass');
+    expect(valueOnPage('דמי כרטיס בסך 19.90 ₪', { type: 'fixed', value: 19.9 })).toBe('pass');
+    expect(valueOnPage('2.50% הנחה', { type: 'percent', value: 2.5 })).toBe('pass');
+    expect(valueOnPage('100% הנחה', { type: 'percent', value: 10 })).toBe('fail');
+  });
+
   it('fails when the page states a different percentage', () => {
     expect(valueOnPage('10% הנחה לחברי המועדון', { type: 'percent', value: 15 })).toBe('fail');
   });
@@ -178,6 +186,30 @@ describe('merchantOnPage', () => {
   });
   it('says unknown for an app shell', () => {
     expect(merchantOnPage('Loading', 'אדידס')).toBe('unknown');
+  });
+});
+
+describe('offerOnPage', () => {
+  const fixed = (value: number, summary: string) => ({
+    type: 'fixed' as const,
+    value,
+    merchant_name: 'פעלטון',
+    conditions: { raw_text_summary: summary },
+  });
+  it('cannot contradict a saving the extractor worked out', () => {
+    const derived = fixed(60, 'שובר בשווי 200 ש"ח ב-140 ש"ח');
+    expect(offerOnPage('BUYME בשווי 200 ₪ ב-140 ₪ בלבד', derived, { shared: false })).toBe('unknown');
+  });
+  it('still contradicts a figure the summary printed', () => {
+    const stated = fixed(50, '50 ש"ח הנחה על כרטיס');
+    expect(offerOnPage('30 ש"ח הנחה על כרטיס', stated, { shared: false })).toBe('fail');
+  });
+  it('confirms a computed saving by its own price pair', () => {
+    const pair = fixed(9, 'כרטיס ב-30 ש״ח (במקום 39 ש״ח)');
+    expect(offerOnPage('מחיר לאחר הנחה 39 ₪ 30 ₪', pair, { shared: false })).toBe('pass');
+    expect(offerOnPage('רק 30 ₪ במקום 39 ₪', pair, { shared: false })).toBe('pass');
+    // The pair gone from the page is not proof the offer changed.
+    expect(offerOnPage('כרטיס ב-45 ₪', pair, { shared: false })).toBe('unknown');
   });
 });
 

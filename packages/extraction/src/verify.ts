@@ -1,5 +1,6 @@
 import { appendFile, copyFile, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
+import vm from 'node:vm';
 import {
   Benefit,
   DEFAULT_CHANGE_GUARD,
@@ -11,7 +12,7 @@ import {
   secondSource,
   termsContradiction,
   toVerification,
-  valueOnPage,
+  offerOnPage,
   type ChangeGuardPolicy,
   type VerificationCheck,
   type VerificationDecision,
@@ -65,6 +66,8 @@ export interface Snapshot {
   /** When a collector read the page. */
   at: string;
   text: string;
+  /** `link_check`: the date only proves the link opened (easy.co.il). */
+  source: 'text_read' | 'link_check';
 }
 
 export interface AuditEntry {
@@ -89,6 +92,10 @@ export interface VerifyReport {
   kept: number;
   /** Queue rows promoted into the catalog on evidence. */
   promoted: number;
+  /** Rows this run conclusively demoted or rejected — what the change guard counts. */
+  takenDown: number;
+  /** Verdicts reached on evidence, as opposed to "could not check". */
+  conclusive: number;
   fetched: number;
   blockedHosts: string[];
   /** Set when the change guard stopped the run. Nothing was written. */
@@ -107,6 +114,8 @@ export interface VerifyOptions {
   /** Also judge the review queue, and promote what the evidence confirms. */
   includeQueue?: boolean;
   fetcher?: PageFetcher;
+  /** Defaults to reading `scripts/scrape-easy.mjs` under `root`. */
+  programOf?: ProgramResolver;
   /** Pause between two requests to one host. */
   gapMs?: number;
   policy?: VerificationPolicy;
@@ -151,14 +160,58 @@ function recordText(record: Record<string, unknown>): string {
   return parts.join('\n');
 }
 
+/** Which program a collected file belongs to, or null when nobody has said. */
+export type ProgramResolver = (group: string, file: string) => string | null;
+
 /**
- * The newest dated snapshot of each URL any collector has saved.
+ * easy.co.il list slug -> program id, read from the crawler that owns it.
+ *
+ * Read out of `scripts/scrape-easy.mjs` rather than copied, so the two cannot
+ * drift: the crawler is where a new club gets mapped. The literal is evaluated
+ * in an empty context, the same way the crawler's own tests rewrite it.
+ */
+export async function easyProgramsFrom(scrapeEasyPath: string): Promise<Record<string, string>> {
+  try {
+    const source = await readFile(scrapeEasyPath, 'utf8');
+    const literal = /const PROGRAMS = (\{[\s\S]*?\n\});/.exec(source)?.[1];
+    if (!literal) return {};
+    return vm.runInNewContext(`(${literal})`, {}, { timeout: 1000 }) as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * The default resolver: a catalog file is named after its program
+ * (`collected/catalogs/max.jsonl`), an easy file after its list slug.
+ */
+export function defaultProgramResolver(easyPrograms: Record<string, string>): ProgramResolver {
+  return (group, file) => {
+    const name = basename(file, '.jsonl');
+    if (group === 'easy') return easyPrograms[name] ?? null;
+    return name;
+  };
+}
+
+const snapshotKey = (programId: string, url: string) => `${programId}\u0000${url}`;
+
+/**
+ * The newest dated snapshot of each (program, URL) any collector has saved.
+ *
+ * Keyed by program as well as URL because one business page is listed by many
+ * clubs — 1023 easy.co.il URLs sit in more than one list with a *different*
+ * headline in each — and judging a Max benefit against the Isracard list's
+ * headline would confirm or demote it on someone else's terms. A record whose
+ * file maps to no program is not evidence for anyone.
  *
  * `collected_at` is when the text was read; easy.co.il records carry
  * `verified_at` instead, the date of their last link check. A record with
  * neither has no date to lend an offer, so it is not evidence.
  */
-export async function loadSnapshots(collectedDir: string): Promise<Map<string, Snapshot>> {
+export async function loadSnapshots(
+  collectedDir: string,
+  programOf: ProgramResolver,
+): Promise<Map<string, Snapshot>> {
   const snapshots = new Map<string, Snapshot>();
   let groups: string[];
   try {
@@ -174,6 +227,8 @@ export async function loadSnapshots(collectedDir: string): Promise<Map<string, S
       continue;
     }
     for (const file of files) {
+      const programId = programOf(group, file);
+      if (!programId) continue;
       const lines = (await readFile(join(collectedDir, group, file), 'utf8')).split('\n');
       for (const line of lines) {
         if (!line.trim()) continue;
@@ -186,14 +241,29 @@ export async function loadSnapshots(collectedDir: string): Promise<Map<string, S
         const url = record.offer_url;
         const at = record.collected_at ?? record.verified_at;
         if (typeof url !== 'string' || typeof at !== 'string' || Number.isNaN(Date.parse(at))) continue;
-        const known = snapshots.get(url);
+        const key = snapshotKey(programId, url);
+        const known = snapshots.get(key);
         if (!known || at > known.at) {
-          snapshots.set(url, { at: new Date(at).toISOString(), text: recordText(record) });
+          snapshots.set(key, {
+            at: new Date(at).toISOString(),
+            text: recordText(record),
+            // A link check proves the page opened, not that its text was
+            // re-read on that day — said so wherever this date is shown.
+            source: record.collected_at ? 'text_read' : 'link_check',
+          });
         }
       }
     }
   }
   return snapshots;
+}
+
+/** The snapshot for a benefit: its own program's record of its own URL. */
+export function snapshotFor(
+  snapshots: ReadonlyMap<string, Snapshot>,
+  benefit: Pick<Benefit, 'program_id' | 'source_url'>,
+): Snapshot | undefined {
+  return snapshots.get(snapshotKey(benefit.program_id, benefit.source_url));
 }
 
 const USER_AGENT = 'SmartBenefitsRecall/0.1 (catalog verifier; personal project; contact via repo)';
@@ -356,7 +426,15 @@ export async function runVerify(options: VerifyOptions): Promise<VerifyReport> {
     ? await readJson<{ benefit: unknown; reason?: string; queued_at?: string }[]>(p.queue, [])
     : [];
   const reports = await readJson<Record<string, number>>(p.reports, {});
-  const snapshots = await loadSnapshots(p.collected);
+  const programOf =
+    options.programOf ??
+    defaultProgramResolver(await easyProgramsFrom(join(root, 'scripts/scrape-easy.mjs')));
+  const snapshots = await loadSnapshots(p.collected, programOf);
+
+  // How many rows each source URL carries. A URL behind many offers is a
+  // listing page, and a figure found somewhere on it says little about one row.
+  const sharedUrls = new Map<string, number>();
+  for (const b of catalog) sharedUrls.set(b.source_url, (sharedUrls.get(b.source_url) ?? 0) + 1);
 
   const candidates: Candidate[] = catalog.map((benefit) => ({
     benefit,
@@ -388,12 +466,12 @@ export async function runVerify(options: VerifyOptions): Promise<VerifyReport> {
         detail: String(candidate.reports),
       },
     ];
-    const snapshot = snapshots.get(benefit.source_url);
+    const snapshot = snapshotFor(snapshots, benefit);
     if (snapshot) {
       checks.push({
         code: 'seen_in_recrawl',
-        outcome: valueOnPage(snapshot.text, benefit),
-        detail: snapshot.at,
+        outcome: offerOnPage(snapshot.text, benefit, { shared: (sharedUrls.get(benefit.source_url) ?? 0) > 1 }),
+        detail: `${snapshot.at}${snapshot.source === 'link_check' ? ' (link check)' : ''}`,
       });
     }
     return { checks, snapshot };
@@ -469,7 +547,12 @@ export async function runVerify(options: VerifyOptions): Promise<VerifyReport> {
               code: 'page_names_merchant',
               outcome: merchantOnPage(page.text, candidate.benefit.merchant_name),
             },
-            { code: 'page_states_value', outcome: valueOnPage(page.text, candidate.benefit) },
+            {
+              code: 'page_states_value',
+              outcome: offerOnPage(page.text, candidate.benefit, {
+                shared: (sharedUrls.get(candidate.benefit.source_url) ?? 0) > 1,
+              }),
+            },
           ]
         : [
             {
@@ -489,6 +572,8 @@ export async function runVerify(options: VerifyOptions): Promise<VerifyReport> {
     rejected: 0,
     kept: 0,
     promoted: 0,
+    takenDown: 0,
+    conclusive: 0,
     fetched,
     blockedHosts: [...blockedHosts],
     aborted: null,
@@ -566,6 +651,8 @@ export async function runVerify(options: VerifyOptions): Promise<VerifyReport> {
     });
   }
 
+  report.takenDown = takenDown;
+  report.conclusive = conclusive;
   const verdict = changeGuard({ checked: conclusive, takenDown }, guard);
   if (!verdict.ok) {
     report.aborted = verdict.reason;

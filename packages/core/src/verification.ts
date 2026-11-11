@@ -136,9 +136,17 @@ export function decideVerification(
   };
 }
 
-/** Thousands separators and the look-alike percent signs a Hebrew page uses. */
+/**
+ * Thousands separators, trailing decimal zeros and the look-alike percent signs
+ * a Hebrew page uses. "16.00%" is how half the club lists write 16%, and
+ * "19.90 ₪" is the catalog's 19.9 — read literally, both looked like a page
+ * stating a different figure, and demoted rows that were exactly right.
+ */
 function normalizeFigures(text: string): string {
-  return text.replace(/(\d)[,٬](?=\d{3}\b)/g, '$1').replace(/[٪﹪％]/g, '%');
+  return text
+    .replace(/(\d)[,٬](?=\d{3}(?!\d))/g, '$1')
+    .replace(/(\d+)\.(\d*?)0+(?!\d)/g, (_, whole: string, frac: string) => (frac ? `${whole}.${frac}` : whole))
+    .replace(/[٪﹪％]/g, '%');
 }
 
 const number = (value: number) => String(value).replace('.', '\\.');
@@ -182,6 +190,89 @@ export function valueOnPage(
     default:
       return 'unknown';
   }
+}
+
+/** How far either side of a merchant's name its own offer is looked for on a listing page. */
+const NEAR_NAME_CHARS = 250;
+
+/** "ב-3,499 ש״ח במקום 9,999 ש״ח" → [3499, 9999]. */
+const PRICE_PAIR =
+  /(\d[\d,]*(?:\.\d+)?)\s*(?:₪|ש"ח|ש״ח|ש''ח|שח)?\s*[(\[]?\s*במקום\s*(?:₪\s*)?(\d[\d,]*(?:\.\d+)?)/;
+
+const toNumber = (raw: string) => Number(raw.replace(/,/g, ''));
+
+/** Both prices of a pair, written close together, anywhere in the text. */
+function pairOnPage(text: string, low: number, high: number): boolean {
+  const body = normalizeFigures(text);
+  const at = (n: number) => [...body.matchAll(new RegExp(`(?<![\\d.])${number(n)}(?![\\d])`, 'g'))].map((m) => m.index ?? 0);
+  const lows = at(low);
+  return at(high).some((h) => lows.some((l) => Math.abs(h - l) < 80));
+}
+
+/**
+ * Does this text state *this* offer — the right figure, for the right merchant?
+ *
+ * `valueOnPage` answers for a page about one offer. Most source URLs are not:
+ * 3556 of 4499 catalog rows share their URL with another row, because a club
+ * publishes one listing page for dozens of shops. Finding "15%" somewhere on a
+ * page with forty offers proves nothing about the shop that row is for, and not
+ * finding it proves little more — the listing may be paginated, or the snapshot
+ * cut short. So on a shared page:
+ *
+ *   pass     the figure sits within a few lines of the merchant's own name
+ *   unknown  anything else
+ *
+ * A listing page can therefore confirm an offer but never demote one. Only a
+ * page about this offer alone can say "the figure is now different".
+ *
+ * A fixed amount the extractor *computed* — "₪3,499 instead of ₪9,999" stored
+ * as ₪6,500 off — never appears on the page as a saving. It passes when its own
+ * pair of prices is still there together, and is otherwise unknown: a page full
+ * of other shekel figures cannot contradict a number it was never going to print.
+ */
+export function offerOnPage(
+  text: string,
+  benefit: Pick<Benefit, 'type' | 'value' | 'merchant_name' | 'conditions'>,
+  options: { shared: boolean },
+): VerificationCheck['outcome'] {
+  if (benefit.type === 'fixed' || benefit.type === 'gift_card') {
+    const pair = PRICE_PAIR.exec(benefit.conditions.raw_text_summary);
+    if (pair) {
+      const low = toNumber(pair[1]!);
+      const high = toNumber(pair[2]!);
+      if (Math.abs(high - low - benefit.value) < 0.01) {
+        return pairOnPage(text, low, high) ? 'pass' : 'unknown';
+      }
+    }
+  }
+  if (!options.shared) {
+    const onPage = valueOnPage(text, benefit);
+    // A page can only contradict a figure the source printed. A shekel amount
+    // the row's own summary never states ("₪200 voucher for ₪140" stored as
+    // ₪60, "50% off a ₪34.90 fee" stored as ₪17.45) was worked out by the
+    // extractor, and a page full of other shekel figures says nothing about it.
+    const derived =
+      (benefit.type === 'fixed' || benefit.type === 'gift_card') &&
+      valueOnPage(benefit.conditions.raw_text_summary, benefit) !== 'pass';
+    return onPage === 'fail' && derived ? 'unknown' : onPage;
+  }
+
+  const haystack = text;
+  const names = [benefit.merchant_name, displayMerchantName(benefit.merchant_name)].filter(
+    (n) => n.trim().length >= 2,
+  );
+  for (const name of names) {
+    let from = haystack.indexOf(name);
+    while (from >= 0) {
+      const window = haystack.slice(
+        Math.max(0, from - NEAR_NAME_CHARS),
+        from + name.length + NEAR_NAME_CHARS,
+      );
+      if (valueOnPage(window, benefit) === 'pass') return 'pass';
+      from = haystack.indexOf(name, from + 1);
+    }
+  }
+  return 'unknown';
 }
 
 /**

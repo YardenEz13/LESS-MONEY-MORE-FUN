@@ -4,7 +4,10 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { Benefit } from '@sbr/core';
 import {
+  defaultProgramResolver,
+  easyProgramsFrom,
   loadSnapshots,
+  snapshotFor,
   revertVerify,
   robotsAllows,
   runVerify,
@@ -257,7 +260,7 @@ describe('runVerify', () => {
 });
 
 describe('loadSnapshots', () => {
-  it('keeps the newest dated record per url and skips undated ones', async () => {
+  it('keeps the newest dated record per program and url, and skips undated ones', async () => {
     const root = await tree([], {
       snapshots: [
         { offer_url: 'u1', terms_text: 'old', collected_at: '2026-01-01T00:00:00.000Z' },
@@ -265,9 +268,70 @@ describe('loadSnapshots', () => {
         { offer_url: 'u2', terms_text: 'undated' },
       ],
     });
-    const snapshots = await loadSnapshots(join(root, 'collected'));
-    expect(snapshots.get('u1')).toMatchObject({ text: 'new' });
-    expect(snapshots.has('u2')).toBe(false);
+    const snapshots = await loadSnapshots(join(root, 'collected'), defaultProgramResolver({}));
+    expect(snapshotFor(snapshots, { program_id: 'club', source_url: 'u1' })).toMatchObject({
+      text: 'new',
+      source: 'link_check',
+    });
+    expect(snapshotFor(snapshots, { program_id: 'club', source_url: 'u2' })).toBeUndefined();
+  });
+
+  it("never judges one club's offer by another club's listing of the same page", async () => {
+    const root = await mkdtemp(join(tmpdir(), 'sbr-verify-'));
+    await mkdir(join(root, 'collected/easy'), { recursive: true });
+    const url = 'https://easy.example/page/1';
+    await writeFile(
+      join(root, 'collected/easy/MAX.jsonl'),
+      JSON.stringify({ offer_url: url, listing_headline: '10% הנחה', verified_at: OLD }),
+    );
+    await writeFile(
+      join(root, 'collected/easy/Unmapped-List.jsonl'),
+      JSON.stringify({ offer_url: url, listing_headline: '3% הנחה', verified_at: NOW.toISOString() }),
+    );
+    const snapshots = await loadSnapshots(
+      join(root, 'collected'),
+      defaultProgramResolver({ MAX: 'max' }),
+    );
+    expect(snapshotFor(snapshots, { program_id: 'max', source_url: url })?.text).toContain('10%');
+    // The unmapped list is nobody's evidence, however new it is.
+    expect(snapshots.size).toBe(1);
+  });
+
+  it('reads the slug map out of the crawler', async () => {
+    const map = await easyProgramsFrom(join(import.meta.dirname, '../../../scripts/scrape-easy.mjs'));
+    expect(map.MAX).toBe('max');
+    expect(Object.keys(map).length).toBeGreaterThan(20);
+  });
+});
+
+describe('listing pages', () => {
+  const listing = (merchantLine: string) =>
+    `${'מבצעים לחברי המועדון. '.repeat(10)}\nנייקי — 30% הנחה\n${'עוד הטבות. '.repeat(40)}\n${merchantLine}`;
+
+  it('confirms only when the figure sits beside the merchant', async () => {
+    const shared = 'https://club.example.org/all';
+    const rows = [
+      benefit('a', { source_url: shared }),
+      benefit('b', { source_url: shared, merchant_name: 'נייקי', value: 30 }),
+    ];
+    const root = await tree(rows);
+    await run(root, fakeNetwork({ [shared]: { kind: 'page', text: listing('אדידס') } }));
+    const states = Object.fromEntries((await catalog(root)).map((r) => [r.id, r.verification?.state]));
+    // 'a' (אדידס 15%) is not stated beside its name: a listing page cannot demote it.
+    expect(states).toEqual({ a: 'unverified', b: 'confirmed' });
+    const a = (await catalog(root)).find((r) => r.id === 'a')!;
+    expect(a.verification?.checks.find((c) => c.code === 'page_states_value')?.outcome).toBe('unknown');
+  });
+
+  it('confirms a computed saving by its own pair of prices', async () => {
+    const row = benefit('a', {
+      type: 'fixed',
+      value: 6500,
+      conditions: { raw_text_summary: 'מתקן משחקים ב-3,499 ש״ח במקום 9,999 ש״ח' },
+    });
+    const root = await tree([row]);
+    await run(root, fakeNetwork({ [row.source_url]: page('רק ב-₪3,499 במקום ₪9,999') }));
+    expect((await catalog(root))[0]!.verification?.state).toBe('confirmed');
   });
 });
 
