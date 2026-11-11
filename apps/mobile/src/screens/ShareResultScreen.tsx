@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import type { Evaluation } from '@sbr/core';
 import { Ticket, stockFor } from '../components/Ticket';
-import { Panel, PrimaryButton, ScreenHeader, Text } from '../components/ui';
+import { GhostButton, Panel, PrimaryButton, ScreenHeader, Text } from '../components/ui';
 import type { ShareResult } from '../services/shareIntent';
 import { space, ticket, type } from '../theme';
 
@@ -10,6 +10,8 @@ interface Props {
   result: ShareResult;
   onSelect: (evaluation: Evaluation) => void;
   onClose: () => void;
+  /** Start watching the shared page's price. */
+  onWatch: (url: string) => void;
 }
 
 /**
@@ -17,7 +19,7 @@ interface Props {
  * is pinned to online upstream, so anything shown here is genuinely usable on
  * this site — no "valid in stores only" teases.
  */
-export function ShareResultScreen({ result, onSelect, onClose }: Props) {
+export function ShareResultScreen({ result, onSelect, onClose, onWatch }: Props) {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -69,6 +71,13 @@ export function ShareResultScreen({ result, onSelect, onClose }: Props) {
             </Panel>
           </>
         )}
+        {/* Only offered when a page address came with the share: a watch with
+            no page has no price to read. Says what it does, not "add". */}
+        {result.sharedUrl && (
+          <View style={styles.watch}>
+            <GhostButton label="עקוב אחרי המחיר" onPress={() => onWatch(result.sharedUrl!)} />
+          </View>
+        )}
       </ScrollView>
 
       <View style={styles.footer}>
@@ -83,5 +92,6 @@ const styles = StyleSheet.create({
   content: { paddingBottom: space.s5, gap: space.s3 },
   lede: { ...type.body, paddingHorizontal: space.s3 },
   figureInline: type.figureInline,
+  watch: { paddingHorizontal: space.s3 },
   footer: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: ticket.rule },
 });

@@ -3,6 +3,7 @@ import { Linking, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import type { UserProfile } from '@sbr/core';
 import { GhostButton, ListRow, Panel, ScreenHeader, Section, Text } from '../components/ui';
 import { programsById, venues } from '../services/catalog';
+import { WATCH_PRIVACY } from '../services/watchCopy';
 import { handleVenueEnter } from '../services/geofencing';
 import { colors, space, ticket, type } from '../theme';
 
@@ -148,6 +149,8 @@ export function SettingsScreen({
             ״חבר״ מעיד על שירות קבע, ״הייטקזון״ על מקום העבודה. שום דבר לא נשלח עד שתשאלו,
             ואפשר להשתמש באפליקציה כרגיל בלי המסך הזה.
           </Text>
+          <Text style={type.bodyStrong}>ורשימת המעקב</Text>
+          <Text style={type.small}>{WATCH_PRIVACY}</Text>
         </Panel>
       </Section>
     </ScrollView>

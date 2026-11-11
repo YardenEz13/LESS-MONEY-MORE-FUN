@@ -3,6 +3,7 @@ import type { Evaluation } from '@sbr/core';
 import { formatVenueNotification } from '@sbr/core';
 import { programNames } from './catalog';
 import { logEvent } from '../state/events';
+import { canNotify } from './runtime';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -70,5 +71,33 @@ export async function cancelVenueNotification(id: string): Promise<void> {
     await Notifications.cancelScheduledNotificationAsync(id);
   } catch {
     // Already delivered, or already gone: the same outcome either way.
+  }
+}
+
+/**
+ * Fire a watch alert now. Returns false when it could not be delivered, so the
+ * caller does not record an alert that never reached the lock screen — the
+ * next check then tries again instead of the drop being silently spent.
+ *
+ * Permission is only checked, never asked for here: this runs from a periodic
+ * check, and a permission dialog nobody expected is worse than a missed alert.
+ * The geofence switch in onboarding is where the dialog lives.
+ */
+export async function notifyWatch(input: {
+  watchId: string;
+  title: string;
+  body: string;
+}): Promise<boolean> {
+  if (!canNotify) return false;
+  try {
+    const permission = await Notifications.getPermissionsAsync();
+    if (!permission.granted) return false;
+    await Notifications.scheduleNotificationAsync({
+      content: { title: input.title, body: input.body, data: { watchId: input.watchId } },
+      trigger: null,
+    });
+    return true;
+  } catch {
+    return false;
   }
 }

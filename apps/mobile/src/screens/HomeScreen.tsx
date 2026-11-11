@@ -55,6 +55,9 @@ const NEVER_LISTED: ReadonlySet<BlockerCode> = new Set<BlockerCode>([
   'program_not_owned',
   'muted',
   'low_confidence',
+  // The automatic verifier retired it: a vanished page, self-contradicting
+  // terms, or repeated reports. Not "not now" — not at all.
+  'rejected',
 ]);
 
 /** Bone: a combo belongs to two clubs, so it takes neither club's stock. */
@@ -75,6 +78,7 @@ interface Props {
   onOpenSettings: () => void;
   onOpenStats: () => void;
   onOpenAdvisor: () => void;
+  onOpenWatch: () => void;
 }
 
 export function HomeScreen({
@@ -85,6 +89,7 @@ export function HomeScreen({
   onOpenSettings,
   onOpenStats,
   onOpenAdvisor,
+  onOpenWatch,
 }: Props) {
   const [query, setQuery] = useState('');
   const [foldOpen, setFoldOpen] = useState(false);
@@ -414,6 +419,7 @@ export function HomeScreen({
       {/* At the bottom, where a thumb reaches while the other hand holds a wallet. */}
       <View style={styles.actions}>
         <BarAction label="מדדים" onPress={onOpenStats} />
+        <BarAction label="מעקב" onPress={onOpenWatch} />
         <BarAction label="שאל" onPress={onOpenAdvisor} primary />
         <BarAction label="הגדרות" onPress={onOpenSettings} />
       </View>
