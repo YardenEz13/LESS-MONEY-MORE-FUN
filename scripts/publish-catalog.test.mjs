@@ -30,18 +30,28 @@ const benefit = (id, over = {}) => ({
   ...over,
 });
 
+const verdict = (state) => ({ state, checked_at: '2026-11-01T00:00:00.000Z', score: 0.8, checks: [] });
+
 const dir = await mkdtemp(join(tmpdir(), 'sbr-publish-'));
 await mkdir(join(dir, 'data', 'generated'), { recursive: true });
 
 // Already live: keeper and pulled. `pulled` has since gone back to review.
 await writeFile(
   join(dir, 'data', 'benefits.json'),
-  JSON.stringify([benefit('keeper'), benefit('pulled')]),
+  JSON.stringify([
+    benefit('keeper', { verification: verdict('rejected') }),
+    benefit('pulled'),
+    benefit('reworded', { verification: verdict('confirmed') }),
+  ]),
   'utf8',
 );
 await writeFile(
   join(dir, 'data', 'generated', 'benefits.json'),
-  JSON.stringify([benefit('keeper'), benefit('fresh')]),
+  JSON.stringify([
+    benefit('keeper'),
+    benefit('fresh'),
+    benefit('reworded', { conditions: { raw_text_summary: '7% הנחה' }, value: 7 }),
+  ]),
   'utf8',
 );
 await writeFile(
@@ -70,4 +80,16 @@ assert.equal(
 );
 assert.match(stdout, /withdrawn:\s+1/, 'the withdrawal must be reported, not done silently');
 
-console.log('ok: approved stay, new ship, re-queued are withdrawn from the catalog');
+const byId = new Map(shipped.map((b) => [b.id, b]));
+assert.equal(
+  byId.get('keeper').verification?.state,
+  'rejected',
+  'a refresh with unchanged terms must keep the verifier\'s verdict — or a rejected row comes back',
+);
+assert.equal(
+  byId.get('reworded').verification,
+  undefined,
+  'a verdict on old terms must not carry over to new ones',
+);
+
+console.log('ok: approved stay, new ship, re-queued are withdrawn, verdicts survive unchanged terms');

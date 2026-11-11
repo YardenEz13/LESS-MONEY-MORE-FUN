@@ -27,7 +27,8 @@
     "unpublish": "node scripts/unpublish.mjs",
     "collect:catalog": "node scripts/collect-catalog.mjs",
     "map:unmapped": "node scripts/map-unmapped.mjs",
-    "extract:catalog": "node scripts/extract-catalog.mjs"
+    "extract:catalog": "node scripts/extract-catalog.mjs",
+    "verify:auto": "npm run -w @sbr/extraction verify --"
   },
   "devDependencies": {
     "typescript": "^5.6.3",

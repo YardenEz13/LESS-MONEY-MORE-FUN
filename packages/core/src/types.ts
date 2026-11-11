@@ -44,6 +44,59 @@ export const BenefitConditions = z
   .strict();
 export type BenefitConditions = z.infer<typeof BenefitConditions>;
 
+/**
+ * What the automatic verifier concluded about an offer.
+ *
+ *   confirmed   machine checks agree the source still states this offer
+ *   unverified  the checks could not reach a verdict, or two of them disagree —
+ *               shown with a plain "not verified" label, never above a confirmed
+ *   rejected    the source is gone, the terms contradict themselves, or people
+ *               at the till keep reporting it — never shown
+ *
+ * No verdict is never read as a yes: "we could not check" is `unverified`.
+ */
+export const VerificationState = z.enum(['confirmed', 'unverified', 'rejected']);
+export type VerificationState = z.infer<typeof VerificationState>;
+
+export const VerificationCheckCode = z.enum([
+  /** The source URL answered. `fail` only for 404/410 — a refusal is `unknown`. */
+  'source_reachable',
+  /** The fetched page names this merchant. */
+  'page_names_merchant',
+  /** The fetched page states this value. `fail`: it states a different one. */
+  'page_states_value',
+  /** A dated collector snapshot of the same URL states this value. */
+  'seen_in_recrawl',
+  /** Another source lists the same merchant and program. `fail`: values differ. */
+  'second_source',
+  /** The structured terms do not contradict each other. */
+  'terms_consistent',
+  /** "The discount was not there" reports. `pass`: none. */
+  'user_reports',
+]);
+export type VerificationCheckCode = z.infer<typeof VerificationCheckCode>;
+
+export const VerificationCheck = z
+  .object({
+    code: VerificationCheckCode,
+    /** `unknown` is "could not run", and is never counted in the offer's favour. */
+    outcome: z.enum(['pass', 'fail', 'unknown']),
+    detail: z.string().nullish(),
+  })
+  .strict();
+export type VerificationCheck = z.infer<typeof VerificationCheck>;
+
+export const Verification = z
+  .object({
+    state: VerificationState,
+    /** When the evidence was gathered — a snapshot's own date, not the run's. */
+    checked_at: z.string().datetime(),
+    score: z.number().min(0).max(1),
+    checks: z.array(VerificationCheck),
+  })
+  .strict();
+export type Verification = z.infer<typeof Verification>;
+
 export const Benefit = z
   .object({
     id: z.string().min(1),
@@ -62,6 +115,12 @@ export const Benefit = z
     confidence_score: z.number().min(0).max(1),
     /** Set once a human has approved a low-confidence extraction. */
     reviewed_by_human: z.boolean().default(false),
+    /**
+     * The automatic verifier's verdict, or absent for a row it has never
+     * judged. Absent keeps the older rules (confidence gate, freshness) exactly
+     * as they were, so a catalog written before the verifier existed still reads.
+     */
+    verification: Verification.nullish(),
   })
   .strict();
 export type Benefit = z.infer<typeof Benefit>;

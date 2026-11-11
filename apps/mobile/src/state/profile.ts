@@ -17,14 +17,25 @@ export const emptyProfile: UserProfile = {
  * No account, no ID number, no card number. That's the Zero-Auth promise in
  * the PRD.
  *
- * It used to be enforced by there being no network write path at all. There is
- * now exactly one, and it is worth stating plainly rather than letting a reader
- * discover it: `services/advisor.ts` sends the question, this program list and
- * the matching benefits to Gemini when the user asks the advisor something.
- * Nothing is sent otherwise, and the settings screen says so in Hebrew.
+ * It used to be enforced by there being no network write path at all. There are
+ * now exactly two, and they are worth stating plainly rather than letting a
+ * reader discover them:
  *
- * That is the only sanctioned exception. If you are about to add a second one,
- * this comment is still the thing you have to argue with first.
+ * 1. `services/advisor.ts` sends the question, this program list and the
+ *    matching benefits to Gemini when the user asks the advisor something.
+ *    Nothing is sent otherwise, and the settings screen says so in Hebrew.
+ * 2. `services/watch.ts` fetches the product page the user chose to watch, from
+ *    the shop's own site, so the phone can read its price. That is a plain GET
+ *    to a URL the person supplied: it carries no profile, no club list and no
+ *    watchlist, and the response is parsed on the device. The watchlist and
+ *    the price history never leave it. The shop sees what it sees from any
+ *    visitor opening the page (an IP address and a user-agent naming this app),
+ *    and the settings and watch screens say that in Hebrew.
+ *
+ * Those are the only sanctioned exceptions, and the second is sanctioned
+ * because it moves nothing about the person — only the page they asked about.
+ * If you are about to add a third, or to send anything personal along with the
+ * second, this comment is still the thing you have to argue with first.
  */
 export async function loadProfile(): Promise<UserProfile> {
   try {

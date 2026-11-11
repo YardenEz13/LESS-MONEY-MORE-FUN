@@ -64,7 +64,8 @@
         }
       ],
       "./plugins/withGradleMemory",
-      "expo-asset"
+      "expo-asset",
+      "expo-background-task"
     ],
     "owner": "yarden1311",
     "extra": {

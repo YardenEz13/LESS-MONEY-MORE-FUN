@@ -150,7 +150,8 @@ export type BlockerCode =
   | 'wrong_channel'
   | 'below_min_spend'
   | 'stale_data'
-  | 'low_confidence';
+  | 'low_confidence'
+  | 'rejected';
 
 export type RequirementCode =
   | 'min_spend_unknown'
@@ -164,7 +165,8 @@ export type RequirementCode =
   | 'aging_data'
   | 'ends_soon'
   | 'upper_bound'
-  | 'eligibility';
+  | 'eligibility'
+  | 'unverified';
 
 export interface Note<T extends string> {
   code: T;
@@ -196,7 +198,8 @@ export type GateCode =
   | 'freshness'
   | 'validity'
   | 'rate'
-  | 'eligibility';
+  | 'eligibility'
+  | 'verification';
 
 export type GateState =
   /** Stated, checkable, and satisfied right now. */
@@ -344,8 +347,28 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
     blockers.push({ code: 'muted', message: 'השתקת את ההטבה הזו' });
   }
 
-  if (benefit.confidence_score < minConfidence && !benefit.reviewed_by_human) {
-    blockers.push({ code: 'low_confidence', message: 'ההטבה ממתינה לאימות ידני' });
+  // A confirmed verdict from the automatic verifier clears the confidence gate
+  // the way a human approval does: it read the source and found this offer on
+  // it, which is the same thing the reviewer was being asked to do.
+  const verdict = benefit.verification?.state;
+  if (
+    benefit.confidence_score < minConfidence &&
+    !benefit.reviewed_by_human &&
+    verdict !== 'confirmed'
+  ) {
+    blockers.push({ code: 'low_confidence', message: 'ההטבה ממתינה לאימות' });
+  }
+  if (verdict === 'rejected') {
+    // Generic on purpose: a rejection is a vanished page, terms that
+    // contradict themselves, or repeated reports from the till, and "not found
+    // at the source" would be false for two of the three.
+    blockers.push({ code: 'rejected', message: 'ההטבה נפסלה בבדיקה האוטומטית מול המקור' });
+    gate('verification', 'blocked', 'נפסל', 'ההטבה נפסלה בבדיקה האוטומטית מול המקור');
+  } else if (verdict === 'unverified') {
+    // Shown, and said plainly. Not actionable: there is nothing to do about it
+    // before paying except ask, which the sentence already says.
+    requirements.push({ code: 'unverified', message: 'לא אומת מול המקור — כדאי לשאול בקופה' });
+    gate('verification', 'pending', 'לא מאומת', 'לא הצלחנו לאמת את ההטבה מול המקור — כדאי לשאול בקופה');
   }
 
   const ageDays = daysSince(benefit.last_verified_at, ctx.now);
@@ -366,7 +389,10 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
       'אימות ישן',
       `אומת לאחרונה לפני ${Math.floor(ageDays)} ימים — כדאי לוודא בקופה`,
     );
-  } else {
+  } else if (benefit.verification?.state !== 'unverified') {
+    // An unverified row has no "verified" to print: its date is the last time
+    // anything proved it, and the verifier has since failed to. One gate saying
+    // מאומת beside another saying לא מאומת would be the app arguing with itself.
     gate('freshness', 'met', 'מאומת', 'אומת בימים האחרונים מול המקור');
   }
 
@@ -582,6 +608,36 @@ export function offerKey(b: Benefit): string {
   return [b.merchant_id, b.value, b.source_url, b.conditions.raw_text_summary].join('|');
 }
 
+/**
+ * The rate a benefit is expected to deliver, as opposed to the one it prints.
+ *
+ * Two offers at one shop: 20% from an aggregator listing with no terms, last
+ * seen five weeks ago, and 15% from the club's own page, read yesterday with
+ * every condition parsed. The headline says the first is better. At a till the
+ * second is — the first is the one that turns out to be "selected items only"
+ * or to have ended. So the printed rate is discounted by how sure we are of it:
+ *
+ *   freshness   full weight until the row starts ageing, then down to 0.7 at
+ *               the point the engine would block it as stale anyway
+ *   confidence  the extractor's own score for how completely it read the terms,
+ *               scaled into 0.5–1 so an unsure row is demoted, not erased
+ *
+ * Null stays null: an offer with no stated rate is not made rankable by being
+ * multiplied.
+ */
+export function expectedRate(
+  evaluation: Pick<Evaluation, 'benefit' | 'ageDays'>,
+  freshness: FreshnessPolicy = freshnessFor(evaluation.benefit),
+): number | null {
+  const rate = savingRate(evaluation.benefit);
+  if (rate == null) return null;
+  const span = Math.max(1, freshness.staleDays - freshness.agingDays);
+  const aged = Math.min(1, Math.max(0, (evaluation.ageDays - freshness.agingDays) / span));
+  const freshnessFactor = 1 - 0.3 * aged;
+  const confidenceFactor = 0.5 + 0.5 * Math.min(1, Math.max(0, evaluation.benefit.confidence_score));
+  return rate * freshnessFactor * confidenceFactor;
+}
+
 export function rankBenefits(
   benefits: readonly Benefit[],
   ctx: EvalContext,
@@ -592,6 +648,12 @@ export function rankBenefits(
     .map((benefit) => evaluateBenefit(benefit, ctx))
     .filter((evaluation) => (hideBlocked ? evaluation.status !== 'blocked' : true))
     .sort((a, b) => {
+      // An offer the verifier could not confirm never sits above one it could,
+      // whatever it claims to be worth — an unproven 40% outranking a proven
+      // 10% is the headline winning over the evidence.
+      const unproven = (e: Evaluation) => (e.benefit.verification?.state === 'unverified' ? 1 : 0);
+      const byProof = unproven(a) - unproven(b);
+      if (byProof !== 0) return byProof;
       // "Nothing left to do" outranks "one thing to do" at equal value: a
       // card you can act on now should never sit under a card you can't.
       const rank = (e: Evaluation) =>
@@ -600,7 +662,8 @@ export function rankBenefits(
       if (byRank !== 0) return byRank;
       // -1 for "no stated rate", so an unrankable benefit sorts below every
       // benefit that does state one instead of above all of them.
-      const byRate = (savingRate(b.benefit) ?? -1) - (savingRate(a.benefit) ?? -1);
+      const byRate =
+        (expectedRate(b, ctx.freshness) ?? -1) - (expectedRate(a, ctx.freshness) ?? -1);
       if (byRate !== 0) return byRate;
       // Same rate: the bigger basket-relative figure wins, which is what
       // separates a 5% with a ₪200 cap from a 5% without one.

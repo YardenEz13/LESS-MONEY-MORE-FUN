@@ -9,7 +9,9 @@ export type InteractionKind =
   | 'benefit_viewed'
   | 'benefit_redeemed'
   | 'share_resolved'
-  | 'share_unmatched';
+  | 'share_unmatched'
+  | 'watch_added'
+  | 'watch_alert_sent';
 
 export interface InteractionEvent {
   kind: InteractionKind;

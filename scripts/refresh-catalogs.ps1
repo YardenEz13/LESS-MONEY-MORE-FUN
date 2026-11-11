@@ -7,7 +7,9 @@
 # the owner asked for new discounts to reach the data unattended. What makes
 # that safe is not this script being careful; it is the gates it refuses to
 # skip:
-#   - the 0.85 confidence gate: nothing below it ships without a human
+#   - the 0.85 confidence gate: nothing below it ships unless verify:auto
+#     confirms it on evidence (no human step since the automatic verifier)
+#   - verify:auto's change guard: a run that would take down too much stops
 #   - validate:data: blocked a 221.85% discount from shipping once already
 #   - shipped-data.test: the catalog must parse with the app's own schemas
 # Any of them failing restores the owned paths and publishes nothing.
@@ -155,6 +157,19 @@ if ($LASTEXITCODE -ne 0) { Stop-Run "publish:catalog failed" -Restore }
 # and publish withdraws what is queued.
 node scripts/sync-easy-proof.mjs 2>&1 | ForEach-Object { Write-Log $_ }
 if ($LASTEXITCODE -ne 0) { Stop-Run "sync-easy-proof failed" -Restore }
+
+# Automatic confirmation: the step that replaces reading the review queue.
+# Judges every row on evidence (snapshots just collected, plus a bounded number
+# of honest page fetches), promotes queued rows the evidence confirms, and
+# demotes or retires the rest. It exits non-zero when its change guard trips —
+# a run that would take down an implausible share of offers is far likelier
+# to be a broken check than a real event — and then nothing is published.
+#
+# --offline: judged on the snapshots this run just collected, no page fetches.
+# The live-fetch path has not yet been measured against real pages; drop the
+# flag (and pass --limit) once a live --dry-run has been sampled.
+npm.cmd run verify:auto -- --queue --offline 2>&1 | ForEach-Object { Write-Log $_ }
+if ($LASTEXITCODE -ne 0) { Stop-Run "verify:auto refused this run (change guard) - nothing published" -Restore }
 
 # A catalog does not lose a fifth of itself in a few days. Whatever caused this,
 # phones keep what they have until a person has looked.
