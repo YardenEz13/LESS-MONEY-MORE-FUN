@@ -386,7 +386,10 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
       'אימות ישן',
       `אומת לאחרונה לפני ${Math.floor(ageDays)} ימים — כדאי לוודא בקופה`,
     );
-  } else {
+  } else if (benefit.verification?.state !== 'unverified') {
+    // An unverified row has no "verified" to print: its date is the last time
+    // anything proved it, and the verifier has since failed to. One gate saying
+    // מאומת beside another saying לא מאומת would be the app arguing with itself.
     gate('freshness', 'met', 'מאומת', 'אומת בימים האחרונים מול המקור');
   }
 
