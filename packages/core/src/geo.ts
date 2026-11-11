@@ -251,14 +251,19 @@ export function shouldNotifyForVenue(input: {
   if (input.state.notifiedAt != null && input.now - input.state.notifiedAt < policy.cooldownMs) {
     return { notify: false, reason: 'cooldown' };
   }
-  const quiet = policy.quietHours;
-  if (quiet) {
-    const { fromMinutes, toMinutes } = quiet;
-    const inQuiet =
-      fromMinutes < toMinutes
-        ? input.localMinutes >= fromMinutes && input.localMinutes < toMinutes
-        : input.localMinutes >= fromMinutes || input.localMinutes < toMinutes;
-    if (inQuiet) return { notify: false, reason: 'quiet_hours' };
+  if (policy.quietHours && inQuietHours(input.localMinutes, policy.quietHours)) {
+    return { notify: false, reason: 'quiet_hours' };
   }
   return { notify: true };
+}
+
+/** Is this local minute-of-day inside a quiet window? The window may cross midnight. */
+export function inQuietHours(
+  localMinutes: number,
+  quiet: { fromMinutes: number; toMinutes: number },
+): boolean {
+  const { fromMinutes, toMinutes } = quiet;
+  return fromMinutes < toMinutes
+    ? localMinutes >= fromMinutes && localMinutes < toMinutes
+    : localMinutes >= fromMinutes || localMinutes < toMinutes;
 }
