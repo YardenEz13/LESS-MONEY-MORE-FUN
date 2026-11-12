@@ -138,6 +138,12 @@ export interface EvalContext {
   timeZone?: string;
   freshness?: FreshnessPolicy;
   minConfidence?: number;
+  /**
+   * Steps the user punched today, as `${benefitId}:${gateCode}`. Only a pending,
+   * actionable gate can be punched: the user is the one who knows the voucher is
+   * in hand, and the caller is the one who expires the punch.
+   */
+  doneSteps?: readonly string[];
 }
 
 export type BlockerCode =
@@ -520,7 +526,7 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
   // Blocked first, then what the user still has to do, then the reassurance.
   const gateOrder: Record<GateState, number> = { blocked: 0, pending: 1, met: 2 };
 
-  return {
+  return applyDoneSteps({
     benefit,
     status: blockers.length > 0 ? 'blocked' : requirements.length > 0 ? 'conditional' : 'eligible',
     blockers,
@@ -531,7 +537,25 @@ export function evaluateBenefit(benefit: Benefit, ctx: EvalContext): Evaluation 
     estimatedSavingIls: upperBound ? 0 : Math.round(value * 100) / 100,
     isEstimate,
     ageDays: Number.isFinite(ageDays) ? Math.floor(ageDays) : -1,
-  };
+  }, ctx.doneSteps ?? []);
+}
+
+/**
+ * Marks the steps the user punched as met. Takes an evaluation made without
+ * punches, so a screen holding one can re-apply them as they change.
+ *
+ * A punched gate keeps its place rather than sorting down among the met ones:
+ * the hole stays where the thumb was, and a ticket capped at four holes cannot
+ * drop it off the end, which would leave no way to take the punch back.
+ */
+export function applyDoneSteps(evaluation: Evaluation, doneSteps: readonly string[]): Evaluation {
+  if (doneSteps.length === 0) return evaluation;
+  const gates = evaluation.gates.map((g) =>
+    g.state === 'pending' && g.actionable && doneSteps.includes(`${evaluation.benefit.id}:${g.code}`)
+      ? { ...g, state: 'met' as const }
+      : g,
+  );
+  return { ...evaluation, gates, actionsRequired: gates.filter((g) => g.state === 'pending' && g.actionable) };
 }
 
 export interface RankOptions {

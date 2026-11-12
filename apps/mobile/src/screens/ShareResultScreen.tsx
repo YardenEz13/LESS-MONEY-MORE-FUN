@@ -44,7 +44,6 @@ export function ShareResultScreen({ result, onSelect, onClose, onWatch }: Props)
                 // No wallet here, so the stock follows the club alone.
                 stock={stockFor(evaluation.benefit.program_id, [])}
                 onPress={onSelect}
-                glide={null}
               />
             ))}
           </>

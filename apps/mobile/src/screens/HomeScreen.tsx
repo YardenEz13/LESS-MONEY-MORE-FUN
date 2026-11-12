@@ -1,9 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  AccessibilityInfo,
   ActivityIndicator,
-  Animated,
-  Platform,
+  FlatList,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -25,7 +23,7 @@ import {
   type Venue,
 } from '@sbr/core';
 import { Seam } from '../components/Kit';
-import { stockFor, Ticket, wallOffset, type TicketSize } from '../components/Ticket';
+import { stockFor, Ticket, type TicketSize } from '../components/Ticket';
 import { GhostButton, LivePill, SearchField, Text } from '../components/ui';
 import {
   benefits,
@@ -38,6 +36,7 @@ import {
   venues,
 } from '../services/catalog';
 import { currentVenue, dwellMinutes } from '../services/geofencing';
+import { usePunches } from '../state/punches';
 import { deepOf, fonts, space, stock, ticket } from '../theme';
 
 /**
@@ -137,16 +136,8 @@ export function HomeScreen({
     setHere(where.venue ? null : where.here);
   }, []);
 
-  /** The wall behind the holes holds still on screen while the roll scrolls over it. */
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const wall = useMemo(() => wallOffset(scrollY), [scrollY]);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  useEffect(() => {
-    void AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
-    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
-    return () => subscription.remove();
-  }, []);
-  const glide = reduceMotion ? null : wall;
+  /** Steps punched today: they decide which group a ticket sits in. */
+  const { doneSteps } = usePunches();
 
   const owned = useMemo(() => ownedProgramIds(profile.program_ids), [profile.program_ids]);
 
@@ -157,10 +148,10 @@ export function HomeScreen({
     const mine = new Set(owned);
     return rankBenefits(
       benefits.filter((b) => mine.has(b.program_id)),
-      { now: new Date(), ownedProgramIds: owned, mutedBenefitIds: hiddenBenefitIds(profile) },
+      { now: new Date(), ownedProgramIds: owned, mutedBenefitIds: hiddenBenefitIds(profile), doneSteps },
       { hideBlocked: false },
     );
-  }, [owned, profile.muted_benefit_ids, profile.rejected_benefit_ids]);
+  }, [owned, profile.muted_benefit_ids, profile.rejected_benefit_ids, doneSteps]);
 
   const evaluations = useMemo(() => ranked.filter((e) => e.status !== 'blocked'), [ranked]);
   const notNow = useMemo(
@@ -251,6 +242,7 @@ export function HomeScreen({
   // Counted off `evaluations`, not the visible rows: this reports what the place
   // is worth to the user, and must not drop as they type in the search below it.
   const hereCount = hereIds ? evaluations.filter((e) => hereIds.has(e.benefit.id)).length : 0;
+  const hereNotNow = hereIds ? notNow.filter((e) => hereIds.has(e.benefit.id)).length : 0;
 
   /**
    * How many benefits a venue is worth *to this user*.
@@ -258,14 +250,16 @@ export function HomeScreen({
    * Counting the catalog instead would advertise a mall as having 8 when the
    * list below it shows 5 — the other three belong to clubs they do not hold
    * or are blocked right now. A count that disagrees with the list under it
-   * teaches the reader to distrust both.
+   * teaches the reader to distrust both. The "not now" fold is counted apart
+   * for the same reason: a bare 0 over a fold that holds offers disagrees too.
    */
   const countAt = useCallback(
     (venueId: string) => {
       const ids = new Set(benefitsAtVenue(venueId).map((b) => b.id));
-      return evaluations.filter((e) => ids.has(e.benefit.id)).length;
+      const at = (e: Evaluation) => ids.has(e.benefit.id);
+      return countLabel(evaluations.filter(at).length, notNow.filter(at).length);
     },
-    [evaluations],
+    [evaluations, notNow],
   );
 
   const renderRow = useCallback(
@@ -284,7 +278,6 @@ export function HomeScreen({
               size={item.size}
               stock={stockFor(item.evaluation.benefit.program_id, owned)}
               onPress={onSelect}
-              glide={glide}
             />
           );
         case 'combo':
@@ -325,7 +318,6 @@ export function HomeScreen({
       catalogStale,
       evaluations.length,
       foldOpen,
-      glide,
       here,
       hereIds,
       onOpenSettings,
@@ -343,7 +335,7 @@ export function HomeScreen({
     <View style={styles.screen}>
       {/* FlatList, not map-in-a-ScrollView: someone holding a few clubs has
           thousands of rows, and mounting them all froze the screen on a phone. */}
-      <Animated.FlatList
+      <FlatList
         data={rows}
         keyExtractor={(row: Row) => row.key}
         renderItem={renderRow}
@@ -352,10 +344,6 @@ export function HomeScreen({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
-        scrollEventThrottle={16}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-          useNativeDriver: Platform.OS !== 'web',
-        })}
         ListHeaderComponent={
           <View style={styles.head}>
             <Text accessibilityRole="header" style={styles.title}>
@@ -372,7 +360,11 @@ export function HomeScreen({
             <WhereAmI
               venue={venue}
               nearby={here != null}
-              count={hereCount}
+              count={
+                hereCount === 0 && hereNotNow > 0
+                  ? countLabel(hereCount, hereNotNow)
+                  : `${hereCount} הטבות כאן`
+              }
               minute={minute}
               locating={locating}
               onLocate={locate}
@@ -505,7 +497,7 @@ function WhereAmI({
   venue: Venue | null;
   /** A fix outside every mall — a place with no name, but still a place. */
   nearby: boolean;
-  count: number;
+  count: string;
   minute: number | null;
   locating: boolean;
   onLocate: () => void;
@@ -519,7 +511,7 @@ function WhereAmI({
           {/* No entry event, no minute — see `dwellMinutes`. */}
           {minute != null && <LivePill minute={minute} />}
           <Text style={styles.whereActiveText} numberOfLines={1}>
-            {venue ? venue.name : 'קרוב אליך'} · {count} הטבות כאן
+            {venue ? venue.name : 'קרוב אליך'} · {count}
           </Text>
         </View>
         <Pressable
@@ -560,13 +552,18 @@ function WhereAmI({
   );
 }
 
+/** A bare 0 reads as an empty place; when the fold under it holds offers, say so. */
+function countLabel(now: number, notNow: number): string {
+  return now === 0 && notNow > 0 ? `0 עכשיו · ${notNow} לא עכשיו` : String(now);
+}
+
 /** The manual fallback: every tracked venue, tap to pin. */
 function VenueSheet({
   countAt,
   onChoose,
   onClose,
 }: {
-  countAt: (venueId: string) => number;
+  countAt: (venueId: string) => string;
   onChoose: (venue: Venue) => void;
   onClose: () => void;
 }) {

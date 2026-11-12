@@ -1,13 +1,7 @@
 import React, { memo } from 'react';
+import { Pressable, StyleSheet, Text as RNText, useWindowDimensions, View } from 'react-native';
 import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text as RNText,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-import {
+  applyDoneSteps,
   displayMerchantName,
   formatLastVerified,
   formatValue,
@@ -17,27 +11,11 @@ import {
 } from '@sbr/core';
 import { Seam } from './Kit';
 import { Text } from './ui';
-import { benefits, merchantLine, programNames } from '../services/catalog';
-import { deepOf, fonts, space, stockDeep, ticket } from '../theme';
+import { merchantLine, programNames } from '../services/catalog';
+import { usePunches } from '../state/punches';
+import { deepOf, fonts, space, ticket } from '../theme';
 
 export type TicketSize = 'big' | 'mid' | 'slim';
-
-/** One line of the wall behind the holes; holes clip it, so it can only be this tall. */
-const WALL_LINE = 26;
-const WALL_PERIOD = WALL_LINE * 2;
-
-/**
- * Real shop names for the wall behind the holes. Hebrew only and short: the EFT
- * faces draw Latin as a serif, and a whole word has to fit a hole to read as one.
- */
-const WALL_NAMES = [...new Set(benefits.map((b) => b.merchant_name))]
-  .filter((name) => name.length <= 12 && /^[֐-׿\s]+$/.test(name))
-  .slice(0, 60);
-
-/** Which way a scroll value moves the wall so it appears not to move at all. */
-export function wallOffset(scrollY: Animated.Value): Animated.AnimatedSubtraction<number> {
-  return Animated.subtract(Animated.modulo(scrollY, WALL_PERIOD), WALL_PERIOD);
-}
 
 function hashOf(text: string): number {
   let sum = 0;
@@ -58,49 +36,52 @@ export function stockFor(programId: string, ownedIds: readonly string[]): string
 }
 
 /**
- * React Native cannot cut a real hole in a view without a new native dependency,
- * so a hole is the ground colour with the wall drawn inside it. It reads the same,
- * and `glide` keeps the wall still on screen while the ticket scrolls past it.
- * One Text node with nested spans, because a screen of tickets has dozens of holes.
+ * A punched hole: the paper ground showing through, with the stock's deep tone
+ * as the hole's inner wall. A punched step of the user's own can be tapped back.
  */
-function Hole({ size, seed, glide }: { size: number; seed: number; glide: Animated.AnimatedNode | null }) {
-  const a = WALL_NAMES[seed % WALL_NAMES.length] ?? '';
-  const b = WALL_NAMES[(seed + 7) % WALL_NAMES.length] ?? '';
-  // Deep tones: the pastel stocks cannot be read as text on a paper-coloured hole.
-  const one = stockDeep[ticket.stocks[seed % ticket.stocks.length]!]!;
-  const two = stockDeep[ticket.stocks[(seed + 2) % ticket.stocks.length]!]!;
-  return (
-    <View style={[styles.hole, { width: size, height: size, borderRadius: size / 2 }]}>
-      <Animated.View style={[styles.wall, glide ? { transform: [{ translateY: glide }] } : null]}>
-        <RNText style={styles.wallText} allowFontScaling={false}>
-          <RNText style={{ color: one }}>{`${a}\n`}</RNText>
-          <RNText style={{ color: two }}>{`${b}\n`}</RNText>
-          <RNText style={{ color: one }}>{`${a}\n`}</RNText>
-          <RNText style={{ color: two }}>{b}</RNText>
-        </RNText>
-      </Animated.View>
-    </View>
-  );
-}
-
 function Mark({
   state,
   size,
-  seed,
-  glide,
+  deep,
+  label,
+  onPunch,
 }: {
   state: HoleState;
   size: number;
-  seed: number;
-  glide: Animated.AnimatedNode | null;
+  deep: string;
+  label: string;
+  /** Set when the user can punch this hole, or take their punch back. */
+  onPunch: (() => void) | null;
 }) {
-  if (state === 'punched') return <Hole size={size} seed={seed} glide={glide} />;
   const shape = { width: size, height: size, borderRadius: size / 2 };
-  if (state === 'open') return <View style={[shape, styles.open]} />;
+  if (state === 'bad') {
+    return (
+      <View style={[shape, styles.bad]}>
+        <View style={[styles.badBar, { width: size * 0.72 }]} />
+      </View>
+    );
+  }
+  const face =
+    state === 'punched' ? (
+      <View style={[shape, styles.hole, { borderTopColor: deep }]} />
+    ) : (
+      <View style={[shape, styles.open]}>
+        <RNText style={styles.plus} allowFontScaling={false}>
+          +
+        </RNText>
+      </View>
+    );
+  if (!onPunch) return face;
   return (
-    <View style={[shape, styles.bad]}>
-      <View style={[styles.badBar, { width: size * 0.72 }]} />
-    </View>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={state === 'open' ? `לנקב: ${label}` : `לבטל ניקוב: ${label}`}
+      hitSlop={(48 - size) / 2 + 2}
+      onPress={onPunch}
+      style={({ pressed }) => pressed && styles.pressedDown}
+    >
+      {face}
+    </Pressable>
   );
 }
 
@@ -110,7 +91,6 @@ interface Props {
   /** The stock for this card. A blocked ticket ignores it and turns grey. */
   stock: string;
   onPress: (evaluation: Evaluation) => void;
-  glide: Animated.AnimatedNode | null;
 }
 
 /**
@@ -121,15 +101,18 @@ interface Props {
  * a punch has to survive a restart and expire, which needs saved state that does
  * not exist. So it says so by not carrying the word "לנקב" from the prototype.
  */
-export const Ticket = memo(function Ticket({ evaluation, size, stock, onPress, glide }: Props) {
+export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onPress }: Props) {
   const { width } = useWindowDimensions();
+  // Punches apply here, so every screen showing a ticket can be punched, and the
+  // evaluation handed on to the detail screen carries them.
+  const { doneSteps, punched, punch } = usePunches();
+  const evaluation = applyDoneSteps(given, doneSteps);
   const { benefit } = evaluation;
   const { figure, unit } = formatValue(benefit);
   const face = ticketFace(evaluation);
   const name = displayMerchantName(benefit.merchant_name);
   const club = programNames[benefit.program_id] ?? benefit.program_id;
   const place = merchantLine(benefit.merchant_id);
-  const seed = hashOf(benefit.id);
 
   const base = size === 'big' ? Math.min(width * 0.4, 150) : size === 'mid' ? 60 : 30;
   // Display figures run to "עד 3.5%": shrink what is long, since the web build has
@@ -184,11 +167,24 @@ export const Ticket = memo(function Ticket({ evaluation, size, stock, onPress, g
   }
 
   const holeSize = size === 'big' ? 44 : 36;
+  const keyOf = (code: string) => `${benefit.id}:${code}`;
+  const punchable = (hole: (typeof face.holes)[number]) =>
+    hole.state === 'open' || punched.has(keyOf(hole.code));
+  // The stub: torn off along a perforation, notched at both edges like a real ticket.
   const rail = face.holes.length > 0 && (
     <View style={styles.rail}>
-      {face.holes.map((hole, i) => (
+      <Seam />
+      <View style={[styles.notch, styles.notchStart]} />
+      <View style={[styles.notch, styles.notchEnd]} />
+      {face.holes.map((hole) => (
         <View key={hole.code} style={styles.cell}>
-          <Mark state={hole.state} size={holeSize} seed={seed + i} glide={glide} />
+          <Mark
+            state={hole.state}
+            size={holeSize}
+            deep={deepOf(stock)}
+            label={hole.label}
+            onPunch={punchable(hole) ? () => punch(keyOf(hole.code)) : null}
+          />
           <Text style={styles.cellLabel} numberOfLines={2}>
             {hole.label}
           </Text>
@@ -217,6 +213,11 @@ export const Ticket = memo(function Ticket({ evaluation, size, stock, onPress, g
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityActions={face.holes.filter(punchable).map((h) => ({
+        name: h.code,
+        label: h.state === 'open' ? `לנקב: ${h.label}` : `לבטל ניקוב: ${h.label}`,
+      }))}
+      onAccessibilityAction={(e) => punch(keyOf(e.nativeEvent.actionName))}
       onPress={() => onPress(evaluation)}
       style={({ pressed }) => [styles.ticket, background, depth, pressed && styles.pressedDown]}
     >
@@ -273,7 +274,25 @@ const styles = StyleSheet.create({
     marginBottom: space.s4,
   },
 
-  rail: { flexDirection: 'row', columnGap: space.s1, marginTop: space.s2 + 4 },
+  rail: {
+    flexDirection: 'row',
+    columnGap: space.s1,
+    marginTop: space.s3,
+    marginHorizontal: -space.s3,
+    paddingHorizontal: space.s3,
+    paddingTop: space.s3,
+  },
+  /* Half off the ticket's edge, in the ground colour: a bite out of the stock. */
+  notch: {
+    position: 'absolute',
+    top: -11,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: ticket.ground,
+  },
+  notchStart: { left: -11 },
+  notchEnd: { right: -11 },
   /* A quarter of the row whatever the count, so holes line up from ticket to ticket. */
   cell: { width: '24%', alignItems: 'center', rowGap: space.s1 },
   cellLabel: {
@@ -284,15 +303,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  hole: { backgroundColor: ticket.ground, overflow: 'hidden', alignItems: 'center' },
-  wall: { width: 170 },
-  wallText: {
-    fontFamily: fonts.display,
-    fontSize: 22,
-    lineHeight: WALL_LINE,
-    textAlign: 'center',
+  /* The deep top edge is the hole's wall, seen at an angle. */
+  hole: { backgroundColor: ticket.ground, borderTopWidth: 5 },
+  open: {
+    backgroundColor: ticket.punch,
+    borderWidth: 3,
+    borderColor: ticket.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  open: { backgroundColor: ticket.punch, borderWidth: 3, borderColor: ticket.ink },
+  plus: { fontFamily: fonts.display, fontSize: 24, lineHeight: 26, color: ticket.ink },
   bad: { borderWidth: 3, borderColor: ticket.void, alignItems: 'center', justifyContent: 'center' },
   badBar: { height: 3, backgroundColor: ticket.void, transform: [{ rotate: '45deg' }] },
 
