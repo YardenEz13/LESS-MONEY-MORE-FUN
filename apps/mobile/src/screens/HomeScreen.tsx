@@ -390,10 +390,24 @@ export function HomeScreen({
             {/* Geofencing armed is the one genuinely live state in the app, so it
                 gets the live marker. Off is plain words: a pill that is always
                 there stops meaning "now". */}
-            <View style={styles.geofence}>
-              {geofenceActive && <LivePill />}
-              <Text style={styles.geofenceText}>{geofenceStatus}</Text>
-            </View>
+            {/* Off is a way in, not a dead end: the settings screen holds the
+                retry and the jump to the OS permission page. */}
+            {geofenceActive ? (
+              <View style={styles.geofence}>
+                <LivePill />
+                <Text style={styles.geofenceText}>{geofenceStatus}</Text>
+              </View>
+            ) : (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${geofenceStatus}. להפעלת התזכורת`}
+                onPress={onOpenSettings}
+                style={[styles.geofence, styles.geofenceOff]}
+              >
+                <Text style={styles.geofenceText}>{geofenceStatus}</Text>
+                <Text style={styles.geofenceAction}>להפעלה</Text>
+              </Pressable>
+            )}
 
             <View style={styles.searchRow}>
               <SearchField
@@ -699,6 +713,8 @@ const styles = StyleSheet.create({
   },
   geofence: { flexDirection: 'row', alignItems: 'center', gap: space.s2 },
   geofenceText: { flexShrink: 1, fontFamily: fonts.latinText, fontSize: 13.5, lineHeight: 19, color: ticket.muted },
+  geofenceOff: { minHeight: 44, justifyContent: 'space-between' },
+  geofenceAction: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: ticket.ink, textDecorationLine: 'underline' },
   /* SearchField brings its own 24dp gutter for the paper screens; here it lines up
      with the rest of the header instead. */
   searchRow: { alignSelf: 'stretch', marginHorizontal: -space.s4 },

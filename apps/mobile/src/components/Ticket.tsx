@@ -114,7 +114,9 @@ export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onP
   const club = programNames[benefit.program_id] ?? benefit.program_id;
   const place = merchantLine(benefit.merchant_id);
 
-  const base = size === 'big' ? Math.min(width * 0.4, 150) : size === 'mid' ? 60 : 30;
+  // The head ticket leads, but it must not fill the screen: at 150 a phone showed
+  // one offer and nothing under it.
+  const base = size === 'big' ? Math.min(width * 0.26, 96) : size === 'mid' ? 60 : 30;
   // Display figures run to "עד 3.5%": shrink what is long, since the web build has
   // no `adjustsFontSizeToFit` to fall back on.
   const figureSize = Math.round(base * Math.min(1, 3.5 / [...figure].length));

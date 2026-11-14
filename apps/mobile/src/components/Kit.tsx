@@ -63,7 +63,14 @@ function initial(name: string): string {
  */
 export function Seam() {
   return (
-    <View style={styles.seam} pointerEvents="none">
+    // Decoration: a screen reader would otherwise read out eighty dots.
+    <View
+      style={styles.seam}
+      pointerEvents="none"
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      aria-hidden
+    >
       <RNText style={styles.seamDots} numberOfLines={1} allowFontScaling={false}>
         {'●'.repeat(80)}
       </RNText>
