@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import * as Linking from 'expo-linking';
 import {
+  firstUrl,
   hiddenBenefitIds,
   rankBenefits,
   resolveMerchantFromShare,
@@ -17,10 +18,16 @@ export interface ShareMatch {
   evaluations: Evaluation[];
 }
 
-export type ShareResult =
+export type ShareOutcome =
   | { kind: 'match'; match: ShareMatch }
   | { kind: 'no_merchant'; hostname: string | null }
   | { kind: 'no_benefits'; hostname: string; merchantName: string };
+
+/**
+ * The outcome, plus the page that was shared. The outcome keeps only a
+ * hostname; "follow this price" needs the whole address, so it rides along.
+ */
+export type ShareResult = ShareOutcome & { sharedUrl: string | null };
 
 /**
  * Resolve a shared URL to the best benefit the user actually holds.
@@ -30,6 +37,10 @@ export type ShareResult =
  * merely unverified, and the engine will filter it out instead of teasing it.
  */
 export async function resolveShare(shared: string): Promise<ShareResult> {
+  return { ...(await resolveOutcome(shared)), sharedUrl: firstUrl(shared) };
+}
+
+async function resolveOutcome(shared: string): Promise<ShareOutcome> {
   const profile = await loadProfile();
   const resolved = resolveMerchantFromShare(shared, merchants);
 

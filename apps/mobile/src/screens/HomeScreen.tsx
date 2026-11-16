@@ -1,18 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  AccessibilityInfo,
   ActivityIndicator,
-  Animated,
-  Platform,
+  FlatList,
   Pressable,
   ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
 import {
-  applyPunches,
   catalogIsStale,
-  punchedCodes,
   displayMerchantName,
   findCombos,
   hiddenBenefitIds,
@@ -23,12 +19,11 @@ import {
   type Combo,
   type Coordinates,
   type Evaluation,
-  type Punches,
   type UserProfile,
   type Venue,
 } from '@sbr/core';
 import { Seam } from '../components/Kit';
-import { stockFor, Ticket, wallOffset, type TicketSize } from '../components/Ticket';
+import { stockFor, Ticket, type TicketSize } from '../components/Ticket';
 import { GhostButton, LivePill, SearchField, Text } from '../components/ui';
 import {
   benefits,
@@ -41,6 +36,7 @@ import {
   venues,
 } from '../services/catalog';
 import { currentVenue, dwellMinutes } from '../services/geofencing';
+import { usePunches } from '../state/punches';
 import { deepOf, fonts, space, stock, ticket } from '../theme';
 
 /**
@@ -58,6 +54,9 @@ const NEVER_LISTED: ReadonlySet<BlockerCode> = new Set<BlockerCode>([
   'program_not_owned',
   'muted',
   'low_confidence',
+  // The automatic verifier retired it: a vanished page, self-contradicting
+  // terms, or repeated reports. Not "not now" — not at all.
+  'rejected',
 ]);
 
 /** Bone: a combo belongs to two clubs, so it takes neither club's stock. */
@@ -72,18 +71,16 @@ type Row =
 
 interface Props {
   profile: UserProfile;
-  /** Steps punched today; see `@sbr/core` punches. */
-  punches: Punches;
   geofenceStatus: string;
   geofenceActive: boolean;
   onSelect: (evaluation: Evaluation) => void;
   onOpenSettings: () => void;
   onOpenStats: () => void;
   onOpenAdvisor: () => void;
+  onOpenWatch: () => void;
 }
 
 export function HomeScreen({
-  punches,
   profile,
   geofenceStatus,
   geofenceActive,
@@ -91,6 +88,7 @@ export function HomeScreen({
   onOpenSettings,
   onOpenStats,
   onOpenAdvisor,
+  onOpenWatch,
 }: Props) {
   const [query, setQuery] = useState('');
   const [foldOpen, setFoldOpen] = useState(false);
@@ -138,16 +136,8 @@ export function HomeScreen({
     setHere(where.venue ? null : where.here);
   }, []);
 
-  /** The wall behind the holes holds still on screen while the roll scrolls over it. */
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const wall = useMemo(() => wallOffset(scrollY), [scrollY]);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  useEffect(() => {
-    void AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
-    const subscription = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
-    return () => subscription.remove();
-  }, []);
-  const glide = reduceMotion ? null : wall;
+  /** Steps punched today: they decide which group a ticket sits in. */
+  const { doneSteps } = usePunches();
 
   const owned = useMemo(() => ownedProgramIds(profile.program_ids), [profile.program_ids]);
 
@@ -158,24 +148,18 @@ export function HomeScreen({
     const mine = new Set(owned);
     return rankBenefits(
       benefits.filter((b) => mine.has(b.program_id)),
-      { now: new Date(), ownedProgramIds: owned, mutedBenefitIds: hiddenBenefitIds(profile) },
+      { now: new Date(), ownedProgramIds: owned, mutedBenefitIds: hiddenBenefitIds(profile), doneSteps },
       { hideBlocked: false },
     );
-  }, [owned, profile.muted_benefit_ids, profile.rejected_benefit_ids]);
+  }, [owned, profile.muted_benefit_ids, profile.rejected_benefit_ids, doneSteps]);
 
-  // A punched step reads as done today, so the ticket moves from "needs a step" to "ready".
-  const punchedRanked = useMemo(() => {
-    const now = new Date();
-    return ranked.map((e) => applyPunches(e, punchedCodes(punches, e.benefit.id, now)));
-  }, [ranked, punches]);
-
-  const evaluations = useMemo(() => punchedRanked.filter((e) => e.status !== 'blocked'), [ranked]);
+  const evaluations = useMemo(() => ranked.filter((e) => e.status !== 'blocked'), [ranked]);
   const notNow = useMemo(
     () =>
-      punchedRanked.filter(
+      ranked.filter(
         (e) => e.status === 'blocked' && !e.blockers.some((b) => NEVER_LISTED.has(b.code)),
       ),
-    [punchedRanked],
+    [ranked],
   );
 
   // Checked against the whole catalog rather than the filtered list: the answer
@@ -258,6 +242,7 @@ export function HomeScreen({
   // Counted off `evaluations`, not the visible rows: this reports what the place
   // is worth to the user, and must not drop as they type in the search below it.
   const hereCount = hereIds ? evaluations.filter((e) => hereIds.has(e.benefit.id)).length : 0;
+  const hereNotNow = hereIds ? notNow.filter((e) => hereIds.has(e.benefit.id)).length : 0;
 
   /**
    * How many benefits a venue is worth *to this user*.
@@ -265,23 +250,16 @@ export function HomeScreen({
    * Counting the catalog instead would advertise a mall as having 8 when the
    * list below it shows 5 — the other three belong to clubs they do not hold
    * or are blocked right now. A count that disagrees with the list under it
-   * teaches the reader to distrust both.
+   * teaches the reader to distrust both. The "not now" fold is counted apart
+   * for the same reason: a bare 0 over a fold that holds offers disagrees too.
    */
   const countAt = useCallback(
     (venueId: string) => {
       const ids = new Set(benefitsAtVenue(venueId).map((b) => b.id));
-      return evaluations.filter((e) => ids.has(e.benefit.id)).length;
+      const at = (e: Evaluation) => ids.has(e.benefit.id);
+      return countLabel(evaluations.filter(at).length, notNow.filter(at).length);
     },
-    [evaluations],
-  );
-
-  /** Same rule for the fold: offers at the venue that are blocked right now. */
-  const notNowAt = useCallback(
-    (venueId: string) => {
-      const ids = new Set(benefitsAtVenue(venueId).map((b) => b.id));
-      return notNow.filter((e) => ids.has(e.benefit.id)).length;
-    },
-    [notNow],
+    [evaluations, notNow],
   );
 
   const renderRow = useCallback(
@@ -300,7 +278,6 @@ export function HomeScreen({
               size={item.size}
               stock={stockFor(item.evaluation.benefit.program_id, owned)}
               onPress={onSelect}
-              glide={glide}
             />
           );
         case 'combo':
@@ -341,7 +318,6 @@ export function HomeScreen({
       catalogStale,
       evaluations.length,
       foldOpen,
-      glide,
       here,
       hereIds,
       onOpenSettings,
@@ -359,7 +335,7 @@ export function HomeScreen({
     <View style={styles.screen}>
       {/* FlatList, not map-in-a-ScrollView: someone holding a few clubs has
           thousands of rows, and mounting them all froze the screen on a phone. */}
-      <Animated.FlatList
+      <FlatList
         data={rows}
         keyExtractor={(row: Row) => row.key}
         renderItem={renderRow}
@@ -368,10 +344,6 @@ export function HomeScreen({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
-        scrollEventThrottle={16}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-          useNativeDriver: Platform.OS !== 'web',
-        })}
         ListHeaderComponent={
           <View style={styles.head}>
             <Text accessibilityRole="header" style={styles.title}>
@@ -388,7 +360,11 @@ export function HomeScreen({
             <WhereAmI
               venue={venue}
               nearby={here != null}
-              count={hereCount}
+              count={
+                hereCount === 0 && hereNotNow > 0
+                  ? countLabel(hereCount, hereNotNow)
+                  : `${hereCount} הטבות כאן`
+              }
               minute={minute}
               locating={locating}
               onLocate={locate}
@@ -402,7 +378,6 @@ export function HomeScreen({
             {picking && (
               <VenueSheet
                 countAt={countAt}
-                notNowAt={notNowAt}
                 onChoose={(chosen) => {
                   setVenue(chosen);
                   setHere(null);
@@ -415,10 +390,24 @@ export function HomeScreen({
             {/* Geofencing armed is the one genuinely live state in the app, so it
                 gets the live marker. Off is plain words: a pill that is always
                 there stops meaning "now". */}
-            <View style={styles.geofence}>
-              {geofenceActive && <LivePill />}
-              <Text style={styles.geofenceText}>{geofenceStatus}</Text>
-            </View>
+            {/* Off is a way in, not a dead end: the settings screen holds the
+                retry and the jump to the OS permission page. */}
+            {geofenceActive ? (
+              <View style={styles.geofence}>
+                <LivePill />
+                <Text style={styles.geofenceText}>{geofenceStatus}</Text>
+              </View>
+            ) : (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${geofenceStatus}. להפעלת התזכורת`}
+                onPress={onOpenSettings}
+                style={[styles.geofence, styles.geofenceOff]}
+              >
+                <Text style={styles.geofenceText}>{geofenceStatus}</Text>
+                <Text style={styles.geofenceAction}>להפעלה</Text>
+              </Pressable>
+            )}
 
             <View style={styles.searchRow}>
               <SearchField
@@ -436,6 +425,7 @@ export function HomeScreen({
       {/* At the bottom, where a thumb reaches while the other hand holds a wallet. */}
       <View style={styles.actions}>
         <BarAction label="מדדים" onPress={onOpenStats} />
+        <BarAction label="מעקב" onPress={onOpenWatch} />
         <BarAction label="שאל" onPress={onOpenAdvisor} primary />
         <BarAction label="הגדרות" onPress={onOpenSettings} />
       </View>
@@ -521,7 +511,7 @@ function WhereAmI({
   venue: Venue | null;
   /** A fix outside every mall — a place with no name, but still a place. */
   nearby: boolean;
-  count: number;
+  count: string;
   minute: number | null;
   locating: boolean;
   onLocate: () => void;
@@ -535,7 +525,7 @@ function WhereAmI({
           {/* No entry event, no minute — see `dwellMinutes`. */}
           {minute != null && <LivePill minute={minute} />}
           <Text style={styles.whereActiveText} numberOfLines={1}>
-            {venue ? venue.name : 'קרוב אליך'} · {count} הטבות כאן
+            {venue ? venue.name : 'קרוב אליך'} · {count}
           </Text>
         </View>
         <Pressable
@@ -576,15 +566,18 @@ function WhereAmI({
   );
 }
 
+/** A bare 0 reads as an empty place; when the fold under it holds offers, say so. */
+function countLabel(now: number, notNow: number): string {
+  return now === 0 && notNow > 0 ? `0 עכשיו · ${notNow} לא עכשיו` : String(now);
+}
+
 /** The manual fallback: every tracked venue, tap to pin. */
 function VenueSheet({
   countAt,
-  notNowAt,
   onChoose,
   onClose,
 }: {
-  countAt: (venueId: string) => number;
-  notNowAt: (venueId: string) => number;
+  countAt: (venueId: string) => string;
   onChoose: (venue: Venue) => void;
   onClose: () => void;
 }) {
@@ -613,9 +606,7 @@ function VenueSheet({
             style={({ pressed }) => [styles.sheetRow, pressed && styles.sheetRowPressed]}
           >
             <Text style={styles.sheetRowName}>{v.name}</Text>
-            <Text style={styles.sheetClose}>
-              {notNowAt(v.id) > 0 ? `${countAt(v.id)} עכשיו, ${notNowAt(v.id)} לא עכשיו` : countAt(v.id)}
-            </Text>
+            <Text style={styles.sheetClose}>{countAt(v.id)}</Text>
           </Pressable>
         ))}
       </ScrollView>
@@ -722,6 +713,8 @@ const styles = StyleSheet.create({
   },
   geofence: { flexDirection: 'row', alignItems: 'center', gap: space.s2 },
   geofenceText: { flexShrink: 1, fontFamily: fonts.latinText, fontSize: 13.5, lineHeight: 19, color: ticket.muted },
+  geofenceOff: { minHeight: 44, justifyContent: 'space-between' },
+  geofenceAction: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: ticket.ink, textDecorationLine: 'underline' },
   /* SearchField brings its own 24dp gutter for the paper screens; here it lines up
      with the rest of the header instead. */
   searchRow: { alignSelf: 'stretch', marginHorizontal: -space.s4 },

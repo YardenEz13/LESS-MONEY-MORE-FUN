@@ -6,4 +6,5 @@ export * from './geo';
 export * from './url';
 export * from './search';
 export * from './format';
-export * from './punches';
+export * from './verification';
+export * from './watch';

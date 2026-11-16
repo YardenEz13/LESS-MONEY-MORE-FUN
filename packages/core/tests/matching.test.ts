@@ -219,6 +219,26 @@ describe('gates', () => {
       expect(gate.detail.length).toBeGreaterThan(gate.label.length);
     }
   });
+
+  it('meets a step the user punched, and only an actionable pending one', () => {
+    const benefit = makeBenefit({
+      conditions: { raw_text_summary: 'x', requires_voucher: true, exclusions: ['טבק'] },
+    });
+    const before = evaluateBenefit(benefit, baseCtx);
+    expect(before.actionsRequired.map((g) => g.code)).toEqual(['voucher']);
+    const after = evaluateBenefit(benefit, {
+      ...baseCtx,
+      doneSteps: ['b1:voucher', 'b1:exclusions', 'other:voucher'],
+    });
+    expect(after.actionsRequired).toEqual([]);
+    expect(after.gates.find((g) => g.code === 'voucher')?.state).toBe('met');
+    // It keeps its slot, so a four-hole ticket cannot drop the punched hole.
+    expect(after.gates.map((g) => g.code)).toEqual(before.gates.map((g) => g.code));
+    // A caveat has nothing to punch: it stays as it was.
+    expect(after.gates.find((g) => g.code === 'exclusions')?.state).toBe(
+      before.gates.find((g) => g.code === 'exclusions')?.state,
+    );
+  });
 });
 
 describe('estimateSaving', () => {

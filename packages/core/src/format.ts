@@ -69,7 +69,12 @@ export function formatVenueNotification(
   evaluations: readonly Evaluation[],
   programNames: Readonly<Record<string, string>>,
 ): { title: string; body: string } | null {
-  if (evaluations.length === 0) return null;
+  // A push is a promise made without the conditions beside it, so it carries
+  // only what the verifier could confirm. An unverified offer stays in the
+  // list, labelled; it does not get to interrupt someone.
+  const shown = evaluations.filter((e) => e.benefit.verification?.state !== 'unverified');
+  if (shown.length === 0) return null;
+  evaluations = shown;
   const top = evaluations.slice(0, 2).map((evaluation) => {
     const program = programNames[evaluation.benefit.program_id] ?? evaluation.benefit.program_id;
     return `${formatHeadline(evaluation.benefit)} ב${evaluation.benefit.merchant_name} (${program})`;
@@ -172,6 +177,7 @@ const HOLE_CODES: ReadonlySet<GateCode> = new Set<GateCode>([
   'eligibility',
   'rate',
   'freshness',
+  'verification',
 ]);
 
 /** The engine's label for `rate` is a bare "עד", which says nothing under a hole. */
@@ -196,7 +202,13 @@ export function ticketFace(
   maxHoles = 4,
 ): TicketFace {
   const holes = evaluation.gates
-    .filter((g) => HOLE_CODES.has(g.code) && (g.state !== 'pending' || g.actionable))
+    // Unverified is not an errand, but it is the one caveat the ticket must
+    // show without a tap — see the verdict below.
+    .filter(
+      (g) =>
+        HOLE_CODES.has(g.code) &&
+        (g.state !== 'pending' || g.actionable || g.code === 'verification'),
+    )
     .slice(0, maxHoles)
     .map((g): TicketHole => ({
       code: g.code,
@@ -214,6 +226,11 @@ export function ticketFace(
     };
   }
   const steps = evaluation.actionsRequired;
+  // "Pay now" is a claim the verifier could not back. The step left is asking.
+  const unproven = evaluation.gates.some((g) => g.code === 'verification' && g.state === 'pending');
+  if (steps.length === 0 && unproven) {
+    return { state: 'open', verdict: 'לא מאומת — לשאול בקופה', stamp: null, holes };
+  }
   if (steps.length === 0) return { state: 'ready', verdict: 'אפשר לשלם', stamp: null, holes };
   return {
     state: 'open',

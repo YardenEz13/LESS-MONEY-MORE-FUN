@@ -76,11 +76,30 @@ for (const id of queuedIds) {
   if (byId.delete(id)) withdrawn += 1;
 }
 
+/**
+ * The verifier's verdict belongs to the terms it judged.
+ *
+ * Pipeline output never carries one — the verifier runs on the shipped file —
+ * so a plain overwrite here stripped every verdict on every refresh, and a row
+ * the verifier had rejected came straight back. Same rule as a human approval
+ * in `mergeBenefits`: unchanged terms keep the verdict, changed terms lose it
+ * and are judged afresh on the next `verify:auto`.
+ */
+const sameTerms = (a, b) =>
+  a.type === b.type &&
+  a.value === b.value &&
+  JSON.stringify(a.conditions) === JSON.stringify(b.conditions);
+
 let added = 0;
 let updated = 0;
-for (const benefit of publishable) {
-  if (byId.has(benefit.id)) {
-    if (JSON.stringify(byId.get(benefit.id)) !== JSON.stringify(benefit)) updated += 1;
+for (const incoming of publishable) {
+  const previous = byId.get(incoming.id);
+  const benefit =
+    previous?.verification && !incoming.verification && sameTerms(previous, incoming)
+      ? { ...incoming, verification: previous.verification }
+      : incoming;
+  if (previous) {
+    if (JSON.stringify(previous) !== JSON.stringify(benefit)) updated += 1;
   } else {
     added += 1;
   }

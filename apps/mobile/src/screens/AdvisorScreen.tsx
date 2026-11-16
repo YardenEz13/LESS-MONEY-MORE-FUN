@@ -123,7 +123,6 @@ export function AdvisorScreen({ profile, onSelect, onBack }: Props) {
                   size="big"
                   stock={stockFor(result.best.benefit.program_id, profile.program_ids)}
                   onPress={onSelect}
-                  glide={null}
                 />
               </Section>
             )}
@@ -135,7 +134,6 @@ export function AdvisorScreen({ profile, onSelect, onBack }: Props) {
                   size="mid"
                   stock={stockFor(result.runnerUp.benefit.program_id, profile.program_ids)}
                   onPress={onSelect}
-                  glide={null}
                 />
               </Section>
             )}

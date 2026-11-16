@@ -30,7 +30,8 @@
     "extract:catalog": "node scripts/extract-catalog.mjs",
     "verify:gemini": "node scripts/gemini-verify.mjs",
     "branches:osm": "node scripts/osm-branches.mjs",
-    "verify:chrome": "node scripts/gemini-chrome-verify.mjs"
+    "verify:chrome": "node scripts/gemini-chrome-verify.mjs",
+    "verify:auto": "npm run -w @sbr/extraction verify --"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

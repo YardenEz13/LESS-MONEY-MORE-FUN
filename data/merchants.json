@@ -22678,7 +22678,9 @@
  {
   "id": "easy_5495755",
   "name": "אדידס",
-  "domains": [],
+  "domains": [
+   "adidas.co.il"
+  ],
   "venue_ids": [
    "dizengoff_center"
   ],
@@ -26754,7 +26756,9 @@
  {
   "id": "easy_24756534",
   "name": "נייקי",
-  "domains": [],
+  "domains": [
+   "nike.com"
+  ],
   "venue_ids": [
    "azrieli_tlv"
   ],

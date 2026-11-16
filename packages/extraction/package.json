@@ -7,7 +7,8 @@
     "start": "tsx src/cli.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "review": "tsx src/review.ts"
+    "review": "tsx src/review.ts",
+    "verify": "tsx src/verify-cli.ts"
   },
   "dependencies": {
     "@sbr/core": "*",
