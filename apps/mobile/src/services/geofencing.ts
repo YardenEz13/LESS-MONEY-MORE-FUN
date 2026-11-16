@@ -27,6 +27,48 @@ const DWELL_KEY = 'sbr.dwell.v1';
 
 type DwellMap = Record<string, DwellState>;
 
+const LAST_KEY = 'sbr.lastGeoEvent.v1';
+
+export interface LastGeoEvent {
+  at: number;
+  venueId: string;
+  /** What the decision path did with this fence event. */
+  outcome:
+    | 'armed'
+    | 'already_armed'
+    | 'unknown_place'
+    | 'notifications_off'
+    | 'no_clubs'
+    | 'nothing_to_show'
+    | 'cooldown'
+    | 'quiet_hours'
+    | 'dwell_too_short'
+    | 'empty_message';
+}
+
+/**
+ * The last fence event and what became of it. Kept so "it did not notify me
+ * today" can be answered from the phone: no event at all means the OS never
+ * woke the app (fence set, permissions, battery); an outcome means it did and
+ * this is the rule that held it back.
+ */
+async function recordEvent(venueId: string, outcome: LastGeoEvent['outcome']): Promise<void> {
+  try {
+    await AsyncStorage.setItem(LAST_KEY, JSON.stringify({ at: Date.now(), venueId, outcome }));
+  } catch {
+    // A diagnostic must never break the path it describes.
+  }
+}
+
+export async function lastGeoEvent(): Promise<LastGeoEvent | null> {
+  try {
+    const raw = await AsyncStorage.getItem(LAST_KEY);
+    return raw ? (JSON.parse(raw) as LastGeoEvent) : null;
+  } catch {
+    return null;
+  }
+}
+
 async function readDwell(): Promise<DwellMap> {
   try {
     const raw = await AsyncStorage.getItem(DWELL_KEY);
@@ -53,10 +95,11 @@ async function writeDwell(map: DwellMap): Promise<void> {
  */
 export async function handleVenueEnter(venueId: string, now: number = Date.now()): Promise<void> {
   const place = placeAt(venueId);
-  if (!place) return;
+  if (!place) return void (await recordEvent(venueId, 'unknown_place'));
 
   const profile = await loadProfile();
-  if (!profile.notifications_enabled || profile.program_ids.length === 0) return;
+  if (!profile.notifications_enabled) return void (await recordEvent(venueId, 'notifications_off'));
+  if (profile.program_ids.length === 0) return void (await recordEvent(venueId, 'no_clubs'));
 
   const dwell = await readDwell();
   // Re-entering a fence we're already inside (GPS drift) must not restart the
@@ -65,7 +108,9 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
 
   // Already armed for this visit: a drift re-entry must not stack a second
   // reminder for the same doorway.
-  if (state.scheduledId && state.notifiedAt != null && now < state.notifiedAt) return;
+  if (state.scheduledId && state.notifiedAt != null && now < state.notifiedAt) {
+    return void (await recordEvent(venueId, 'already_armed'));
+  }
 
   const policy = DEFAULT_NOTIFICATION_POLICY;
   // The reminder is judged at the moment it would land, not the moment the
@@ -106,7 +151,12 @@ export async function handleVenueEnter(venueId: string, now: number = Date.now()
       // Cooldown runs from when the reminder lands. A future timestamp here is
       // also what marks this visit as already armed, above.
       state.notifiedAt = fireAt;
+      await recordEvent(venueId, 'armed');
+    } else {
+      await recordEvent(venueId, 'empty_message');
     }
+  } else {
+    await recordEvent(venueId, decision.reason);
   }
 
   dwell[venueId] = state;
