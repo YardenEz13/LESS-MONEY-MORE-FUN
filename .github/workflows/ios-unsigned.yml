@@ -81,6 +81,9 @@ jobs:
         working-directory: apps/mobile
         env:
           EXPO_PUBLIC_ADVISOR_URL: ${{ secrets.EXPO_PUBLIC_ADVISOR_URL }}
+          # Personal sideload build only: this key is readable from the bundle.
+          # Ignored when EXPO_PUBLIC_ADVISOR_URL is set (the proxy wins).
+          EXPO_PUBLIC_GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           set -euo pipefail
           xcodebuild \
