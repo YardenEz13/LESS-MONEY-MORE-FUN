@@ -1895,15 +1895,6 @@
   ]
  },
  {
-  "id": "cinema_7d_dead_sea",
-  "name": "קולנוע 7 מימדים - ים המלח",
-  "domains": [],
-  "venue_ids": [],
-  "categories": [
-   "leisure"
-  ]
- },
- {
   "id": "cinema_7d_eilat",
   "name": "קולנוע 7 מימדים - אילת",
   "domains": [],
