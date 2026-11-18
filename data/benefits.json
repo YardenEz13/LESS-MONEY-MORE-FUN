@@ -253323,5 +253323,510 @@
         }
       ]
     }
+  },
+  {
+    "id": "max_cinematheque_haifa_b898e608e0f1",
+    "program_id": "max",
+    "merchant_id": "cinematheque_haifa",
+    "merchant_name": "סינמטק חיפה - מנוי שנתי",
+    "google_place_id": null,
+    "type": "fixed",
+    "value": 233,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": null,
+      "valid_hours": null,
+      "channel": null,
+      "stacks_with_club": null,
+      "exclusions": [
+        "פסטיבל הסרטים"
+      ],
+      "raw_text_summary": "סינמטק חיפה - מנוי שנתי ב-233 ₪. עונת המנויים 2025-2026. מהות ההטבה: 10 כניסות לסרטים בסינמטק. פרטים נוספים: תוקף המנוי שנה מיום רכישתו; לא כולל פסטיבל הסרטים. אופן המימוש: עם קבלת אישור ההזמנה, הספק ייצור קשר עם הלקוח וימסור קוד משתמש וסיסמה לאתר. *ההטבה עד גמר המלאי. חשוב לדעת: ניתן להזמין עד 2 פריטים ללקוח בחודש. *ההטבה עד גמר המלאי. *תוקף המבצע - התאריך המצוין באתר. *מספר המקומות מוגבל. *הכרטיסים ימתינו בקופות האירוע, מומלץ להביא אישור הזמנה שנשלח במייל. *max/בית העסק רשאיות להפסיק/לשנות את המבצע בכל עת וללא הודעה מוקדמת.",
+      "usage_limit": "ניתן להזמין עד 2 פריטים ללקוח בחודש",
+      "requires_voucher": true
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/movies/cinematechaifa",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.85,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        },
+        {
+          "code": "seen_in_recrawl",
+          "outcome": "unknown",
+          "detail": "2026-11-16T03:30:14.524Z"
+        }
+      ]
+    }
+  },
+  {
+    "id": "max_cinema_7d_eilat_adce1967a1db",
+    "program_id": "max",
+    "merchant_id": "cinema_7d_eilat",
+    "merchant_name": "קולנוע 7 מימדים - אילת",
+    "google_place_id": null,
+    "type": "fixed",
+    "value": 60,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": null,
+      "valid_hours": null,
+      "channel": "in_store",
+      "stacks_with_club": false,
+      "exclusions": [
+        "סניף ת\"א",
+        "כרטיסי בנק פועלים (למעט מועדונים נבחרים)",
+        "FREE",
+        "רכש",
+        "DEBIT",
+        "בנק לאומי",
+        "PEPPER"
+      ],
+      "raw_text_summary": "קולנוע 7 מימדים - אילת, החל מ-60 ₪. פרטים נוספים: פעילות לכל המשפחה; גילאי 4-7 זקוקים ללווי מבוגר; אין צורך בתיאום מראש; בקולנוע מוקרנים סרטי 7D באורך של 5-10 דקות בשילוב אפקטים ייחודיים; לא תקף לסניף ת\"א. לאחר ביצוע ההזמנה הכרטיסים ימתינו בקופות בית העסק, יש להציג כרטיס אשראי של max שבו בוצעה ההזמנה. *מלאי מינימלי חודשי: 50 כרטיסים. *ההטבה עד גמר המלאי. *על מנת לממש את ההטבה שנרכשה יש להגיע לקופת בית העסק עם אחד מכרטיסי האשראי הפעילים של max שברשותכם ולציין כי ההטבה נרכשה ב-max. *לא כולל כרטיסי בנק פועלים (למעט מועדונים נבחרים), FREE, רכש, DEBIT, בנק לאומי וכרטיסי PEPPER. *אין כפל מבצעים והנחות.",
+      "usage_limit": null,
+      "requires_voucher": true
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/movies/7dmaxeilat",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.85,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "max_beit_gabriel_f1e7a3a5f40c",
+    "program_id": "max",
+    "merchant_id": "beit_gabriel",
+    "merchant_name": "קולנוע בית גבריאל",
+    "google_place_id": null,
+    "type": "bogo",
+    "value": 0,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "valid_hours": null,
+      "channel": "both",
+      "stacks_with_club": false,
+      "exclusions": [
+        "סרטים הכוללים מפגש עם יוצרים"
+      ],
+      "raw_text_summary": "קולנוע בית גבריאל — 1+1 ב-45 ₪ כולל סופ\"ש וחג (תמורת פינוק). פרטים נוספים: ההטבה אינה כוללת סרטים הכוללים מפגש עם יוצרים. אופן המימוש: למימוש ההטבה יש להזין את מספר כרטיס החבר באתר בית העסק או למסור אותו לנציג בקופה. *מלאי מינימלי: 50. *ההטבה עד גמר המלאי. *הטבות 1+1: ניתן להזמין עד 2 הטבות 1+1 עבור הטבה זו באותו חודש. *תוקף למימוש הטבת 1+1 עד חודשיים מיום הזמנת ההטבה אלא אם מצוין אחרת. *יש לממש את שני מוצרי/שירותי ההטבה (1+1) באותו מועד. *אם הזמנתם מספר הטבות באותו בית עסק, בבואכם לנצלן תמומשנה כל ההטבות בבת אחת. *על מנת לממש את ההטבה שנרכשה יש להגיע לקופת בית העסק עם כרטיס max שבאמצעותו בוצעה ההזמנה. *אין כפל מבצעים והנחות.",
+      "usage_limit": "ניתן להזמין עד 2 הטבות 1+1 עבור הטבה זו באותו חודש",
+      "requires_voucher": true
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/movies/cinemabeitgavriel",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.85,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "max_arcadia_f0ca91e89447",
+    "program_id": "max",
+    "merchant_id": "arcadia",
+    "merchant_name": "ארקדיה",
+    "google_place_id": null,
+    "type": "percent",
+    "value": 8,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": null,
+      "valid_hours": null,
+      "channel": "in_store",
+      "stacks_with_club": false,
+      "exclusions": null,
+      "raw_text_summary": "ארקדיה — 8% הנחה במעמד החיוב בארקדיה. שעות פעילות: סניף תל אביב (דיזנגוף סנטר בניין B קומה 2) א'-ה' 11:00-20:00, ו' 10:00-14:30; סניף אשדוד (תש\"ח 9) א'-ה' 11:00-19:00, ו' 10:00-14:30. איך זה עובד? רוכשים בבית העסק ומשלמים עם כרטיס MyMAX; לאחר 4 ימי עסקים יתקבל זיכוי לכרטיס בגובה ההנחה. חשוב לדעת: הנחות במעמד החיוב יינתנו בעת שימוש בכרטיס MyMAX בלבד | רשימת הרשתות עשויה להשתנות מעת לעת | מובהר כי כרטיס MyMAX לא יהנה מהנחות במעמד החיוב הניתנות לכרטיסי האשראי של max, אלא להנחות המפורטות לעיל בלבד.",
+      "usage_limit": null,
+      "requires_voucher": false
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/MyMAX/MyMAXarcadia",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.88,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "max_burger_king_66165046bcc3",
+    "program_id": "max",
+    "merchant_id": "burger_king",
+    "merchant_name": "ברגר קינג",
+    "google_place_id": null,
+    "type": "percent",
+    "value": 10,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": null,
+      "valid_hours": null,
+      "channel": "in_store",
+      "stacks_with_club": false,
+      "exclusions": null,
+      "raw_text_summary": "ברגר קינג — 10% הנחה במעמד החיוב ברשת ברגר קינג. איך זה עובד? רוכשים בבית העסק ומשלמים עם כרטיס MyMAX; לאחר 4 ימי עסקים יתקבל זיכוי לכרטיס בגובה ההנחה. חשוב לדעת: הנחות במעמד החיוב יינתנו בעת שימוש בכרטיס MyMAX בלבד ובכפוף לתנאים המפורטים | רשימת הרשתות עשויה להשתנות מעת לעת | מובהר כי כרטיס MyMAX לא יהנה מהנחות במעמד החיוב הניתנות לכרטיסי האשראי של max, אלא להנחות המפורטות לעיל בלבד.",
+      "usage_limit": null,
+      "requires_voucher": false
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/MyMAX/MyMAXburgerking",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.9,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "max_sweetime_a6fb55f0c8be",
+    "program_id": "max",
+    "merchant_id": "sweetime",
+    "merchant_name": "Sweetime",
+    "google_place_id": null,
+    "type": "percent",
+    "value": 7,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": null,
+      "valid_hours": null,
+      "channel": "in_store",
+      "stacks_with_club": false,
+      "exclusions": null,
+      "raw_text_summary": "Sweetime — 7% הנחה במעמד החיוב ברשת Sweetime. איך זה עובד? רוכשים בבית העסק ומשלמים עם כרטיס MyMAX; לאחר 4 ימי עסקים יתקבל זיכוי לכרטיס בגובה ההנחה. חשוב לדעת: הנחות במעמד החיוב יינתנו בעת שימוש בכרטיס MyMAX בלבד | רשימת הרשתות עשויה להשתנות מעת לעת | מובהר כי כרטיס MyMAX לא יהנה מהנחות במעמד החיוב הניתנות לכרטיסי האשראי של max, אלא להנחות המפורטות לעיל בלבד.",
+      "usage_limit": null,
+      "requires_voucher": false
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/MyMAX/MyMAXSweetime",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.9,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "max_mr_pretzels_7b5b998b0d7e",
+    "program_id": "max",
+    "merchant_id": "mr_pretzels",
+    "merchant_name": "Mr. Pretzels",
+    "google_place_id": null,
+    "type": "percent",
+    "value": 10,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": null,
+      "valid_hours": null,
+      "channel": "in_store",
+      "stacks_with_club": false,
+      "exclusions": null,
+      "raw_text_summary": "Mr. Pretzels — 10% הנחה במעמד החיוב ברשת Mr. Pretzels. הרשת מונה 17 סניפים ברחבי הארץ. איך זה עובד? רוכשים בבית העסק ומשלמים עם כרטיס MyMAX; לאחר 4 ימי עסקים יתקבל זיכוי לכרטיס בגובה ההנחה. חשוב לדעת: הנחות במעמד החיוב יינתנו בעת שימוש בכרטיס MyMAX בלבד | רשימת הרשתות עשויה להשתנות מעת לעת | מובהר כי כרטיס MyMAX לא יהנה מהנחות במעמד החיוב הניתנות לכרטיסי האשראי של max, אלא להנחות המפורטות לעיל בלבד.",
+      "usage_limit": null,
+      "requires_voucher": false
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/MyMAX/MyMAXMrPretzels",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.9,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "max_dominos_6ef261fac3e3",
+    "program_id": "max",
+    "merchant_id": "dominos",
+    "merchant_name": "דומינו'ס",
+    "google_place_id": null,
+    "type": "percent",
+    "value": 8,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": null,
+      "valid_hours": null,
+      "channel": "both",
+      "stacks_with_club": false,
+      "exclusions": null,
+      "raw_text_summary": "דומינו'ס — 8% הנחה במעמד החיוב ברשת דומינו'ס פיצה. ניתן לממש בכל סניפי הרשת ובאתר. איך זה עובד? רוכשים בבית העסק ומשלמים עם כרטיס MyMAX; לאחר 4 ימי עסקים יתקבל זיכוי לכרטיס בגובה ההנחה. חשוב לדעת: הנחות במעמד החיוב יינתנו בעת שימוש בכרטיס MyMAX בלבד | רשימת הרשתות עשויה להשתנות מעת לעת | מובהר כי כרטיס MyMAX לא יהנה מהנחות במעמד החיוב הניתנות לכרטיסי האשראי של max, אלא להנחות המפורטות לעיל בלבד.",
+      "usage_limit": null,
+      "requires_voucher": false
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/MyMAX/MyMAXdominos",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.9,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "max_sky_jump_4278f359d97e",
+    "program_id": "max",
+    "merchant_id": "sky_jump",
+    "merchant_name": "סקיי ג'אמפ",
+    "google_place_id": null,
+    "type": "percent",
+    "value": 10,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": null,
+      "valid_hours": null,
+      "channel": "in_store",
+      "stacks_with_club": false,
+      "exclusions": null,
+      "raw_text_summary": "סקיי ג'אמפ — 10% הנחה במעמד החיוב ברשת סקיי ג'אמפ – פארק טרמפולינות וטיפוס. שעות פתיחה: רעננה א'-ה' 14:00-20:00, שישי 10:00-19:00, שבת 10:00-20:00; נמל תל אביב א'-ה' 11:00-20:00, סופי שבוע 10:00-20:00. מומלץ לשריין שעת קפיצה באמצעות האתר. איך זה עובד? רוכשים בבית העסק ומשלמים עם כרטיס MyMAX; לאחר 4 ימי עסקים יתקבל זיכוי לכרטיס בגובה ההנחה. חשוב לדעת: הנחות במעמד החיוב יינתנו בעת שימוש בכרטיס MyMAX בלבד | רשימת הרשתות עשויה להשתנות מעת לעת | מובהר כי כרטיס MyMAX לא יהנה מהנחות במעמד החיוב הניתנות לכרטיסי האשראי של max, אלא להנחות המפורטות לעיל בלבד.",
+      "usage_limit": null,
+      "requires_voucher": false
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/MyMAX/MyMAXskyjump",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.88,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        }
+      ]
+    }
+  },
+  {
+    "id": "max_tsomet_sfarim_41f4a5787c80",
+    "program_id": "max",
+    "merchant_id": "tsomet_sfarim",
+    "merchant_name": "צומת ספרים",
+    "google_place_id": null,
+    "type": "percent",
+    "value": 5,
+    "conditions": {
+      "min_spend": null,
+      "max_discount": null,
+      "valid_days": null,
+      "valid_hours": null,
+      "channel": "both",
+      "stacks_with_club": false,
+      "exclusions": null,
+      "raw_text_summary": "צומת ספרים — 5% הנחה במעמד החיוב ברשת צומת ספרים. *ניתן לממש בכל סניפי הרשת ובאתר. איך זה עובד? רוכשים בבית העסק ומשלמים עם כרטיס MyMAX; לאחר 4 ימי עסקים יתקבל זיכוי לכרטיס בגובה ההנחה. חשוב לדעת: הנחות במעמד החיוב יינתנו בעת שימוש בכרטיס MyMAX בלבד | רשימת הרשתות עשויה להשתנות מעת לעת | מובהר כי כרטיס MyMAX לא יהנה מהנחות במעמד החיוב הניתנות לכרטיסי האשראי של max, אלא להנחות המפורטות לעיל בלבד.",
+      "usage_limit": null,
+      "requires_voucher": false
+    },
+    "valid_from": null,
+    "valid_until": null,
+    "source_url": "https://www.max.co.il/benefits/MyMAX/MyMAXzometsfarim",
+    "last_verified_at": "2026-11-18T16:25:26.000Z",
+    "confidence_score": 0.9,
+    "reviewed_by_human": false,
+    "verification": {
+      "state": "unverified",
+      "checked_at": "2026-11-16T04:02:24.029Z",
+      "score": 0.1,
+      "checks": [
+        {
+          "code": "terms_consistent",
+          "outcome": "pass",
+          "detail": null
+        },
+        {
+          "code": "second_source",
+          "outcome": "unknown"
+        },
+        {
+          "code": "user_reports",
+          "outcome": "pass",
+          "detail": "0"
+        }
+      ]
+    }
   }
 ]
