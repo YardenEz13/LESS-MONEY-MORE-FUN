@@ -138,6 +138,39 @@ async function fetchPage(url) {
   return { markdown: htmlToMarkdown(html), metadata: { title, statusCode: response.status } };
 }
 
+/**
+ * Local headless render for offer pages that are client-rendered (adif.org.il
+ * returns an Angular shell to a plain GET, so every seeded page was skipped and
+ * its rows aged out). Obscura runs the page's JS on this machine, no API key.
+ * It renders the public page only: a challenge or login wall still yields no
+ * record, same as fetch. Set OBSCURA_BIN to point elsewhere; missing binary =
+ * no fallback.
+ */
+const OBSCURA = process.env.OBSCURA_BIN ?? 'C:\\Users\\yarde\\Desktop\\obscura\\obscura.exe';
+
+async function renderPage(url) {
+  const { execFile } = await import('node:child_process');
+  const html = await new Promise((resolvePage, reject) =>
+    execFile(
+      OBSCURA,
+      ['fetch', url, '--dump', 'html', '--timeout', '45'],
+      { maxBuffer: 32 * 1024 * 1024, timeout: 90_000, windowsHide: true },
+      (error, stdout) => (error ? reject(error) : resolvePage(stdout)),
+    ),
+  );
+  const title = decodeEntities(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? '').trim();
+  return { markdown: htmlToMarkdown(html), metadata: { title, statusCode: 200 } };
+}
+
+let obscuraAvailable;
+async function canRender() {
+  if (obscuraAvailable === undefined) {
+    const { access } = await import('node:fs/promises');
+    obscuraAvailable = await access(OBSCURA).then(() => true, () => false);
+  }
+  return obscuraAvailable;
+}
+
 async function firecrawl(path, body, tries = 3) {
   for (let attempt = 1; attempt <= tries; attempt++) {
     let response;
@@ -607,6 +640,16 @@ async function collect({ program, root, limit, concurrency, transport }) {
           // Only the rendering transport benefits from waiting longer; a plain
           // fetch returns the same bytes however many times it is asked.
           if (record || transport === 'fetch') break;
+        }
+        // Plain HTTP got a shell: render it locally once before giving up.
+        if (!record && transport === 'fetch' && (await canRender())) {
+          record = toRecord(url, await renderPage(url), {
+            site,
+            program,
+            maxChars: singlePage ? 60_000 : 20_000,
+            catalogPage: singlePage,
+          });
+          if (record) record.transport = 'obscura';
         }
       } catch (error) {
         failures += 1;
