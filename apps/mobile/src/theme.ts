@@ -172,35 +172,35 @@ export const fonts = {
   displayLight: 'EFT_OffSet',
   display: 'EFT_OffSet',
   displayBold: 'EFT_OffSet',
-  /** EFT_Artzisraeli — body and interface text */
-  text: 'EFT_Artzisraeli',
-  textMedium: 'EFT_Artzisraeli',
-  textSemibold: 'EFT_Artzisraeli',
-  textBold: 'EFT_Artzisraeli',
+  /**
+   * FL Eitan Round — body and interface text. Four real weights (Fontland,
+   * free licence in assets/FL-EitanRound-LICENSE.txt); 600 has no file, so
+   * semibold uses Medium rather than a faked weight.
+   */
+  text: 'FLEitanRound_400',
+  textMedium: 'FLEitanRound_500',
+  textSemibold: 'FLEitanRound_500',
+  textBold: 'FLEitanRound_700',
 
   /**
    * Latin runs — "Terminal X", "Cash כאל Pro", "שופרסל LIFE".
    *
-   * Both EFT faces do carry A–Z, so nothing ever falls back; the text engine
-   * simply draws their Latin, and their Latin is a bookish serif that shares
-   * nothing with the Hebrew beside it. Their `&` is also mapped to a shekel
-   * glyph, so "Golf & Co" renders as "Golf ₪ Co". Neither is a hierarchy
-   * a reader can use, so Latin gets its own pair of faces.
-   *
-   * These two are the faces the design system already names — the Hebrew
-   * simply moved to EFT and left them holding only the Latin half of the job.
+   * EFT OffSet carries A–Z, but its Latin is a bookish serif that shares
+   * nothing with the Hebrew beside it, and its `&` is mapped to a shekel glyph
+   * ("Golf & Co" renders as "Golf ₪ Co"). So headline Latin runs get Karantina.
+   * FL Eitan Round draws its own Latin to match its Hebrew, so text needs no
+   * swap: latinText is the text face itself, for the small labels that name it.
    */
   latinDisplay: 'Karantina_700Bold',
-  latinText: 'NotoSansHebrew_400Regular',
+  latinText: 'FLEitanRound_400',
 } as const;
 
 /**
- * Which Latin face stands in for which Hebrew one. Two entries because the
- * weight aliases above all resolve to two real files.
+ * Which Latin face stands in for which Hebrew one. Only the EFT headline face
+ * needs one; FL Eitan Round's own Latin matches its Hebrew.
  */
 export const latinFace: Record<string, string> = {
   [fonts.display]: fonts.latinDisplay,
-  [fonts.text]: fonts.latinText,
 };
 
 /**
