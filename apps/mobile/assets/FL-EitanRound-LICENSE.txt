@@ -1,0 +1,52 @@
+FL Eitan Round (איתן עגול), version 1.0
+Copyright (c) 2026 Dolev Hayut (Fontland).
+https://www.fontland.co.il/license/free/
+
+# פונטלנד — רישיון לפונטים חינמיים
+
+גרסה 1.0 · 13 באוקטובר 2026
+
+## 1. על מה חל הרישיון
+
+הרישיון חל על משפחות הגופנים שפונטלנד מציעה להורדה בחינם, כפי שהן מסומנות באתר https://www.fontland.co.il ובקובצי הפונטים עצמם: איתן (FL Eitan) ואיתן עגול (FL Eitan Round). הפונטים ניתנים ברישיון שימוש, ולא נמסרת הבעלות בהם. זכויות היוצרים שמורות לדולב חיוט, פונטלנד.
+
+## 2. מה מותר
+
+- שימוש אישי ושימוש מסחרי, ללא תשלום, בכל פרויקט שלכם או של הלקוחות שלכם.
+- התקנה בכל מספר מחשבים ושימוש בכל מספר משתמשים.
+- עיצוב לדפוס ולדיגיטל: כרזות, אריזות, שילוט, מצגות, רשתות חברתיות, וידאו ותוצרים ללקוחות.
+- הטמעה באתרים (‎@font-face) ובאפליקציות, כחלק מהאתר או מהאפליקציה בלבד.
+- לוגואים וסימני מסחר. הרישיון אינו נותן בלעדיות על הפונט עצמו.
+- תמונות, קובצי PDF ומוצרים מודפסים שנוצרו בפונט אפשר למכור ולהפיץ בחופשיות.
+
+## 3. מה אסור
+
+- למכור את קובצי הפונטים, לבדם או בתוך חבילה, גם אם שונה שמם או הפורמט שלהם.
+- להפיץ את קובצי הפונטים או להעלות אותם להורדה באתר, במאגר, בשירות שיתוף קבצים או בכל מקום אחר. מי שרוצה את הפונט יוריד אותו מאתר פונטלנד.
+- לשנות את הפונטים ולהפיץ את הגרסה המשונה, או ליצור מהם פונט נגזר להפצה.
+- לשנות או להסיר את פרטי זכויות היוצרים והרישיון שבתוך הקבצים.
+
+הטמעה באתר או באפליקציה מותרת גם כשהדפדפן טוען את הקובץ, כל עוד הקובץ אינו מוצע להורדה כפונט.
+
+## 4. קרדיט
+
+לא חובה. נשמח אם תזכירו את פונטלנד ותקשרו ל־https://www.fontland.co.il כשנוח לכם.
+
+## 5. בלי אחריות
+
+הפונטים ניתנים כמות שהם (AS IS), ללא אחריות מכל סוג, לרבות התאמה למטרה מסוימת. פונטלנד ודולב חיוט לא יישאו באחריות לכל נזק הנובע מהשימוש בפונטים, ככל שהדין מתיר.
+
+## 6. שונות
+
+פונטלנד רשאית לעדכן את תנאי הרישיון לגרסאות עתידיות של הפונטים; גרסה שהורדתם ממשיכה לפעול לפי הרישיון שצורף אליה. הפרת התנאים מבטלת את הרישיון. על הרישיון חל הדין הישראלי. שאלות: studio@fontland.co.il.
+
+## English summary
+
+The Fontland Free Font License covers the families Fontland offers as free downloads: FL Eitan and FL Eitan Round. Copyright (c) 2026 Dolev Hayut / Fontland.
+
+- **Allowed:** free personal and commercial use in any project: print, digital, web embedding (@font-face), apps, logos and client work, on any number of computers.
+- **Not allowed:** selling the font files; redistributing or re-hosting them for download; modifying them and distributing the result; removing the copyright and license information.
+- **Attribution:** not required, but appreciated.
+- **No warranty:** the fonts are provided as-is, without warranty of any kind.
+
+The Hebrew text above is the binding version. https://www.fontland.co.il/license/free/

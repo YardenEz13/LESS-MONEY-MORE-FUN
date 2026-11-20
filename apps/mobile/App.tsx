@@ -7,7 +7,6 @@ import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
 import { useFonts } from 'expo-font';
 import { Karantina_700Bold } from '@expo-google-fonts/karantina';
-import { NotoSansHebrew_400Regular } from '@expo-google-fonts/noto-sans-hebrew';
 import type { Evaluation, UserProfile } from '@sbr/core';
 import { AdvisorScreen } from './src/screens/AdvisorScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
@@ -124,13 +123,14 @@ function AppRoot() {
   const [geofenceActive, setGeofenceActive] = useState(false);
   /** Whether the current failure is one only the OS settings page can clear. */
   const [geofenceFixable, setGeofenceFixable] = useState(false);
-  // The EFT pair carries the Hebrew; the two Google faces carry Latin runs
-  // inside it — see the `latinFace` note in theme.ts.
+  // EFT OffSet carries the Hebrew headlines (Karantina its Latin runs); FL Eitan
+  // Round carries all text, Hebrew and Latin alike — see the `fonts` note in theme.ts.
   const [fontsLoaded] = useFonts({
     EFT_OffSet: require('./assets/EFT_OffSet-Bold.ttf'),
-    EFT_Artzisraeli: require('./assets/EFT_Artzisraeli.ttf'),
+    FLEitanRound_400: require('./assets/FL-EitanRound-Regular.ttf'),
+    FLEitanRound_500: require('./assets/FL-EitanRound-Medium.ttf'),
+    FLEitanRound_700: require('./assets/FL-EitanRound-Bold.ttf'),
     Karantina_700Bold,
-    NotoSansHebrew_400Regular,
   });
 
   const persist = useCallback(async (next: UserProfile) => {

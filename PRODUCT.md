@@ -33,7 +33,7 @@ Native Expo app in Hebrew, right to left, with a location reminder after a 3-min
 ## Brand Commitments
 
 - Name in repo: less-money-more-fun. Final public Hebrew name is undecided.
-- Keep the Hebrew faces EFT OffSet and EFT Artzisraeli (`apps/mobile/assets`). Confirm their licence covers website use before they ship on the web.
+- Keep the Hebrew headline face EFT OffSet (`apps/mobile/assets`); confirm its licence covers website use before it ships on the web. Text is FL Eitan Round (Fontland free licence: embedding in apps and sites is allowed, offering the font files for download is not).
 - The football look is being replaced.
 
 ## Evidence on Hand
