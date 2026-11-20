@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { findCombos, UNIVERSAL_MERCHANT_ID } from '../src/combos';
+import {
+  BASKET_PRESETS_ILS,
+  calculateBasketSaving,
+  findCombos,
+  optimizeTillBasket,
+  UNIVERSAL_MERCHANT_ID,
+} from '../src/combos';
 import { formatValue } from '../src/format';
 import { evaluateBenefit, expandOwnedPrograms, rankBenefits } from '../src/matching';
 import type { Benefit, Program } from '../src/types';
@@ -201,5 +207,143 @@ describe('findCombos', () => {
       { cartAmount: 1000 },
     );
     expect(combos[0]!.confirmed).toBe(true);
+  });
+
+  it('skips an offer whose min_spend exceeds the chosen cart amount', () => {
+    const highMin = benefit({
+      id: 'high-min',
+      program_id: 'hever',
+      type: 'gift_card',
+      value: 150,
+      conditions: { ...giftCard.conditions, min_spend: 300 },
+    });
+    // Evaluated without cartAmount (as HomeScreen does before a basket is chosen),
+    // then passed a ₪200 basket into findCombos: must not pair highMin.
+    const evals = evaluate([thirtyPercent, highMin]);
+    expect(findCombos(evals, { cartAmount: 200 })).toHaveLength(0);
+    expect(findCombos(evals, { cartAmount: 350 })).toHaveLength(1);
+  });
+});
+
+describe('calculateBasketSaving', () => {
+  it('exposes the standard one-tap basket presets', () => {
+    expect(BASKET_PRESETS_ILS).toEqual([50, 100, 200, 350]);
+  });
+
+  it('computes exact percent saving and respects max_discount cap', () => {
+    const uncapped = benefit({ id: 'p15', program_id: 'max', type: 'percent', value: 15 });
+    expect(calculateBasketSaving(uncapped, 200)).toMatchObject({
+      cartAmount: 200,
+      savingIls: 30,
+      netPayIls: 170,
+      missingForMinSpend: 0,
+      capped: false,
+      isEstimate: false,
+    });
+
+    const capped = benefit({
+      id: 'p20cap',
+      program_id: 'max',
+      type: 'percent',
+      value: 20,
+      conditions: { ...uncapped.conditions, max_discount: 50 },
+    });
+    expect(calculateBasketSaving(capped, 350)).toMatchObject({
+      savingIls: 50,
+      netPayIls: 300,
+      capped: true,
+    });
+  });
+
+  it('clamps fixed and gift_card savings to the basket size', () => {
+    const voucher = benefit({ id: 'v100', program_id: 'hever', type: 'gift_card', value: 100 });
+    expect(calculateBasketSaving(voucher, 50)).toMatchObject({
+      savingIls: 50,
+      netPayIls: 0,
+      isEstimate: false,
+    });
+    expect(calculateBasketSaving(voucher, 200)).toMatchObject({
+      savingIls: 100,
+      netPayIls: 100,
+    });
+  });
+
+  it('reports ₪0 saving and exact shortfall when below min_spend', () => {
+    const withMin = benefit({
+      id: 'min250',
+      program_id: 'cal',
+      type: 'fixed',
+      value: 50,
+      conditions: { ...benefit({ id: 'x', program_id: 'cal' }).conditions, min_spend: 250 },
+    });
+    expect(calculateBasketSaving(withMin, 200)).toMatchObject({
+      savingIls: 0,
+      netPayIls: 200,
+      missingForMinSpend: 50,
+    });
+    expect(calculateBasketSaving(withMin, 350)).toMatchObject({
+      savingIls: 50,
+      netPayIls: 300,
+      missingForMinSpend: 0,
+    });
+  });
+
+  it('flags upper-bound ("עד X%") and 1+1 offers as estimates', () => {
+    const base = benefit({ id: 'u', program_id: 'cal', type: 'percent', value: 25 });
+    base.conditions = { ...base.conditions, raw_text_summary: 'עד 25% הנחה על פריטים נבחרים' };
+    expect(calculateBasketSaving(base, 200)).toMatchObject({
+      savingIls: 50,
+      isEstimate: true,
+      isUpperBound: true,
+    });
+
+    const bogo = benefit({ id: 'bogo', program_id: 'max', type: 'bogo', value: 0 });
+    expect(calculateBasketSaving(bogo, 100)).toMatchObject({
+      savingIls: 50,
+      isEstimate: true,
+      isUpperBound: false,
+    });
+  });
+
+  it('handles zero or negative cart safely', () => {
+    const offer = benefit({ id: 'z', program_id: 'max', type: 'percent', value: 10 });
+    expect(calculateBasketSaving(offer, 0)).toMatchObject({ savingIls: 0, netPayIls: 0 });
+    expect(calculateBasketSaving(offer, -50)).toMatchObject({ savingIls: 0, netPayIls: 0 });
+  });
+});
+
+describe('optimizeTillBasket', () => {
+  const tenOff = benefit({ id: 'p10', program_id: 'max', type: 'percent', value: 10 });
+  const cashback = benefit({
+    id: 'cb2',
+    program_id: 'cal_cash_pro',
+    merchant_id: UNIVERSAL_MERCHANT_ID,
+    merchant_name: 'כל בית עסק',
+    type: 'cashback',
+    value: 2,
+  });
+
+  it('returns the single saving and best 2-club combo that beats it', () => {
+    const evals = evaluate([tenOff, cashback], 200);
+    const plan = optimizeTillBasket(evals[0]!, evals, 200);
+    expect(plan.single.savingIls).toBe(20);
+    expect(plan.single.netPayIls).toBe(180);
+    expect(plan.bestCombo).not.toBeNull();
+    // 10% off 200 = 20, then 2% of 180 = 3.6 -> total 23.6
+    expect(plan.bestCombo!.estimatedSavingIls).toBeCloseTo(23.6);
+  });
+
+  it('returns null bestCombo when cart is below min_spend', () => {
+    const highMin = benefit({
+      id: 'p10min',
+      program_id: 'max',
+      type: 'percent',
+      value: 10,
+      conditions: { ...tenOff.conditions, min_spend: 300 },
+    });
+    const evals = evaluate([highMin, cashback]);
+    const plan = optimizeTillBasket(evals[0]!, evals, 100);
+    expect(plan.single.missingForMinSpend).toBe(200);
+    expect(plan.bestCombo).toBeNull();
   });
 });

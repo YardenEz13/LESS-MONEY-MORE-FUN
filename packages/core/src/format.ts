@@ -1,3 +1,4 @@
+import type { BasketSaving } from './combos';
 import { isUpperBound, type Evaluation, type GateCode } from './matching';
 import type { Benefit } from './types';
 
@@ -58,6 +59,33 @@ export function formatHeadline(benefit: Benefit): string {
 export function formatSaving(evaluation: Evaluation): string | null {
   if (evaluation.isEstimate) return null;
   return `חיסכון ₪${Math.round(evaluation.estimatedSavingIls)}`;
+}
+
+/** Compact ILS number without trailing ".00": 15 → "15", 12.5 → "12.5". */
+export function formatIls(amount: number): string {
+  const rounded = Math.round(amount * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(/0$/, '');
+}
+
+/** Live one-line summary for a chosen basket amount on the roll or at the till. */
+export function formatBasketSaving(saving: BasketSaving): string {
+  if (saving.missingForMinSpend > 0) {
+    return `חסרים ₪${formatIls(saving.missingForMinSpend)} למינימום`;
+  }
+  if (saving.savingIls <= 0) return 'ללא חיסכון בסל הזה';
+  if (saving.isUpperBound) return `עד ₪${formatIls(saving.savingIls)} הנחה`;
+  if (saving.isEstimate) return `כ-₪${formatIls(saving.savingIls)} חיסכון`;
+  return `חוסכים ₪${formatIls(saving.savingIls)} · משלמים ₪${formatIls(saving.netPayIls)}`;
+}
+
+/**
+ * Venue offer count label.
+ *
+ * A bare 0 misleads when blocked/later offers sit under the "לא עכשיו" fold:
+ * show "0 עכשיו · N לא עכשיו" instead of hiding them behind a zero.
+ */
+export function formatVenueCount(now: number, notNow: number): string {
+  return now === 0 && notNow > 0 ? `0 עכשיו · ${notNow} לא עכשיו` : String(now);
 }
 
 /**

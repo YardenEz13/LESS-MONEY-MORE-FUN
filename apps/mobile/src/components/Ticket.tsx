@@ -1,8 +1,10 @@
 import React, { memo } from 'react';
-import { Pressable, StyleSheet, Text as RNText, useWindowDimensions, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text as RNText, useWindowDimensions, View } from 'react-native';
 import {
   applyDoneSteps,
+  calculateBasketSaving,
   displayMerchantName,
+  formatBasketSaving,
   formatLastVerified,
   formatValue,
   ticketFace,
@@ -10,9 +12,10 @@ import {
   type HoleState,
 } from '@sbr/core';
 import { Seam } from './Kit';
+import { stampForMerchant } from './stamps';
 import { Text } from './ui';
-import { merchantLine, programNames } from '../services/catalog';
-import { usePunches } from '../state/punches';
+import { merchantLine, merchantsById, programNames } from '../services/catalog';
+import { punchKey, usePunches } from '../state/punches';
 import { deepOf, fonts, space, ticket } from '../theme';
 
 export type TicketSize = 'big' | 'mid' | 'slim';
@@ -90,6 +93,8 @@ interface Props {
   size: TicketSize;
   /** The stock for this card. A blocked ticket ignores it and turns grey. */
   stock: string;
+  /** Optional active basket amount in ILS to display exact live shekel saving. */
+  cartAmount?: number | null;
   onPress: (evaluation: Evaluation) => void;
 }
 
@@ -97,11 +102,16 @@ interface Props {
  * One benefit, as a ticket. Size follows what it can do for you now: ready and at
  * the head of the roll is big, the rest of the live ones are mid, blocked are slim.
  *
- * The open circle shows what is left and opens the ticket. It does not punch yet:
- * a punch has to survive a restart and expire, which needs saved state that does
- * not exist. So it says so by not carrying the word "לנקב" from the prototype.
+ * Open actionable holes can be tapped directly to punch them (persisted until
+ * Israel midnight), immediately promoting the ticket toward ready ("אפשר לשלם").
  */
-export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onPress }: Props) {
+export const Ticket = memo(function Ticket({
+  evaluation: given,
+  size,
+  stock,
+  cartAmount,
+  onPress,
+}: Props) {
   const { width } = useWindowDimensions();
   // Punches apply here, so every screen showing a ticket can be punched, and the
   // evaluation handed on to the detail screen carries them.
@@ -113,6 +123,11 @@ export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onP
   const name = displayMerchantName(benefit.merchant_name);
   const club = programNames[benefit.program_id] ?? benefit.program_id;
   const place = merchantLine(benefit.merchant_id);
+  const stamp = stampForMerchant(merchantsById.get(benefit.merchant_id), benefit.merchant_name);
+  const liveBasket =
+    cartAmount != null && cartAmount > 0 && face.state !== 'blocked'
+      ? calculateBasketSaving(benefit, cartAmount)
+      : null;
 
   // The head ticket leads, but it must not fill the screen: at 150 a phone showed
   // one offer and nothing under it.
@@ -154,6 +169,15 @@ export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onP
         style={({ pressed }) => [styles.slim, background, pressed && styles.pressed]}
       >
         <Seam />
+        {stamp && (
+          <Image
+            source={stamp}
+            style={styles.stampSlim}
+            resizeMode="contain"
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+        )}
         <View style={[styles.grow, styles.identity]}>
           <Text style={styles.slimName} numberOfLines={1}>
             {name}
@@ -169,7 +193,7 @@ export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onP
   }
 
   const holeSize = size === 'big' ? 44 : 36;
-  const keyOf = (code: string) => `${benefit.id}:${code}`;
+  const keyOf = (code: string) => punchKey(benefit.id, code);
   const punchable = (hole: (typeof face.holes)[number]) =>
     hole.state === 'open' || punched.has(keyOf(hole.code));
   // The stub: torn off along a perforation, notched at both edges like a real ticket.
@@ -197,9 +221,23 @@ export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onP
 
   const identity = (
     <>
-      <Text style={size === 'big' ? styles.nameBig : styles.name} numberOfLines={2}>
-        {name}
-      </Text>
+      <View style={styles.nameRow}>
+        {stamp && (
+          <Image
+            source={stamp}
+            style={size === 'big' ? styles.stampBig : styles.stampMid}
+            resizeMode="contain"
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
+        )}
+        <Text
+          style={[size === 'big' ? styles.nameBig : styles.name, styles.nameText]}
+          numberOfLines={2}
+        >
+          {name}
+        </Text>
+      </View>
       {place && (
         <Text style={styles.line} numberOfLines={1}>
           {place}
@@ -209,6 +247,12 @@ export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onP
         בכרטיס {club}, {formatLastVerified(benefit)}
       </Text>
     </>
+  );
+
+  const basketBadge = liveBasket && (
+    <View style={styles.basketBadge}>
+      <Text style={styles.basketBadgeText}>{formatBasketSaving(liveBasket)}</Text>
+    </View>
   );
 
   return (
@@ -228,7 +272,10 @@ export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onP
         <>
           <View style={styles.identity}>{identity}</View>
           <View style={styles.bigRow}>
-            <Text style={styles.verdictBig}>{face.verdict}</Text>
+            <View style={styles.bigVerdictCol}>
+              {basketBadge}
+              <Text style={styles.verdictBig}>{face.verdict}</Text>
+            </View>
             {figureNode}
           </View>
         </>
@@ -238,7 +285,10 @@ export const Ticket = memo(function Ticket({ evaluation: given, size, stock, onP
             <View style={[styles.identity, styles.grow]}>{identity}</View>
             {figureNode}
           </View>
-          <Text style={styles.verdict}>{face.verdict}</Text>
+          <View style={styles.midFoot}>
+            <Text style={styles.verdict}>{face.verdict}</Text>
+            {basketBadge}
+          </View>
         </>
       )}
       {rail}
@@ -254,8 +304,34 @@ const styles = StyleSheet.create({
   grow: { flex: 1, minWidth: 0 },
   /* flex-start so a Latin or number-only line aligns with a Hebrew one: see ui.tsx. */
   identity: { alignItems: 'flex-start' },
+  nameRow: { flexDirection: 'row', alignItems: 'center', columnGap: 8, maxWidth: '100%' },
+  nameText: { flexShrink: 1 },
+  stampBig: { width: 28, height: 28, opacity: 0.85 },
+  stampMid: { width: 22, height: 22, opacity: 0.82 },
+  stampSlim: { width: 20, height: 20, opacity: 0.6 },
   midRow: { flexDirection: 'row', alignItems: 'flex-start', columnGap: space.s2 + 4 },
+  midFoot: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: space.s2,
+    marginTop: space.s2,
+  },
   bigRow: { flexDirection: 'row', alignItems: 'flex-end', columnGap: space.s2 + 4 },
+  bigVerdictCol: { flex: 1, minWidth: 0, alignItems: 'flex-start', gap: space.s1, marginBottom: space.s3 },
+  basketBadge: {
+    backgroundColor: ticket.ink,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  basketBadgeText: {
+    fontFamily: fonts.display,
+    fontSize: 15,
+    lineHeight: 19,
+    color: ticket.ground,
+    fontVariant: ['tabular-nums', 'lining-nums'],
+  },
 
   nameBig: { fontFamily: fonts.text, fontSize: 31, lineHeight: 36, color: ticket.ink },
   name: { fontFamily: fonts.text, fontSize: 25, lineHeight: 29, color: ticket.ink },
@@ -265,15 +341,12 @@ const styles = StyleSheet.create({
   figure: { fontFamily: fonts.display, color: ticket.ink, fontVariant: ['tabular-nums', 'lining-nums'] },
   unit: { fontFamily: fonts.latinText, fontSize: 13, lineHeight: 17, color: ticket.ink2 },
 
-  verdict: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: ticket.ink, marginTop: space.s2 },
+  verdict: { fontFamily: fonts.display, fontSize: 17, lineHeight: 22, color: ticket.ink },
   verdictBig: {
-    flex: 1,
-    minWidth: 0,
     fontFamily: fonts.display,
     fontSize: 25,
     lineHeight: 29,
     color: ticket.ink,
-    marginBottom: space.s4,
   },
 
   rail: {

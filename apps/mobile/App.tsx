@@ -32,6 +32,7 @@ import { requestNotificationPermission } from './src/services/notifications';
 import { runtimeLimitation } from './src/services/runtime';
 import { resolveShare, subscribeToShares, type ShareResult } from './src/services/shareIntent';
 import { clearRejections, loadProfile, rejectBenefit, saveProfile, toggleMuted } from './src/state/profile';
+import { pruneExpiredPunches } from './src/state/punches';
 import { logEvent } from './src/state/events';
 import { colors, enforceRtl } from './src/theme';
 import { stockFor } from './src/components/Ticket';
@@ -75,8 +76,8 @@ const SETTINGS_FIXABLE = new Set(['foreground_denied', 'background_denied']);
 type RootStackParamList = {
   onboarding: undefined;
   home: undefined;
-  detail: { evaluation: Evaluation };
-  till: { evaluation: Evaluation };
+  detail: { evaluation: Evaluation; cartAmount?: number | null };
+  till: { evaluation: Evaluation; cartAmount?: number | null };
   settings: undefined;
   stats: undefined;
   advisor: undefined;
@@ -157,6 +158,7 @@ function AppRoot() {
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (state) => {
       if (state === 'active') {
+        pruneExpiredPunches();
         void refreshFencesIfMoved();
         void checkWatches();
       }
@@ -299,9 +301,9 @@ function AppRoot() {
                 profile={profile}
                 geofenceStatus={geofenceStatus}
                 geofenceActive={geofenceActive}
-                onSelect={(evaluation) => {
+                onSelect={(evaluation, cartAmount) => {
                   void logEvent({ kind: 'benefit_viewed', benefitId: evaluation.benefit.id });
-                  navigation.navigate('detail', { evaluation });
+                  navigation.navigate('detail', { evaluation, cartAmount });
                 }}
                 onOpenSettings={() => navigation.navigate('settings')}
                 onOpenStats={() => navigation.navigate('stats')}
@@ -326,7 +328,7 @@ function AppRoot() {
 
           <Stack.Screen name="detail">
             {({ navigation, route }) => {
-              const { evaluation } = route.params;
+              const { evaluation, cartAmount } = route.params;
               // These three change what the list contains, so they return to it
               // rather than to whichever screen opened the card — `navigate`
               // pops back to the existing `home` instead of stacking a second.
@@ -335,10 +337,11 @@ function AppRoot() {
                 <BenefitDetailScreen
                   evaluation={evaluation}
                   stock={stockFor(evaluation.benefit.program_id, profile.program_ids)}
+                  cartAmount={cartAmount}
                   isMuted={profile.muted_benefit_ids.includes(evaluation.benefit.id)}
                   isRejected={profile.rejected_benefit_ids.includes(evaluation.benefit.id)}
                   onBack={() => navigation.goBack()}
-                  onTill={() => navigation.navigate('till', { evaluation })}
+                  onTill={() => navigation.navigate('till', { evaluation, cartAmount })}
                   onRedeemed={async () => {
                     await logEvent({ kind: 'benefit_redeemed', benefitId: evaluation.benefit.id });
                     backToList();
@@ -358,11 +361,13 @@ function AppRoot() {
 
           <Stack.Screen name="till">
             {({ navigation, route }) => {
-              const { evaluation } = route.params;
+              const { evaluation, cartAmount } = route.params;
               return (
                 <TillScreen
                   evaluation={evaluation}
+                  profile={profile}
                   stock={stockFor(evaluation.benefit.program_id, profile.program_ids)}
+                  initialCartAmount={cartAmount}
                   onClose={() => navigation.goBack()}
                   onRedeemed={async () => {
                     await logEvent({ kind: 'benefit_redeemed', benefitId: evaluation.benefit.id });

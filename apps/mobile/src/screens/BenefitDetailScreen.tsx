@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Linking, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import {
+  applyDoneSteps,
+  calculateBasketSaving,
   extractHostname,
+  formatBasketSaving,
   formatLastVerified,
   formatSaving,
   formatValue,
@@ -11,12 +14,14 @@ import { GateList, gateSummary } from '../components/Gates';
 import { Seam } from '../components/Kit';
 import { GhostButton, ListRow, Panel, PrimaryButton, ScreenHeader, Section, Text } from '../components/ui';
 import { programNames, programsById } from '../services/catalog';
-import { fonts, space, ticket, type } from '../theme';
+import { punchKey, usePunches } from '../state/punches';
+import { fonts, space, stock as stocks, ticket, type } from '../theme';
 
 interface Props {
   evaluation: Evaluation;
   /** The stock the ticket had on the roll, so the colour carries across the tap. */
   stock: string;
+  cartAmount?: number | null;
   isMuted: boolean;
   isRejected: boolean;
   onReport: () => void;
@@ -27,8 +32,9 @@ interface Props {
 }
 
 export function BenefitDetailScreen({
-  evaluation,
+  evaluation: given,
   stock,
+  cartAmount,
   isMuted,
   isRejected,
   onReport,
@@ -38,9 +44,15 @@ export function BenefitDetailScreen({
   onToggleMute,
 }: Props) {
   const { width } = useWindowDimensions();
+  const { doneSteps, punched, punch } = usePunches();
+  const evaluation = useMemo(() => applyDoneSteps(given, doneSteps), [given, doneSteps]);
   const { benefit, gates, actionsRequired } = evaluation;
   const { figure, unit } = formatValue(benefit);
-  const saving = formatSaving(evaluation);
+  const saving =
+    cartAmount != null && cartAmount > 0
+      ? formatBasketSaving(calculateBasketSaving(benefit, cartAmount))
+      : formatSaving(evaluation);
+  const ready = evaluation.status !== 'blocked' && actionsRequired.length === 0;
   // The figure is bigger than its box on purpose, and steps down as it gets longer.
   const bigSize = Math.round(width * 0.5 * Math.min(1, 3.5 / [...figure].length));
 
@@ -80,6 +92,11 @@ export function BenefitDetailScreen({
             <Text style={styles.tillUnit}>{unit}</Text>
             {saving && <Text style={styles.tillSaving}>{saving}</Text>}
             <View style={styles.tillRule} />
+            {ready && (
+              <View style={styles.readyStamp}>
+                <Text style={styles.readyStampText}>✓ מוכן לקופה</Text>
+              </View>
+            )}
             <Text style={styles.tillNote}>
               {actionsRequired.length === 0
                 ? 'אין מה להכין מראש — אפשר ללכת לקופה.'
@@ -97,13 +114,23 @@ export function BenefitDetailScreen({
             left to you, and which club it comes from. */}
         <View style={styles.strip}>
           <StripCell figure={String(gates.length)} label="תנאים" color={ticket.good} />
-          <StripCell figure={String(actionsRequired.length)} label="צעדים עליך" color={ticket.gold} divided />
+          <StripCell
+            figure={String(actionsRequired.length)}
+            label="צעדים עליך"
+            color={actionsRequired.length === 0 ? ticket.good : ticket.gold}
+            divided
+          />
           <StripCell figure={programNames[benefit.program_id] ?? benefit.program_id} label="מועדון" color={ticket.ink} divided />
         </View>
 
         <Section eyebrow={gateSummary(gates)}>
           <Text style={styles.dateLine}>{formatLastVerified(benefit)}</Text>
-          <GateList gates={gates} />
+          <GateList
+            gates={gates}
+            benefitId={benefit.id}
+            punched={punched}
+            onPunch={(code) => punch(punchKey(benefit.id, code))}
+          />
         </Section>
 
         <Section eyebrow="לשון התקנון">
@@ -206,6 +233,18 @@ const styles = StyleSheet.create({
   tillUnit: { ...type.bodyStrong, fontSize: 17, color: ticket.ink2 },
   tillSaving: { ...type.small, color: ticket.ink2 },
   tillRule: { height: 1, alignSelf: 'stretch', backgroundColor: ticket.ink2, marginVertical: space.s3 - 2 },
+  readyStamp: {
+    backgroundColor: ticket.ink,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    marginBottom: 4,
+  },
+  readyStampText: {
+    fontFamily: fonts.display,
+    fontSize: 16,
+    lineHeight: 20,
+    color: stocks.mint,
+  },
   tillNote: { ...type.bodyStrong, color: ticket.ink },
   /**
    * The label is two fixed words and never earns a break; the value is the

@@ -1,13 +1,14 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import type { Gate } from '@sbr/core';
+import { Pressable, StyleSheet, View } from 'react-native';
+import type { Gate, GateCode } from '@sbr/core';
 import { Text } from './ui';
+import { punchKey } from '../state/punches';
 import {
   colors,
   fonts,
   gateTone,
   gateVerdict,
-    space,
+  space,
   ticket,
   type,
   type GateTone,
@@ -26,21 +27,29 @@ function toneFor(gate: Gate): GateTone {
  * tone names the darkest member of its family that still reads as that family.
  */
 const VERDICT_INK: Record<GateTone, string> = {
-  met: colors.surfacePrimary,
+  met: ticket.good,
   action: colors.cardYellowDeep,
   note: colors.textMuted,
   blocked: colors.cardRedText,
 };
 
+interface GateListProps {
+  gates: readonly Gate[];
+  /** When provided alongside `onPunch`, actionable gates can be manually punched. */
+  benefitId?: string;
+  punched?: ReadonlySet<string>;
+  onPunch?: (code: GateCode) => void;
+}
+
 /**
  * The expanded form on the detail screen: one row per gate, ordered so the
  * thing standing between you and the discount is the first thing you read.
  *
- * The marker is a round mark, the shape the roll's holes have; the glyph stays on
- * it because colour is the fast channel, not the only one — roughly one reader in
- * twelve cannot separate the marigold from the grey.
+ * Actionable gates (`action` tone) and user-punched gates are interactive holes:
+ * tapping punches the hole and promotes the ticket toward ready ("מוכן לקופה"),
+ * persisting until Israel midnight.
  */
-export function GateList({ gates }: { gates: readonly Gate[] }) {
+export function GateList({ gates, benefitId, punched, onPunch }: GateListProps) {
   if (gates.length === 0) {
     return (
       <View style={[styles.row, { backgroundColor: colors.surfacePrimary, borderBottomWidth: 0 }]}>
@@ -56,18 +65,70 @@ export function GateList({ gates }: { gates: readonly Gate[] }) {
       {gates.map((gate, index) => {
         const key = toneFor(gate);
         const tone = gateTone[key];
-        return (
-          <View key={gate.code} style={styles.row}>
-            <View style={[styles.marker, { backgroundColor: tone.bg, borderColor: tone.border }]}>
-              <Text style={[styles.markerNumber, { color: tone.fg }]}>{index + 1}</Text>
-            </View>
+        const isUserPunched =
+          benefitId != null && punched != null && punched.has(punchKey(benefitId, gate.code));
+        const canPunch = onPunch != null && (key === 'action' || isUserPunched);
+
+        const markerNode = isUserPunched ? (
+          <View style={[styles.marker, styles.markerPunched]}>
+            <Text style={styles.markerCheck}>✓</Text>
+          </View>
+        ) : key === 'action' && canPunch ? (
+          <View style={[styles.marker, styles.markerActionable]}>
+            <Text style={[styles.markerNumber, { color: ticket.ink }]}>+</Text>
+          </View>
+        ) : (
+          <View style={[styles.marker, { backgroundColor: tone.bg, borderColor: tone.border }]}>
+            <Text style={[styles.markerNumber, { color: tone.fg }]}>{index + 1}</Text>
+          </View>
+        );
+
+        const content = (
+          <>
+            {markerNode}
             <View style={styles.rowText}>
               <Text style={type.bodyStrong}>{gate.label}</Text>
               <Text style={type.small}>{gate.detail}</Text>
-              {/* The ruling, in the ruling's colour. `note` is grey by design:
-                  "worth knowing" is not a verdict and should not look like one. */}
-              <Text style={[styles.verdict, { color: VERDICT_INK[key] }]}>{gateVerdict[key]}</Text>
+              <View style={styles.verdictRow}>
+                <Text style={[styles.verdict, { color: VERDICT_INK[key] }]}>
+                  {isUserPunched ? 'נוקב היום · מוכן' : gateVerdict[key]}
+                </Text>
+                {canPunch && (
+                  <View style={[styles.punchChip, isUserPunched && styles.punchChipDone]}>
+                    <Text style={[styles.punchChipText, isUserPunched && styles.punchChipTextDone]}>
+                      {isUserPunched ? 'ביטול ניקוב' : 'לחץ לניקוב'}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
+          </>
+        );
+
+        if (canPunch) {
+          return (
+            <Pressable
+              key={gate.code}
+              accessibilityRole="checkbox"
+              aria-checked={isUserPunched}
+              accessibilityLabel={
+                isUserPunched ? `בטל ניקוב: ${gate.label}` : `נקב כהושלם: ${gate.label}`
+              }
+              onPress={() => onPunch(gate.code)}
+              style={({ pressed }) => [
+                styles.row,
+                isUserPunched && styles.rowPunched,
+                pressed && styles.rowPressed,
+              ]}
+            >
+              {content}
+            </Pressable>
+          );
+        }
+
+        return (
+          <View key={gate.code} style={styles.row}>
+            {content}
           </View>
         );
       })}
@@ -105,6 +166,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: ticket.rule,
   },
+  rowPunched: { backgroundColor: ticket.ground2 },
+  rowPressed: { backgroundColor: ticket.ground3, transform: [{ translateY: 2 }] },
   /* A round mark, the same shape as the holes on the roll's tickets. */
   marker: {
     width: 38,
@@ -115,8 +178,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  markerActionable: {
+    backgroundColor: ticket.punch,
+    borderColor: ticket.ink,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+  },
+  /* Punched hole: paper ground showing through with a deep mint wall on top. */
+  markerPunched: {
+    backgroundColor: ticket.ground,
+    borderColor: ticket.good,
+    borderWidth: 2,
+    borderTopWidth: 5,
+    borderBottomWidth: 2,
+  },
   markerNumber: { fontFamily: fonts.display, fontSize: 24, lineHeight: 28 },
-  verdict: { ...type.micro, marginTop: 3 },
+  markerCheck: { fontFamily: fonts.display, fontSize: 20, lineHeight: 24, color: ticket.good },
+  verdictRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: space.s2,
+    marginTop: 4,
+  },
+  verdict: { ...type.micro },
+  punchChip: {
+    backgroundColor: ticket.punch,
+    borderWidth: 1,
+    borderColor: ticket.ink,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  punchChipDone: {
+    backgroundColor: ticket.ground,
+    borderColor: ticket.muted,
+  },
+  punchChipText: {
+    fontFamily: fonts.display,
+    fontSize: 13,
+    lineHeight: 16,
+    color: ticket.ink,
+  },
+  punchChipTextDone: { color: ticket.muted },
   /* flex-start so a number-only label ("₪300+") aligns with a Hebrew one — see ui.tsx. */
   rowText: { flex: 1, gap: 2, alignItems: 'flex-start' },
 });

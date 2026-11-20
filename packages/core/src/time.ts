@@ -146,3 +146,32 @@ export function daysSince(isoDate: string, now: Date): number {
   if (Number.isNaN(then)) return Number.POSITIVE_INFINITY;
   return (now.getTime() - then) / 86_400_000;
 }
+
+const dateKeyFormatterCache = new Map<string, Intl.DateTimeFormat>();
+
+/**
+ * Calendar day key ("YYYY-MM-DD") in the given time zone (default Israel).
+ *
+ * Used for expiring manual punches at local Israel midnight rather than UTC
+ * midnight (which flips at 02:00/03:00 in Israel) or a traveller's phone zone.
+ */
+export function localDateKey(
+  date: Date = new Date(),
+  timeZone: string = DEFAULT_TIME_ZONE,
+): string {
+  let formatter = dateKeyFormatterCache.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    dateKeyFormatterCache.set(timeZone, formatter);
+  }
+  const parts = formatter.formatToParts(date);
+  const year = parts.find((p) => p.type === 'year')?.value ?? String(date.getFullYear());
+  const month = parts.find((p) => p.type === 'month')?.value ?? String(date.getMonth() + 1).padStart(2, '0');
+  const day = parts.find((p) => p.type === 'day')?.value ?? String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,6 +12,8 @@ import {
   catalogIsStale,
   displayMerchantName,
   findCombos,
+  formatIls,
+  formatVenueCount,
   hiddenBenefitIds,
   matchesQuery,
   rankBenefits,
@@ -22,6 +25,7 @@ import {
   type UserProfile,
   type Venue,
 } from '@sbr/core';
+import { BasketStrip } from '../components/BasketStrip';
 import { Seam } from '../components/Kit';
 import { stockFor, Ticket, type TicketSize } from '../components/Ticket';
 import { GhostButton, LivePill, SearchField, Text } from '../components/ui';
@@ -38,6 +42,8 @@ import {
 import { currentVenue, dwellMinutes } from '../services/geofencing';
 import { usePunches } from '../state/punches';
 import { deepOf, fonts, space, stock, ticket } from '../theme';
+
+const EMPTY_TICKET_ART = require('../../assets/art/empty-ticket.png');
 
 /**
  * How far "here" reaches when the fix lands outside every mall.
@@ -73,7 +79,7 @@ interface Props {
   profile: UserProfile;
   geofenceStatus: string;
   geofenceActive: boolean;
-  onSelect: (evaluation: Evaluation) => void;
+  onSelect: (evaluation: Evaluation, cartAmount?: number | null) => void;
   onOpenSettings: () => void;
   onOpenStats: () => void;
   onOpenAdvisor: () => void;
@@ -92,6 +98,8 @@ export function HomeScreen({
 }: Props) {
   const [query, setQuery] = useState('');
   const [foldOpen, setFoldOpen] = useState(false);
+  /** Optional live basket size in ILS: prices tickets & combos before paying. */
+  const [cartAmount, setCartAmount] = useState<number | null>(null);
 
   /** Where the user is. Null means "everywhere" — the default, not an error. */
   const [venue, setVenue] = useState<Venue | null>(null);
@@ -148,10 +156,16 @@ export function HomeScreen({
     const mine = new Set(owned);
     return rankBenefits(
       benefits.filter((b) => mine.has(b.program_id)),
-      { now: new Date(), ownedProgramIds: owned, mutedBenefitIds: hiddenBenefitIds(profile), doneSteps },
+      {
+        now: new Date(),
+        ownedProgramIds: owned,
+        mutedBenefitIds: hiddenBenefitIds(profile),
+        doneSteps,
+        cartAmount: cartAmount ?? undefined,
+      },
       { hideBlocked: false },
     );
-  }, [owned, profile.muted_benefit_ids, profile.rejected_benefit_ids, doneSteps]);
+  }, [owned, profile.muted_benefit_ids, profile.rejected_benefit_ids, doneSteps, cartAmount]);
 
   const evaluations = useMemo(() => ranked.filter((e) => e.status !== 'blocked'), [ranked]);
   const notNow = useMemo(
@@ -169,7 +183,10 @@ export function HomeScreen({
   // Two offers on one purchase. Kept high in the roll because a combo is the one
   // thing a user cannot work out by scrolling — it only exists between two
   // tickets, never on either of them.
-  const combos = useMemo(() => findCombos(evaluations, { limit: 2 }), [evaluations]);
+  const combos = useMemo(
+    () => findCombos(evaluations, { cartAmount: cartAmount ?? undefined, limit: 2 }),
+    [evaluations, cartAmount],
+  );
 
   // Readiness is "nothing left to do", not "no caveats at all" — see Gate
   // in @sbr/core. Counting caveats here would make the number permanently 0.
@@ -257,7 +274,7 @@ export function HomeScreen({
     (venueId: string) => {
       const ids = new Set(benefitsAtVenue(venueId).map((b) => b.id));
       const at = (e: Evaluation) => ids.has(e.benefit.id);
-      return countLabel(evaluations.filter(at).length, notNow.filter(at).length);
+      return formatVenueCount(evaluations.filter(at).length, notNow.filter(at).length);
     },
     [evaluations, notNow],
   );
@@ -277,11 +294,18 @@ export function HomeScreen({
               evaluation={item.evaluation}
               size={item.size}
               stock={stockFor(item.evaluation.benefit.program_id, owned)}
-              onPress={onSelect}
+              cartAmount={cartAmount}
+              onPress={(ev) => onSelect(ev, cartAmount)}
             />
           );
         case 'combo':
-          return <ComboTicket combo={item.combo} onPress={() => onSelect(item.combo.parts[0])} />;
+          return (
+            <ComboTicket
+              combo={item.combo}
+              cartAmount={cartAmount}
+              onPress={() => onSelect(item.combo.parts[0], cartAmount)}
+            />
+          );
         case 'fold':
           return (
             <Pressable
@@ -298,6 +322,13 @@ export function HomeScreen({
         case 'empty':
           return query.trim() !== '' ? (
             <View style={styles.empty}>
+              <Image
+                source={EMPTY_TICKET_ART}
+                style={styles.emptyArt}
+                resizeMode="contain"
+                accessibilityElementsHidden
+                importantForAccessibility="no"
+              />
               <Text style={styles.emptyTitle}>אין תוצאות</Text>
               <Text style={styles.emptyBody}>
                 {`לא נמצא בית עסק שמתאים ל״${query.trim()}״ מבין ${evaluations.length} ההטבות שלך.`}
@@ -315,6 +346,7 @@ export function HomeScreen({
       }
     },
     [
+      cartAmount,
       catalogStale,
       evaluations.length,
       foldOpen,
@@ -362,7 +394,7 @@ export function HomeScreen({
               nearby={here != null}
               count={
                 hereCount === 0 && hereNotNow > 0
-                  ? countLabel(hereCount, hereNotNow)
+                  ? formatVenueCount(hereCount, hereNotNow)
                   : `${hereCount} הטבות כאן`
               }
               minute={minute}
@@ -418,6 +450,25 @@ export function HomeScreen({
                 resultCount={shownLive.length}
               />
             </View>
+
+            <View style={styles.basketBox}>
+              <View style={styles.basketHeader}>
+                <Text style={styles.basketLabel}>
+                  {cartAmount != null ? `חיסכון לסל של ₪${formatIls(cartAmount)}` : 'חשב חיסכון לסל בקופה'}
+                </Text>
+                {cartAmount != null && (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="נקה סכום סל"
+                    onPress={() => setCartAmount(null)}
+                    hitSlop={8}
+                  >
+                    <Text style={styles.basketClear}>הכול</Text>
+                  </Pressable>
+                )}
+              </View>
+              <BasketStrip amount={cartAmount} onChange={setCartAmount} surface="paper" clearable />
+            </View>
           </View>
         }
       />
@@ -438,15 +489,23 @@ export function HomeScreen({
  * combination*, which is a weaker claim than a single ticket's, and the last line
  * says so rather than hiding it.
  */
-function ComboTicket({ combo, onPress }: { combo: Combo; onPress: () => void }) {
+function ComboTicket({
+  combo,
+  cartAmount,
+  onPress,
+}: {
+  combo: Combo;
+  cartAmount?: number | null;
+  onPress: () => void;
+}) {
   const [first, second] = combo.parts;
   const firstName = displayMerchantName(first.benefit.merchant_name);
   const secondName = displayMerchantName(second.benefit.merchant_name);
-  const estimate = `₪${Math.round(combo.estimatedSavingIls)}`;
+  const estimate = `₪${formatIls(combo.estimatedSavingIls)}`;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`שילוב הטבות ב${combo.merchantName}, חיסכון משוער ${Math.round(
+      accessibilityLabel={`שילוב הטבות ב${combo.merchantName}, חיסכון ${formatIls(
         combo.estimatedSavingIls,
       )} שקלים`}
       onPress={onPress}
@@ -468,10 +527,13 @@ function ComboTicket({ combo, onPress }: { combo: Combo; onPress: () => void }) 
           <Text style={styles.comboFigure} numberOfLines={1}>
             {estimate}
           </Text>
-          {/* The figure assumes a cart, since a list screen has none. Printed under
-              the number, where no line clamp can cut it off. */}
+          {/* The figure assumes a cart only when none is chosen. */}
           <Text style={styles.comboLine}>
-            {combo.isEstimate ? `יחד, בסל של ₪${REFERENCE_BASKET_ILS}` : 'יחד'}
+            {combo.isEstimate
+              ? `יחד, בסל של ₪${REFERENCE_BASKET_ILS}`
+              : cartAmount != null
+                ? `יחד, בסל של ₪${formatIls(cartAmount)}`
+                : 'יחד'}
           </Text>
         </View>
       </View>
@@ -566,11 +628,6 @@ function WhereAmI({
   );
 }
 
-/** A bare 0 reads as an empty place; when the fold under it holds offers, say so. */
-function countLabel(now: number, notNow: number): string {
-  return now === 0 && notNow > 0 ? `0 עכשיו · ${notNow} לא עכשיו` : String(now);
-}
-
 /** The manual fallback: every tracked venue, tap to pin. */
 function VenueSheet({
   countAt,
@@ -595,20 +652,23 @@ function VenueSheet({
         </Pressable>
       </View>
       <ScrollView style={styles.sheetList} nestedScrollEnabled keyboardShouldPersistTaps="handled">
-        {venues.map((v) => (
-          <Pressable
-            key={v.id}
-            accessibilityRole="button"
-            // The city as well as the name: "קניון עזריאלי" alone is three
-            // different malls in this list.
-            accessibilityLabel={`${v.name}, ${v.city}`}
-            onPress={() => onChoose(v)}
-            style={({ pressed }) => [styles.sheetRow, pressed && styles.sheetRowPressed]}
-          >
-            <Text style={styles.sheetRowName}>{v.name}</Text>
-            <Text style={styles.sheetClose}>{countAt(v.id)}</Text>
-          </Pressable>
-        ))}
+        {venues.map((v) => {
+          const countText = countAt(v.id);
+          return (
+            <Pressable
+              key={v.id}
+              accessibilityRole="button"
+              // The city as well as the name: "קניון עזריאלי" alone is three
+              // different malls in this list.
+              accessibilityLabel={`${v.name}, ${v.city}, ${countText}`}
+              onPress={() => onChoose(v)}
+              style={({ pressed }) => [styles.sheetRow, pressed && styles.sheetRowPressed]}
+            >
+              <Text style={styles.sheetRowName}>{v.name}</Text>
+              <Text style={styles.sheetClose}>{countText}</Text>
+            </Pressable>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -689,6 +749,13 @@ function EmptyState({
 
   return (
     <View style={styles.empty}>
+      <Image
+        source={EMPTY_TICKET_ART}
+        style={styles.emptyArt}
+        resizeMode="contain"
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      />
       <Text style={styles.emptyTitle}>{copy.title}</Text>
       <Text style={styles.emptyBody}>{copy.body}</Text>
       {!hasPrograms && <GhostButton label="עריכת המועדונים" onPress={onEditPrograms} />}
@@ -718,6 +785,21 @@ const styles = StyleSheet.create({
   /* SearchField brings its own 24dp gutter for the paper screens; here it lines up
      with the rest of the header instead. */
   searchRow: { alignSelf: 'stretch', marginHorizontal: -space.s4 },
+  basketBox: { alignSelf: 'stretch', gap: space.s1 + 2, paddingTop: space.s1 },
+  basketHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    alignSelf: 'stretch',
+  },
+  basketLabel: { fontFamily: fonts.latinText, fontSize: 13.5, lineHeight: 18, color: ticket.onGround2 },
+  basketClear: {
+    fontFamily: fonts.latinText,
+    fontSize: 13.5,
+    lineHeight: 18,
+    color: ticket.ink,
+    textDecorationLine: 'underline',
+  },
 
   whereRow: { flexDirection: 'row', alignItems: 'center', gap: space.s2, alignSelf: 'stretch' },
   whereButton: {
@@ -811,6 +893,7 @@ const styles = StyleSheet.create({
   foldAction: { fontFamily: fonts.latinText, fontSize: 14, color: ticket.onGround2, textDecorationLine: 'underline' },
 
   empty: { paddingHorizontal: space.s3, paddingVertical: space.s5, gap: space.s3 - 2, alignItems: 'flex-start' },
+  emptyArt: { width: 150, height: 112, alignSelf: 'center', marginBottom: space.s1 },
   emptyTitle: { fontFamily: fonts.display, fontSize: 26, lineHeight: 30, color: ticket.onGround },
   emptyBody: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: ticket.onGround2 },
 

@@ -28,6 +28,111 @@ import { isUpperBound, offerKey, REFERENCE_BASKET_ILS } from './matching';
  */
 export const UNIVERSAL_MERCHANT_ID = 'any_merchant';
 
+/** One-tap basket amounts offered at the till and on the roll. */
+export const BASKET_PRESETS_ILS = [50, 100, 200, 350] as const;
+
+export interface BasketSaving {
+  cartAmount: number;
+  /** ILS saved at this basket size (0 when below `min_spend`). */
+  savingIls: number;
+  /** Net ILS left to pay at the till after this single benefit. */
+  netPayIls: number;
+  /** Positive when the cart is short of `conditions.min_spend`. */
+  missingForMinSpend: number;
+  /** True when `conditions.max_discount` capped the saving. */
+  capped: boolean;
+  /** True when the saving is an estimate (upper-bound "עד X%" or 1+1). */
+  isEstimate: boolean;
+  /** True specifically when the T&C states an upper bound ("עד X%"). */
+  isUpperBound: boolean;
+}
+
+export interface TillBasketPlan {
+  single: BasketSaving;
+  /** Best 2-club combo pairing this benefit at `cartAmount` that beats `single`, or null. */
+  bestCombo: Combo | null;
+}
+
+function roundIls(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/**
+ * Exact shekel saving for one benefit against a known basket amount.
+ *
+ * Honest by design: below `min_spend` yields ₪0 with the exact shortfall,
+ * fixed/gift-card amounts never exceed the basket, caps are respected, and
+ * "עד X%" / 1+1 stay flagged as estimates rather than promises.
+ */
+export function calculateBasketSaving(benefit: Benefit, cartAmount: number): BasketSaving {
+  const basket = Number.isFinite(cartAmount) && cartAmount > 0 ? cartAmount : 0;
+  const minSpend = benefit.conditions.min_spend ?? 0;
+  const upperBound = isUpperBound(benefit);
+
+  if (basket <= 0) {
+    return {
+      cartAmount: 0,
+      savingIls: 0,
+      netPayIls: 0,
+      missingForMinSpend: minSpend > 0 ? roundIls(minSpend) : 0,
+      capped: false,
+      isEstimate: upperBound || benefit.type === 'bogo',
+      isUpperBound: upperBound,
+    };
+  }
+
+  if (minSpend > 0 && basket < minSpend) {
+    return {
+      cartAmount: roundIls(basket),
+      savingIls: 0,
+      netPayIls: roundIls(basket),
+      missingForMinSpend: roundIls(minSpend - basket),
+      capped: false,
+      isEstimate: upperBound || benefit.type === 'bogo',
+      isUpperBound: upperBound,
+    };
+  }
+
+  let raw = 0;
+  let capped = false;
+  let isEstimate = upperBound;
+
+  switch (benefit.type) {
+    case 'percent':
+    case 'cashback': {
+      raw = (basket * benefit.value) / 100;
+      const cap = benefit.conditions.max_discount;
+      if (cap != null && raw > cap) {
+        raw = cap;
+        capped = true;
+      }
+      break;
+    }
+    case 'fixed':
+    case 'gift_card':
+      raw = Math.min(benefit.value, basket);
+      break;
+    case 'bogo':
+      raw = basket / 2;
+      isEstimate = true;
+      break;
+    default:
+      raw = 0;
+  }
+
+  const savingIls = roundIls(Math.min(Math.max(0, raw), basket));
+  const netPayIls = roundIls(Math.max(0, basket - savingIls));
+  return {
+    cartAmount: roundIls(basket),
+    savingIls,
+    netPayIls,
+    missingForMinSpend: 0,
+    capped,
+    isEstimate,
+    isUpperBound: upperBound,
+  };
+}
+
 export interface Combo {
   /** Ordered as displayed: the larger contributor first. */
   parts: [Evaluation, Evaluation];
@@ -107,7 +212,9 @@ export function findCombos(
       evaluation.status !== 'blocked' &&
       evaluation.benefit.type !== 'bogo' &&
       // An explicit "no stacking" is a dead end for every pair it appears in.
-      evaluation.benefit.conditions.stacks_with_club !== false,
+      evaluation.benefit.conditions.stacks_with_club !== false &&
+      // When the real basket is known, never pair an offer whose min spend is unmet.
+      (cartAmount === undefined || (evaluation.benefit.conditions.min_spend ?? 0) <= cartAmount),
   );
 
   const combos: Combo[] = [];
@@ -164,4 +271,34 @@ export function findCombos(
     return y.estimatedSavingIls - x.estimatedSavingIls;
   });
   return limit != null ? combos.slice(0, limit) : combos;
+}
+
+/**
+ * Live till calculation for a chosen benefit and basket size: exact single-card
+ * saving plus the best 2-club stack that includes this benefit and saves more.
+ */
+export function optimizeTillBasket(
+  evaluation: Evaluation,
+  allEvaluations: readonly Evaluation[],
+  cartAmount: number,
+): TillBasketPlan {
+  const single = calculateBasketSaving(evaluation.benefit, cartAmount);
+  if (cartAmount <= 0 || single.missingForMinSpend > 0 || evaluation.status === 'blocked') {
+    return { single, bestCombo: null };
+  }
+
+  const seen = new Set<string>([evaluation.benefit.id]);
+  const pool: Evaluation[] = [evaluation];
+  for (const candidate of allEvaluations) {
+    if (seen.has(candidate.benefit.id)) continue;
+    seen.add(candidate.benefit.id);
+    pool.push(candidate);
+  }
+
+  const combos = findCombos(pool, { cartAmount }).filter(
+    (combo) =>
+      combo.parts.some((p) => p.benefit.id === evaluation.benefit.id) &&
+      combo.estimatedSavingIls > single.savingIls,
+  );
+  return { single, bestCombo: combos[0] ?? null };
 }

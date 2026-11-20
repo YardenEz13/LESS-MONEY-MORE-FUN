@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dateOnlyToInstant } from '../src/time';
+import { dateOnlyToInstant, localDateKey } from '../src/time';
 
 describe('dateOnlyToInstant', () => {
   it('passes through anything that is not a bare date', () => {
@@ -39,5 +39,16 @@ describe('dateOnlyToInstant', () => {
         new Date(dateOnlyToInstant(day, 'start')!).getTime(),
       );
     }
+  });
+});
+
+describe('localDateKey', () => {
+  it('rolls over at Israel midnight rather than UTC midnight', () => {
+    // Winter in Israel is UTC+2: 21:59Z is 23:59 Israel, 22:00Z is 00:00 next day.
+    expect(localDateKey(new Date('2026-12-30T21:59:59.000Z'))).toBe('2026-12-30');
+    expect(localDateKey(new Date('2026-12-30T22:00:00.000Z'))).toBe('2026-12-31');
+    // Summer in Israel is UTC+3: 20:59Z is 23:59 Israel, 21:00Z is 00:00 next day.
+    expect(localDateKey(new Date('2026-07-14T20:59:59.000Z'))).toBe('2026-07-14');
+    expect(localDateKey(new Date('2026-07-14T21:00:00.000Z'))).toBe('2026-07-15');
   });
 });

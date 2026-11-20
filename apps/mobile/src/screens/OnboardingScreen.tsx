@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { matchesQuery, type Program, type UserProfile } from '@sbr/core';
 import { Crest } from '../components/Kit';
 import { ListRow, PrimaryButton, ScreenHeader, SearchField, Section, Text } from '../components/ui';
 import { benefits, programs } from '../services/catalog';
 import { toggleProgram } from '../state/profile';
 import { colors, fonts, space, ticket, type } from '../theme';
+
+const ONBOARDING_ART = require('../../assets/art/onboarding-tickets.png');
 
 /**
  * `public` is deliberately absent. It is granted to everyone rather than
@@ -80,6 +82,13 @@ export function OnboardingScreen({ profile, onChange, onDone }: Props) {
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.intro}>
+          <Image
+            source={ONBOARDING_ART}
+            style={styles.heroArt}
+            resizeMode="contain"
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
           <Text style={type.body}>
             סמן את המועדונים והכרטיסים שברשותך. לא נשאל ת״ז, סיסמה או מספר כרטיס — הסימון נשמר
             במכשיר שלך ולא נשלח לשום מקום.
@@ -164,6 +173,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: ticket.ground },
   content: { paddingTop: space.s2, paddingBottom: space.s5, gap: space.s3 },
   intro: { paddingHorizontal: space.s3, gap: space.s2 },
+  heroArt: { width: 168, height: 136, alignSelf: 'center', marginBottom: space.s1 },
   /* The roll's count line: a quiet sentence with the number in marigold display. */
   count: { fontFamily: fonts.latinText, fontSize: 15, lineHeight: 22, color: ticket.onGround2 },
   countFigure: { ...type.figureInline },

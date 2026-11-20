@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -26,6 +27,7 @@ import { colors, space, ticket, type } from '../theme';
 
 const HOUR_MS = 3_600_000;
 const MAX_MERCHANT_RESULTS = 20;
+const EMPTY_TICKET_ART = require('../../assets/art/empty-ticket.png');
 
 /** "לפני שעתיים", "לפני 3 ימים" — how old a reading is, in the words people use. */
 function ago(ms: number): string {
@@ -133,6 +135,13 @@ export function WatchScreen({ onBack }: Props) {
 
         {store.items.length === 0 ? (
           <Panel>
+            <Image
+              source={EMPTY_TICKET_ART}
+              style={styles.emptyArt}
+              resizeMode="contain"
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+            />
             <Text style={type.displaySmall}>עוד לא עוקבים אחרי כלום</Text>
             <Text style={type.body}>
               הדביקו קישור למוצר ואנחנו נבדוק את המחיר מדי פעם ונתריע כשהוא יורד. אפשר גם
@@ -473,4 +482,5 @@ const styles = StyleSheet.create({
   privacy: { backgroundColor: ticket.ground3 },
   pending: { paddingVertical: space.s3, alignItems: 'center', gap: space.s1 },
   lede: { ...type.body, paddingHorizontal: space.s3 },
+  emptyArt: { width: 150, height: 112, alignSelf: 'center', marginBottom: space.s1 },
 });

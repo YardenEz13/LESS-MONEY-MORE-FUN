@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { displayMerchantName, formatSaving, latinRuns, ticketFace } from '../src/format';
+import {
+  displayMerchantName,
+  formatBasketSaving,
+  formatSaving,
+  formatVenueCount,
+  latinRuns,
+  ticketFace,
+} from '../src/format';
 import type { Evaluation, Gate } from '../src/matching';
 
 const gate = (code: Gate['code'], state: Gate['state'], label: string, actionable = false): Gate => ({
@@ -136,5 +143,53 @@ describe('formatSaving', () => {
    */
   it('says nothing when the cart was assumed', () => {
     expect(formatSaving(evaluation(25, true))).toBeNull();
+  });
+});
+
+describe('formatVenueCount', () => {
+  it('shows blocked count instead of a misleading bare zero', () => {
+    expect(formatVenueCount(0, 4)).toBe('0 עכשיו · 4 לא עכשיו');
+    expect(formatVenueCount(0, 0)).toBe('0');
+    expect(formatVenueCount(5, 3)).toBe('5');
+  });
+});
+
+describe('formatBasketSaving', () => {
+  it('formats exact savings, shortfall, and upper-bound estimates clearly', () => {
+    expect(
+      formatBasketSaving({
+        cartAmount: 200,
+        savingIls: 30,
+        netPayIls: 170,
+        missingForMinSpend: 0,
+        capped: false,
+        isEstimate: false,
+        isUpperBound: false,
+      }),
+    ).toBe('חוסכים ₪30 · משלמים ₪170');
+
+    expect(
+      formatBasketSaving({
+        cartAmount: 100,
+        savingIls: 0,
+        netPayIls: 100,
+        missingForMinSpend: 50,
+        capped: false,
+        isEstimate: false,
+        isUpperBound: false,
+      }),
+    ).toBe('חסרים ₪50 למינימום');
+
+    expect(
+      formatBasketSaving({
+        cartAmount: 200,
+        savingIls: 40,
+        netPayIls: 160,
+        missingForMinSpend: 0,
+        capped: false,
+        isEstimate: true,
+        isUpperBound: true,
+      }),
+    ).toBe('עד ₪40 הנחה');
   });
 });
